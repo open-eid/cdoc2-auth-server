@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ee.cyber.cdoc2</groupId>
+    <artifactId>cdoc2-auth-server</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>cdoc2-auth-server</name>
+    <description>cdoc2-auth-server</description>
+    <url/>
+    <licenses>
+        <license/>
+    </licenses>
+    <developers>
+        <developer/>
+    </developers>
+
+    <modules>
+        <module>adapter</module>
+        <module>app</module>
+        <module>webapp</module>
+        <module>openapi</module>
+    </modules>
+    <scm>
+        <connection/>
+        <developerConnection/>
+        <tag/>
+        <url/>
+    </scm>
+
+    <properties>
+        <java.version>21</java.version>
+        <junit-jupiter.version>6.0.3</junit-jupiter.version>
+        <lombok.version>1.18.42</lombok.version>
+        <spring-boot.version>4.0.3</spring-boot.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.6.0</version>
+
+                    <configuration>
+                        <configLocation>checkstyle.xml</configLocation>
+<!--                        <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>-->
+
+                        <sourceDirectories>
+                            <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                            <sourceDirectory>${project.build.testSourceDirectory}</sourceDirectory>
+                        </sourceDirectories>
+
+                        <consoleOutput>true</consoleOutput>
+
+                        <failsOnError>true</failsOnError>
+                        <failOnViolation>false</failOnViolation>
+
+                        <linkXRef>false</linkXRef>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+
+                    <configuration>
+                        <excludes>
+                            <exclude>**/*-dev.properties</exclude>
+                            <exclude>**/logback.xml</exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>
