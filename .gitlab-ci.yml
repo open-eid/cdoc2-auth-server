@@ -1,0 +1,10 @@
+stages:
+  - build
+
+build:
+  stage: build
+  image: maven:3.9.14-eclipse-temurin-21-alpine
+  script:
+    - cat $MAVEN_SETTINGS
+    - mvn clean install -s $MAVEN_SETTINGS -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
+
