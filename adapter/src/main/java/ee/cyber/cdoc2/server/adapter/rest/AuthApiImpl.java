@@ -8,7 +8,7 @@ import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import ee.cyber.cdoc2.server.adapter.generated.api.AuthApiDelegate;
+import ee.cyber.cdoc2.server.adapter.generated.api.Cdoc2AuthApiDelegate;
 import ee.cyber.cdoc2.server.adapter.generated.model.AuhtProcessStatusResponse;
 import ee.cyber.cdoc2.server.adapter.generated.model.AuthIdentity;
 import ee.cyber.cdoc2.server.app.usecase.GetStatus;
@@ -16,7 +16,7 @@ import ee.cyber.cdoc2.server.app.usecase.StartAuth;
 
 @Component
 @RequiredArgsConstructor
-public class AuthApiImpl implements AuthApiDelegate {
+public class AuthApiImpl implements Cdoc2AuthApiDelegate {
     private final StartAuth startAuth;
     private final GetStatus getStatus;
 

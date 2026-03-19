@@ -58,7 +58,7 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.12.0</version>
+                <version>7.20.0</version>
                 <executions>
                     <execution>
                         <id>generate-cdoc2-shares</id>
@@ -80,7 +80,7 @@
                     <generateAliasAsModel>false</generateAliasAsModel>
                     <configOptions>
                         <useSpringBoot4>true</useSpringBoot4>
-                        <useJakartaEe>true</useJakartaEe>
+                        <useTags>true</useTags>
                         <delegatePattern>true</delegatePattern>
                         <dateLibrary>java8</dateLibrary>
                         <hateoas>false</hateoas>
