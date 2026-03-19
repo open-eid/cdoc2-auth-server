@@ -3,6 +3,7 @@ package ee.cyber.cdoc2;
 import tools.jackson.databind.ObjectMapper;
 
 import java.net.URI;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -57,9 +59,40 @@ class Cdoc2AuthServerApplicationTest {
         assertEquals("STARTED", authStatusResponseBody.status);
     }
 
+    @Test
+    void shouldGetWellKnown() throws Exception {
+        MockHttpServletResponse getWellKnownResponse = mockMvc.perform(
+                get(URI.create("/.well-known/jwks.jws"))
+            ).andExpect(status().isOk())
+            .andReturn().getResponse();
+
+        GetWellKnownResponseBody getWellKnownResponseBody = OBJECT_MAPPER.readValue(
+            getWellKnownResponse.getContentAsString(),
+            GetWellKnownResponseBody.class
+        );
+
+        assertEquals(2, getWellKnownResponseBody.keys.size());
+
+        assertTrue(
+            getWellKnownResponseBody.keys.stream()
+                .allMatch(key -> key.kid != null && key.kty != null)
+        );
+    }
+
     private record AuthStatusResponseBody(String status) {
     }
 
     private record StartAuthRequest(String identifier, String mobileNr) {
+    }
+
+    private record GetWellKnownResponseBody(
+        List<WellKnownKeys> keys
+    ) {
+    }
+
+    private record WellKnownKeys(
+        String kid,
+        String kty
+    ) {
     }
 }

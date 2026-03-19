@@ -68,6 +68,25 @@ paths:
         '404':
           description: 'Not Found. 404 is also returned, when recipient id in record does not match user id in auth-ticket'
 
+  '/.well-known/jwks.jws':
+    get:
+      summary: Returns information about signing keys
+      description: Returns information about signing keys
+      tags:
+        - cdoc2-auth
+      operationId: getWellKnown
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WellKnownResponse'
+        '400':
+          description: 'Bad request. Client error.'
+        '403':
+          description: 'Authentication failed'
+
 components:
   schemas:
     AuthIdentity:
@@ -102,6 +121,64 @@ components:
       required:
         - status
 
+    WellKnownResponse:
+      title: well-known response
+      type: object
+      required:
+        - keys
+      properties:
+        keys:
+          type: array
+          items:
+            type: object
+            required:
+              - kid
+              - kty
+            properties:
+              kid:
+                description: 'key identifier'
+                example: '1'
+                type: string
+              kty:
+                type: string
+                description: 'identifies the cryptographic algorithm family used with the key'
+                example: 'EC'
+              use:
+                type: string
+                description: 'identifies the intended use of the public key'
+                example: 'enc'
+                nullable: true
+              crv:
+                type: string
+                description: ''
+                example: 'P-256'
+                nullable: true
+              x:
+                type: string
+                description: 'base64 encoded x curve coordinate'
+                example: ''
+                nullable: true
+              y:
+                type: string
+                description: 'base64 encoded y curve coordinate'
+                example: ''
+                nullable: true
+              n:
+                type: string
+                description: 'base64 encoded public modulus'
+                example: ''
+                nullable: true
+              e:
+                type: string
+                description: 'base64 encoded public exponent'
+                example: ''
+                nullable: true
+              alg:
+                type: string
+                description: 'identifies the algorithm intended for use with the key'
+                example: 'RS256'
+                nullable: true
+
   securitySchemes:
     bearerAuth: # long-term token
       type: http
@@ -111,4 +188,4 @@ components:
       scheme: basic
 
 tags:
-  - name: cdoc2-key-shares
+  - name: cdoc2-auth
