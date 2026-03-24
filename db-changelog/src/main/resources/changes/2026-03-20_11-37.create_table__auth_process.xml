@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="auth" id="create_table__auth_process.0000" dbms="h2">
+        <createSequence cacheSize="20"
+                        cycle="false"
+                        incrementBy="1"
+                        ordered="false"
+                        sequenceName="AUTH_PROCESS_PK_SEQUENCE"
+                        startValue="1"/>
+    </changeSet>
+    <changeSet author="auth" id="create_table__auth_process.0000" dbms="postgresql">
+        <createSequence cacheSize="20"
+                        cycle="false"
+                        incrementBy="1"
+                        maxValue="9223372036854775807"
+                        minValue="1"
+                        sequenceName="AUTH_PROCESS_PK_SEQUENCE"
+                        startValue="1"/>
+    </changeSet>
+
+    <changeSet author="auth" id="create_table__auth_process.0001">
+        <createTable tableName="AUTH_PROCESS"
+                     remarks="State and result of a MID/SID authentication process">
+
+            <column name="ID" type="NUMBER(19, 0)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+
+            <column name="UUID"
+                    remarks="UUID of the authentication process"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="MID_SID_SESSION_ID"
+                    remarks="ID of MID/SID signature session"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="STATUS"
+                    remarks="Status of the authentication process"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="CREATED_AT"
+                    remarks="Instant of process creation"
+                    type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex indexName="IDX_AUTH_PROCESS__UUID"
+                     tableName="AUTH_PROCESS"
+                     unique="true">
+            <column name="UUID"/>
+        </createIndex>
+
+        <rollback>
+            <dropIndex tableName="AUTH_PROCESS"
+                       indexName="IDX_AUTH_PROCESS__UUID" />
+
+            <dropTable tableName="AUTH_PROCESS"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

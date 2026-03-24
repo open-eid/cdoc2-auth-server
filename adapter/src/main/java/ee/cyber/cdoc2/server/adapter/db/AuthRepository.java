@@ -1,26 +1,36 @@
 package ee.cyber.cdoc2.server.adapter.db;
 
-import java.util.HashMap;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+
 import java.util.UUID;
 
 import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Repository;
 
+import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessEntity;
+import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessJpaRepository;
 import ee.cyber.cdoc2.server.app.usecase.GetAuthState;
 import ee.cyber.cdoc2.server.app.usecase.StoreAuth;
 
 @NullMarked
 @Repository
+@RequiredArgsConstructor
 public class AuthRepository implements StoreAuth, GetAuthState {
-    private final HashMap<UUID, String> inMemoryDb = new HashMap<>();
+    private final AuthProcessJpaRepository authProcessJpaRepository;
 
     @Override
-    public void execute(Request request) {
-        inMemoryDb.put(request.authUuid(), request.authState());
+    @Transactional
+    public void execute(StoreAuth.Request request) {
+        AuthProcessEntity entity = new AuthProcessEntity();
+        entity.setUuid(request.authUuid().toString());
+        entity.setMidSidSessionId(request.midSidSessionId());
+        entity.setStatus(request.authStatus().name());
+        authProcessJpaRepository.save(entity);
     }
 
     @Override
     public String execute(UUID uuid) {
-        return inMemoryDb.get(uuid);
+        return authProcessJpaRepository.findByUuid(uuid.toString()).getStatus();
     }
 }

@@ -20,7 +20,8 @@ public class StartAuthImpl implements StartAuth {
 
         storeAuth.execute(new StoreAuth.Request(
             authUuid,
-            "STARTED"
+            UUID.randomUUID().toString(),
+            AuthProcessStatus.STARTED
         ));
 
         return authUuid;

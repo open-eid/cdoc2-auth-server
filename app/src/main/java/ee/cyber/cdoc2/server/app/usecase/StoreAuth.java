@@ -9,6 +9,10 @@ public interface StoreAuth {
 
     void execute(Request request);
 
-    record Request(UUID authUuid, String authState) {
+    record Request(
+        UUID authUuid,
+        String midSidSessionId,
+        AuthProcessStatus authStatus
+    ) {
     }
 }
