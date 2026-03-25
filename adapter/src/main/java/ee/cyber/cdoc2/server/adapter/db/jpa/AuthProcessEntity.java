@@ -1,0 +1,52 @@
+package ee.cyber.cdoc2.server.adapter.db.jpa;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import lombok.Data;
+
+import java.time.Instant;
+import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+@Entity
+@Data
+@Table(name = "AUTH_PROCESS")
+@SequenceGenerator(
+    name = "AUTH_PROCESS_PK_SEQUENCE",
+    sequenceName = "AUTH_PROCESS_PK_SEQUENCE",
+    allocationSize = 1
+)
+public class AuthProcessEntity {
+    @Id
+    @GeneratedValue(generator = "AUTH_PROCESS_PK_SEQUENCE")
+    @Column(name = "id", nullable = false)
+    private Long id;
+
+    @Column(name = "status", nullable = false)
+    private String status;
+
+    @Column(name = "uuid", nullable = false)
+    private String uuid;
+
+    @Column(name = "mid_sid_session_id", nullable = false)
+    private String midSidSessionId;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
+    @OneToMany(
+        mappedBy = "authProcess",
+        fetch = FetchType.LAZY,
+        cascade = CascadeType.ALL
+    )
+    private List<AuthProcessSessionNonceEntity> serverSessionNonce;
+}

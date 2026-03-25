@@ -1,0 +1,11 @@
+services:
+  db-auth:
+    container_name: db-auth
+    image: postgres:17-alpine
+    restart: always
+    ports:
+      - "7433:5432"
+    environment:
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - ./setup_schema.sh:/docker-entrypoint-initdb.d/00-setup_schema.sh

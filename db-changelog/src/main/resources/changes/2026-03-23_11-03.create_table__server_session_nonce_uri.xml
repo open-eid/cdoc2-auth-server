@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="auth" id="create_table__server_session_nonce_uri.0000" dbms="h2">
+        <createSequence cacheSize="20"
+                        cycle="false"
+                        incrementBy="1"
+                        ordered="false"
+                        sequenceName="SERVER_SESSION_NONCE_URI_PK_SEQUENCE"
+                        startValue="1"/>
+    </changeSet>
+    <changeSet author="auth" id="create_table__server_session_nonce_uri.0000" dbms="postgresql">
+        <createSequence cacheSize="20"
+                        cycle="false"
+                        incrementBy="1"
+                        maxValue="9223372036854775807"
+                        minValue="1"
+                        sequenceName="SERVER_SESSION_NONCE_URI_PK_SEQUENCE"
+                        startValue="1"/>
+    </changeSet>
+
+    <changeSet author="auth" id="create_table__server_session_nonce_uri.0001">
+        <createTable tableName="SERVER_SESSION_NONCE_URI"
+                     remarks="Server URIs that need to be queried for a session nonce during the auth process">
+
+            <column name="ID" type="NUMBER(19, 0)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+
+            <column name="URI"
+                    remarks="Server URI to be queried for a session nonce"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+
+        <createIndex indexName="IDX_SERVER_SESSION_NONCE_URI__URI"
+                     tableName="SERVER_SESSION_NONCE_URI"
+                     unique="true">
+            <column name="URI"/>
+        </createIndex>
+
+        <rollback>
+            <dropIndex tableName="SERVER_SESSION_NONCE_URI"
+                       indexName="IDX_SERVER_SESSION_NONCE_URI__URI" />
+
+            <dropTable tableName="SERVER_SESSION_NONCE_URI"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

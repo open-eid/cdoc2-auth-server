@@ -59,9 +59,12 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/cdoc2-auth-server-openapi.yaml</inputSpec>
+                            <inputSpec>
+                                ${project.basedir}/src/main/resources/cdoc2-auth-server-openapi.yaml
+                            </inputSpec>
                             <apiPackage>ee.cyber.cdoc2.server.adapter.generated.api</apiPackage>
-                            <modelPackage>ee.cyber.cdoc2.server.adapter.generated.model</modelPackage>
+                            <modelPackage>ee.cyber.cdoc2.server.adapter.generated.model
+                            </modelPackage>
                         </configuration>
                     </execution>
 

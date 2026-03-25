@@ -22,6 +22,7 @@
         <module>app</module>
         <module>webapp</module>
         <module>openapi</module>
+        <module>db-changelog</module>
     </modules>
     <scm>
         <connection/>
