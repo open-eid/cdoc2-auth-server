@@ -13,6 +13,7 @@ import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessEntity;
 import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessJpaRepository;
 import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessSessionNonceEntity;
 import ee.cyber.cdoc2.server.adapter.db.jpa.ServerSessionNonceUriEntity;
+import ee.cyber.cdoc2.server.app.usecase.AuthProcessStatus;
 import ee.cyber.cdoc2.server.app.usecase.GetAuthState;
 import ee.cyber.cdoc2.server.app.usecase.StoreAuth;
 
@@ -25,20 +26,28 @@ public class AuthRepository implements StoreAuth, GetAuthState {
     @Override
     @Transactional
     public void execute(StoreAuth.Request request) {
-        ServerSessionNonceUriEntity nonceUriEntity = new ServerSessionNonceUriEntity();
-        nonceUriEntity.setUri("localhost:1234");
-
-        AuthProcessSessionNonceEntity nonceEntity = new AuthProcessSessionNonceEntity();
-        nonceEntity.setSessionNonce("12345");
-        nonceEntity.setServerUri(nonceUriEntity);
-
         AuthProcessEntity authProcessEntity = new AuthProcessEntity();
-        nonceEntity.setAuthProcess(authProcessEntity);
 
-        authProcessEntity.setServerSessionNonce(List.of(nonceEntity));
+        List<AuthProcessSessionNonceEntity> nonceEntities = request.sessionNonces().stream()
+            .map(n -> {
+                    ServerSessionNonceUriEntity nonceUriEntity = new ServerSessionNonceUriEntity();
+                    nonceUriEntity.setUri(n.uri().toString());
+
+                    AuthProcessSessionNonceEntity nonceEntity =
+                        new AuthProcessSessionNonceEntity();
+
+                    nonceEntity.setAuthProcess(authProcessEntity);
+                    nonceEntity.setSessionNonce(n.nonce());
+                    nonceEntity.setServerUri(nonceUriEntity);
+
+                    return nonceEntity;
+                }
+            ).toList();
+
+        authProcessEntity.setServerSessionNonce(nonceEntities);
         authProcessEntity.setUuid(request.authUuid().toString());
         authProcessEntity.setMidSidSessionId(request.midSidSessionId());
-        authProcessEntity.setStatus(request.authStatus().name());
+        authProcessEntity.setStatus(AuthProcessStatus.STARTED.name());
 
         authProcessJpaRepository.save(authProcessEntity);
     }

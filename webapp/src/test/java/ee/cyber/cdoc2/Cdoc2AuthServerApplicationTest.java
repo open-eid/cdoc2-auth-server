@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -15,6 +16,12 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -27,11 +34,39 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class Cdoc2AuthServerApplicationTest {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+    @RegisterExtension
+    static WireMockExtension wiremock = WireMockExtension.newInstance()
+        .options(wireMockConfig().port(18080))
+        .build();
+
+    @RegisterExtension
+    static WireMockExtension wiremock2 = WireMockExtension.newInstance()
+        .options(wireMockConfig().port(18090))
+        .build();
+
     @Autowired
     private MockMvc mockMvc;
 
     @Test
     void shouldGetAuthStatus() throws Exception {
+        wiremock.stubFor(
+            WireMock.post(
+                urlEqualTo("/session_nonce")
+            ).willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"nonce\":\"1234567890987654321\"}"))
+        );
+
+        wiremock2.stubFor(
+            WireMock.post(
+                urlEqualTo("/session_nonce")
+            ).willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"nonce\":\"98765432123456789\"}"))
+        );
+
         StartAuthRequest startAuthRequest = new StartAuthRequest(
             "ETSI-00223355",
             "1234567890"

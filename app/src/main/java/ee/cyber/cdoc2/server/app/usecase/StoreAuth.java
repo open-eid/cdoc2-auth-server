@@ -1,5 +1,6 @@
 package ee.cyber.cdoc2.server.app.usecase;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.jspecify.annotations.NullMarked;
@@ -12,7 +13,7 @@ public interface StoreAuth {
     record Request(
         UUID authUuid,
         String midSidSessionId,
-        AuthProcessStatus authStatus
+        List<SessionNonce.UriSessionNonce> sessionNonces
     ) {
     }
 }

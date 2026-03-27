@@ -6,4 +6,3 @@
 * `docker compose up`
 * `mvn clean compile liquibase:update`
 * `mvn liquibase:rollback -Dliquibase.rollbackCount={count_of_changesets_run_on_update}`
-* 
