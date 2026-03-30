@@ -42,13 +42,16 @@ public class SessionNonceRestApi implements SessionNonce {
     }
 
     @Override
-    public List<UriSessionNonce> collectSessionNonces() {
-        List<Supplier<CompletableFuture<UriSessionNonce>>> collectNonceTasks = List.of(
-            () -> sessionNonceFutureForUri(URI.create("http://localhost:18080/session_nonce")),
-            () -> sessionNonceFutureForUri(URI.create("http://localhost:18090/session_nonce"))
-        );
+    public List<UriSessionNonce> collectSessionNonces(List<URI> uris) {
+        List<Supplier<CompletableFuture<UriSessionNonce>>> collectNonceTasks = uris.stream().map(
+            this::createSupplier
+        ).toList();
 
         return PerformTaskWithRetriesHelper.allOfWithRetries(collectNonceTasks, props.retries());
+    }
+
+    private Supplier<CompletableFuture<UriSessionNonce>> createSupplier(URI uri) {
+        return () -> sessionNonceFutureForUri(uri);
     }
 
     private CompletableFuture<UriSessionNonce> sessionNonceFutureForUri(URI uri) {

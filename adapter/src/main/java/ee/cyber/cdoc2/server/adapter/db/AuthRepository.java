@@ -1,14 +1,17 @@
 package ee.cyber.cdoc2.server.adapter.db;
 
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
 import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Repository;
 
+import ee.cyber.cdoc2.server.adapter.conf.SessionNonceUriDbCache;
 import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessEntity;
 import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessJpaRepository;
 import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessSessionNonceEntity;
@@ -22,6 +25,8 @@ import ee.cyber.cdoc2.server.app.usecase.StoreAuth;
 @RequiredArgsConstructor
 public class AuthRepository implements StoreAuth, GetAuthState {
     private final AuthProcessJpaRepository authProcessJpaRepository;
+    private final SessionNonceUriDbCache sessionNonceUriDbCache;
+    private final EntityManager entityManager;
 
     @Override
     @Transactional
@@ -29,16 +34,15 @@ public class AuthRepository implements StoreAuth, GetAuthState {
         AuthProcessEntity authProcessEntity = new AuthProcessEntity();
 
         List<AuthProcessSessionNonceEntity> nonceEntities = request.sessionNonces().stream()
-            .map(n -> {
-                    ServerSessionNonceUriEntity nonceUriEntity = new ServerSessionNonceUriEntity();
-                    nonceUriEntity.setUri(n.uri().toString());
-
+            .map(uriSessionNonce -> {
                     AuthProcessSessionNonceEntity nonceEntity =
                         new AuthProcessSessionNonceEntity();
-
                     nonceEntity.setAuthProcess(authProcessEntity);
-                    nonceEntity.setSessionNonce(n.nonce());
-                    nonceEntity.setServerUri(nonceUriEntity);
+                    nonceEntity.setSessionNonce(uriSessionNonce.nonce());
+
+                    nonceEntity.setServerUri(createNonceUriEntityReference(
+                        uriSessionNonce.uri()
+                    ));
 
                     return nonceEntity;
                 }
@@ -56,5 +60,12 @@ public class AuthRepository implements StoreAuth, GetAuthState {
     public String execute(UUID uuid) {
         AuthProcessEntity entity = authProcessJpaRepository.findByUuid(uuid.toString());
         return entity.getStatus();
+    }
+
+    private ServerSessionNonceUriEntity createNonceUriEntityReference(URI uri) {
+        return entityManager.getReference(
+            ServerSessionNonceUriEntity.class,
+            sessionNonceUriDbCache.sessionNonceUriEntityIdByUri(uri)
+        );
     }
 }

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -19,9 +20,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static ee.cyber.cdoc2.SessionNonceUriHelper.SESSION_NONCE_URI_1;
+import static ee.cyber.cdoc2.SessionNonceUriHelper.SESSION_NONCE_URI_2;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -33,36 +35,37 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class Cdoc2AuthServerApplicationTest {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final int WIREMOCK_PORT = 8080;
 
     @RegisterExtension
     static WireMockExtension wiremock = WireMockExtension.newInstance()
-        .options(wireMockConfig().port(18080))
-        .build();
-
-    @RegisterExtension
-    static WireMockExtension wiremock2 = WireMockExtension.newInstance()
-        .options(wireMockConfig().port(18090))
+        .options(wireMockConfig().port(WIREMOCK_PORT))
         .build();
 
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private SessionNonceUriHelper sessionNonceUriHelper;
+
     @Test
     void shouldGetAuthStatus() throws Exception {
+        sessionNonceUriHelper.createSessionNonceUriTestData();
+
         wiremock.stubFor(
             WireMock.post(
-                urlEqualTo("/session_nonce")
+                urlEqualTo(SESSION_NONCE_URI_1)
             ).willReturn(aResponse()
-                .withStatus(200)
+                .withStatus(HttpStatus.OK.value())
                 .withHeader("Content-Type", "application/json")
                 .withBody("{\"nonce\":\"1234567890987654321\"}"))
         );
 
-        wiremock2.stubFor(
+        wiremock.stubFor(
             WireMock.post(
-                urlEqualTo("/session_nonce")
+                urlEqualTo(SESSION_NONCE_URI_2)
             ).willReturn(aResponse()
-                .withStatus(200)
+                .withStatus(HttpStatus.OK.value())
                 .withHeader("Content-Type", "application/json")
                 .withBody("{\"nonce\":\"98765432123456789\"}"))
         );
@@ -92,6 +95,9 @@ class Cdoc2AuthServerApplicationTest {
         );
 
         assertEquals("STARTED", authStatusResponseBody.status);
+
+        verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_1)));
+        verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_2)));
     }
 
     @Test
