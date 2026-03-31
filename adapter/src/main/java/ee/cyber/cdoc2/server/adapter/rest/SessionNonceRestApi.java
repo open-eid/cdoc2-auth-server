@@ -25,22 +25,6 @@ public class SessionNonceRestApi implements SessionNonce {
         this.props = props;
     }
 
-    private UriSessionNonce createSessionNonce(URI uri) {
-        NonceBody nonceBody = restClient.post()
-            .uri(uri)
-            .retrieve()
-            .body(NonceBody.class);
-
-        if (nonceBody == null || nonceBody.nonce == null) {
-            throw new IllegalStateException("malformed nonce response");
-        }
-
-        return new UriSessionNonce(
-            uri,
-            nonceBody.nonce
-        );
-    }
-
     @Override
     public List<UriSessionNonce> collectSessionNonces(List<URI> uris) {
         List<Supplier<CompletableFuture<UriSessionNonce>>> collectNonceTasks = uris.stream().map(
@@ -56,6 +40,22 @@ public class SessionNonceRestApi implements SessionNonce {
 
     private CompletableFuture<UriSessionNonce> sessionNonceFutureForUri(URI uri) {
         return CompletableFuture.supplyAsync(() -> createSessionNonce(uri)
+        );
+    }
+
+    private UriSessionNonce createSessionNonce(URI uri) {
+        NonceBody nonceBody = restClient.post()
+            .uri(uri)
+            .retrieve()
+            .body(NonceBody.class);
+
+        if (nonceBody == null || nonceBody.nonce == null) {
+            throw new IllegalStateException("malformed nonce response");
+        }
+
+        return new UriSessionNonce(
+            uri,
+            nonceBody.nonce
         );
     }
 
