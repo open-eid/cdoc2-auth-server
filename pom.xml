@@ -36,6 +36,7 @@
         <junit-jupiter.version>6.0.3</junit-jupiter.version>
         <lombok.version>1.18.42</lombok.version>
         <spring-boot.version>4.0.3</spring-boot.version>
+        <postgresql.version>42.7.10</postgresql.version>
     </properties>
 
     <dependencies>
