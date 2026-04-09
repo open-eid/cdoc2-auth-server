@@ -36,6 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class Cdoc2AuthServerApplicationTest {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final int WIREMOCK_PORT = 8080;
+    private static final String IDENTIFIER_OK = "PNOEE-40504040001-DEM0-Q";
+    private static final String IDENTIFIER_USER_REFUSED = "PNOEE-30403039917-MOCK-Q";
 
     @RegisterExtension
     static WireMockExtension wiremock = WireMockExtension.newInstance()
@@ -71,8 +73,8 @@ class Cdoc2AuthServerApplicationTest {
         );
 
         StartAuthRequest startAuthRequest = new StartAuthRequest(
-            "etsi/PNOEE-30303039914",
-            "1234567890"
+            "etsi/" + IDENTIFIER_USER_REFUSED,
+            null
         );
 
         MockHttpServletResponse startAuthResponse = mockMvc.perform(
@@ -94,7 +96,7 @@ class Cdoc2AuthServerApplicationTest {
             AuthStatusResponseBody.class
         );
 
-        assertEquals("STARTED", authStatusResponseBody.status);
+        assertEquals("COMPLETE", authStatusResponseBody.status);
 
         verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_1)));
         verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_2)));

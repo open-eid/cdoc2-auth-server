@@ -23,9 +23,10 @@ import ee.cyber.cdoc2.server.app.usecase.startauth.token.SessionToken.SessionTok
 @RequiredArgsConstructor
 @Component
 public class StartAuthImpl implements StartAuth {
-    private final StoreAuth storeAuth;
+    private final StoreAuthProcess storeAuthProcess;
     private final SessionNonce sessionNonce;
     private final SessionNonceUriConf sessionNonceUriConf;
+    private final SidAuthenticate sidAuthenticate;
 
     @Override
     public Response execute(Request request) {
@@ -49,9 +50,15 @@ public class StartAuthImpl implements StartAuth {
             rpChallenge
         );
 
-        storeAuth.execute(new StoreAuth.Request(
+        UUID sidAuthSessionUuid = sidAuthenticate.execute(new SidAuthenticate.Request(
+            "",
+            rpChallenge,
+            etsiIdentifier.getSemanticsIdentifier()
+        ));
+
+        storeAuthProcess.execute(new StoreAuthProcess.Request(
             authUuid,
-            UUID.randomUUID().toString(),
+            sidAuthSessionUuid,
             sessionNonces,
             unsignedSdJWT.toString()
         ));

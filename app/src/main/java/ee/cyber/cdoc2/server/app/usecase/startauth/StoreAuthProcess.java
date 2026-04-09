@@ -6,13 +6,13 @@ import java.util.UUID;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public interface StoreAuth {
+public interface StoreAuthProcess {
 
     void execute(Request request);
 
     record Request(
         UUID authUuid,
-        String midSidSessionId,
+        UUID midSidSessionId,
         List<SessionNonce.UriSessionNonce> sessionNonces,
         String unsignedSdJwt
     ) {
