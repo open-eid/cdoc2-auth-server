@@ -34,6 +34,18 @@
         </dependency>
 
         <dependency>
+            <groupId>ee.cyber.cdoc2</groupId>
+            <artifactId>cdoc2-auth-token</artifactId>
+            <version>0.3.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.authlete</groupId>
+            <artifactId>sd-jwt</artifactId>
+            <version>1.8</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>${junit-jupiter.version}</version>

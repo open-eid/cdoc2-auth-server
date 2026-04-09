@@ -39,6 +39,9 @@ public class AuthProcessEntity {
     @Column(name = "mid_sid_session_id", nullable = false)
     private String midSidSessionId;
 
+    @Column(name = "unsigned_sdjwt", nullable = false)
+    private String unsignedSdJwt;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;

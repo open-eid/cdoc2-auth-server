@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import ee.cyber.cdoc2.server.adapter.rest.configuration.SessionNonceRestClientConfiguration;
-import ee.cyber.cdoc2.server.app.usecase.SessionNonce;
+import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce;
 
 @Component
 public class SessionNonceRestApi implements SessionNonce {
