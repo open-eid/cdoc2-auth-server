@@ -1,11 +1,11 @@
 package ee.cyber.cdoc2.server.adapter.db.jpa;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -31,7 +31,7 @@ public class AuthProcessSessionNonceEntity {
     @JoinColumn(name = "auth_process_id", nullable = false)
     private AuthProcessEntity authProcess;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "uri_id", nullable = false)
     private ServerSessionNonceUriEntity serverUri;
 

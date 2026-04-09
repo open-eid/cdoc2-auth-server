@@ -1,4 +1,4 @@
-package ee.cyber.cdoc2.server.adapter.rest;
+package ee.cyber.cdoc2.server.adapter.api;
 
 import lombok.RequiredArgsConstructor;
 import tools.jackson.databind.ObjectMapper;

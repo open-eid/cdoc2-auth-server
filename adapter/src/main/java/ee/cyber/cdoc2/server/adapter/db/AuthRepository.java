@@ -1,18 +1,22 @@
 package ee.cyber.cdoc2.server.adapter.db;
 
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
 import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Repository;
 
+import ee.cyber.cdoc2.server.adapter.conf.SessionNonceUriDbCache;
 import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessEntity;
 import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessJpaRepository;
 import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessSessionNonceEntity;
 import ee.cyber.cdoc2.server.adapter.db.jpa.ServerSessionNonceUriEntity;
+import ee.cyber.cdoc2.server.app.usecase.AuthProcessStatus;
 import ee.cyber.cdoc2.server.app.usecase.GetAuthState;
 import ee.cyber.cdoc2.server.app.usecase.StoreAuth;
 
@@ -21,24 +25,33 @@ import ee.cyber.cdoc2.server.app.usecase.StoreAuth;
 @RequiredArgsConstructor
 public class AuthRepository implements StoreAuth, GetAuthState {
     private final AuthProcessJpaRepository authProcessJpaRepository;
+    private final SessionNonceUriDbCache sessionNonceUriDbCache;
+    private final EntityManager entityManager;
 
     @Override
     @Transactional
     public void execute(StoreAuth.Request request) {
-        ServerSessionNonceUriEntity nonceUriEntity = new ServerSessionNonceUriEntity();
-        nonceUriEntity.setUri("localhost:1234");
-
-        AuthProcessSessionNonceEntity nonceEntity = new AuthProcessSessionNonceEntity();
-        nonceEntity.setSessionNonce("12345");
-        nonceEntity.setServerUri(nonceUriEntity);
-
         AuthProcessEntity authProcessEntity = new AuthProcessEntity();
-        nonceEntity.setAuthProcess(authProcessEntity);
 
-        authProcessEntity.setServerSessionNonce(List.of(nonceEntity));
+        List<AuthProcessSessionNonceEntity> nonceEntities = request.sessionNonces().stream()
+            .map(uriSessionNonce -> {
+                    AuthProcessSessionNonceEntity nonceEntity =
+                        new AuthProcessSessionNonceEntity();
+                    nonceEntity.setAuthProcess(authProcessEntity);
+                    nonceEntity.setSessionNonce(uriSessionNonce.nonce());
+
+                    nonceEntity.setServerUri(createNonceUriEntityReference(
+                        uriSessionNonce.uri()
+                    ));
+
+                    return nonceEntity;
+                }
+            ).toList();
+
+        authProcessEntity.setServerSessionNonce(nonceEntities);
         authProcessEntity.setUuid(request.authUuid().toString());
         authProcessEntity.setMidSidSessionId(request.midSidSessionId());
-        authProcessEntity.setStatus(request.authStatus().name());
+        authProcessEntity.setStatus(AuthProcessStatus.STARTED.name());
 
         authProcessJpaRepository.save(authProcessEntity);
     }
@@ -47,5 +60,12 @@ public class AuthRepository implements StoreAuth, GetAuthState {
     public String execute(UUID uuid) {
         AuthProcessEntity entity = authProcessJpaRepository.findByUuid(uuid.toString());
         return entity.getStatus();
+    }
+
+    private ServerSessionNonceUriEntity createNonceUriEntityReference(URI uri) {
+        return entityManager.getReference(
+            ServerSessionNonceUriEntity.class,
+            sessionNonceUriDbCache.sessionNonceUriEntityIdByUri(uri)
+        );
     }
 }
