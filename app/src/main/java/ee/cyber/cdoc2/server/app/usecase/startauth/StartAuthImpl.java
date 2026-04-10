@@ -16,8 +16,8 @@ import ee.cyber.cdoc2.auth.EtsiIdentifier;
 import ee.cyber.cdoc2.server.app.conf.SessionNonceUriConf;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce.UriSessionNonce;
 import ee.cyber.cdoc2.server.app.usecase.startauth.sid.NotificationVerificationCode;
-import ee.cyber.cdoc2.server.app.usecase.startauth.token.SessionToken;
-import ee.cyber.cdoc2.server.app.usecase.startauth.token.SessionToken.SessionTokenCreationParams;
+import ee.cyber.cdoc2.server.app.usecase.common.SessionToken;
+import ee.cyber.cdoc2.server.app.usecase.common.SessionToken.SessionTokenCreationParams;
 
 @NullMarked
 @RequiredArgsConstructor

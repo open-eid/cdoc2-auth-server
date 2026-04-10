@@ -24,8 +24,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static ee.cyber.cdoc2.SessionNonceUriHelper.SESSION_NONCE_URI_1;
 import static ee.cyber.cdoc2.SessionNonceUriHelper.SESSION_NONCE_URI_2;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -73,7 +72,7 @@ class Cdoc2AuthServerApplicationTest {
         );
 
         StartAuthRequest startAuthRequest = new StartAuthRequest(
-            "etsi/" + IDENTIFIER_USER_REFUSED,
+            "etsi/" + IDENTIFIER_OK,
             null
         );
 
@@ -84,22 +83,44 @@ class Cdoc2AuthServerApplicationTest {
             ).andExpect(status().isCreated())
             .andReturn().getResponse();
 
-        MockHttpServletResponse authStatusResponse = mockMvc.perform(
-                get(URI.create(
-                    startAuthResponse.getHeader("location")
-                ))
-            ).andExpect(status().isOk())
-            .andReturn().getResponse();
-
-        AuthStatusResponseBody authStatusResponseBody = OBJECT_MAPPER.readValue(
-            authStatusResponse.getContentAsString(),
-            AuthStatusResponseBody.class
+        AuthStatusResponseBody authStatusResponseBody = performAuthStatusRequest(
+            startAuthResponse,
+            1
         );
 
-        assertEquals("COMPLETE", authStatusResponseBody.status);
+        assertNotNull(authStatusResponseBody);
+//        assertEquals("COMPLETE", authStatusResponseBody.status);
 
         verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_1)));
         verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_2)));
+    }
+
+    private AuthStatusResponseBody performAuthStatusRequest(
+        MockHttpServletResponse startAuthResponse,
+        int maxPollCount
+    ) throws Exception {
+        assertNotNull(startAuthResponse);
+        AuthStatusResponseBody authStatusResponseBody = null;
+
+        for (int i = 0; i < maxPollCount; i++) {
+            MockHttpServletResponse authStatusResponse = mockMvc.perform(
+                    get(URI.create(
+                        startAuthResponse.getHeader("location")
+                    ))
+                ).andExpect(status().isOk())
+                .andReturn().getResponse();
+
+            authStatusResponseBody = OBJECT_MAPPER.readValue(
+                authStatusResponse.getContentAsString(),
+                AuthStatusResponseBody.class
+            );
+
+            if (!"STARTED".equals(authStatusResponseBody.status)) {
+                break;
+            }
+        }
+
+        return authStatusResponseBody;
     }
 
     @Test

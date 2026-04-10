@@ -6,6 +6,8 @@ import ee.sk.smartid.RpChallenge;
 import ee.sk.smartid.SmartIdClient;
 import ee.sk.smartid.common.notification.interactions.NotificationInteraction;
 import ee.sk.smartid.rest.SessionStatusPoller;
+import ee.sk.smartid.rest.dao.SessionSignature;
+import ee.sk.smartid.rest.dao.SessionSignatureAlgorithmParameters;
 import ee.sk.smartid.rest.dao.SessionStatus;
 import ee.sk.smartid.signature.AuthenticationSignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -16,25 +18,24 @@ import java.util.UUID;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Component;
 
-import ee.cyber.cdoc2.server.app.usecase.SidSession;
+import ee.cyber.cdoc2.server.app.conf.RelyingPartyConf;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SidAuthenticate;
+import ee.cyber.cdoc2.server.app.usecase.status.sid.GetSidSession;
 
 @NullMarked
 @Component
 @RequiredArgsConstructor
-public class SidClient implements SidAuthenticate, SidSession {
-    public static final UUID DEMO_RP_UUID = UUID.fromString("00000000-0000-4000-8000-000000000000");
-    public static final String DEMO_RP_NAME = "DEMO";
-
+public class SidClient implements SidAuthenticate, GetSidSession {
     private final SmartIdClient smartIdClient;
+    private final RelyingPartyConf relyingPartyConf;
 
     public UUID execute(Request request) {
         RpChallenge rpChallenge = new RpChallenge(request.rpChallenge());
 
         var authenticationSessionResponse = smartIdClient.createNotificationAuthentication()
             .withRpChallenge(rpChallenge.toBase64EncodedValue())
-            .withRelyingPartyUUID(String.valueOf(DEMO_RP_UUID))
-            .withRelyingPartyName(DEMO_RP_NAME)
+            .withRelyingPartyUUID(String.valueOf(relyingPartyConf.getUuid()))
+            .withRelyingPartyName(relyingPartyConf.getName())
             .withInteractions(List.of(
                 NotificationInteraction
                     .confirmationMessageAndVerificationCodeChoice("Creating CDOC2 session")
@@ -49,21 +50,40 @@ public class SidClient implements SidAuthenticate, SidSession {
         return UUID.fromString(authenticationSessionResponse.sessionID());
     }
 
-    public SidSession.Response execute(UUID sessionId) {
+    @Override
+    public GetSidSession.Response execute(UUID sessionId) {
         SessionStatusPoller poller = smartIdClient.getSessionStatusPoller();
 
         SessionStatus sessionStatus = poller.getSessionStatus(String.valueOf(sessionId));
 
-        return new Response(
+        SessionSignature signature = sessionStatus.getSignature();
+        SessionSignatureAlgorithmParameters signatureAlgorithmParameters = signature != null
+            ? signature.getSignatureAlgorithmParameters() : null;
+
+        return new GetSidSession.Response(
             sessionStatus.getState(),
-            sessionStatus.getResult().getEndResult(),
-            sessionStatus.getSignature() != null
-                ? new SessionSignature(
-                sessionStatus.getSignature().getValue(),
-                sessionStatus.getSignature().getServerRandom(),
-                sessionStatus.getSignature().getUserChallenge()
+            sessionStatus.getResult() != null ? sessionStatus.getResult().getEndResult()
+                : null,
+            signature != null
+                ? new Signature(
+                signature.getValue(),
+                signature.getServerRandom(),
+                signature.getUserChallenge(),
+                signature.getSignatureAlgorithm(),
+                new SignatureAlgorithmParameters(
+                    signatureAlgorithmParameters.getHashAlgorithm(),
+                    signatureAlgorithmParameters.getSaltLength(),
+                    signatureAlgorithmParameters.getTrailerField()
+                )
             )
-                : null
+                : null,
+            sessionStatus.getCert() != null
+                ? new Certificate(
+                sessionStatus.getCert().getValue(),
+                sessionStatus.getCert().getCertificateLevel()
+            )
+                : null,
+            sessionStatus.getInteractionTypeUsed()
         );
     }
 }

@@ -1,4 +1,4 @@
-package ee.cyber.cdoc2.server.app.usecase.startauth.token;
+package ee.cyber.cdoc2.server.app.usecase.common;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -13,12 +13,17 @@ import java.util.Map;
 import com.authlete.sd.Disclosure;
 import com.authlete.sd.SDJWT;
 import com.authlete.sd.SDObjectBuilder;
+import com.nimbusds.jose.JOSEObjectType;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 
 import ee.cyber.cdoc2.auth.EtsiIdentifier;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce.UriSessionNonce;
 
 public final class SessionToken {
+    private static final String SESSION_TOKEN_JWT_TYP = "vnd.cdoc2.session-token.v2+sd-jwt";
 
     private SessionToken() {
         // utility class
@@ -62,7 +67,18 @@ public final class SessionToken {
 
         JWTClaimsSet payload = createPayload(creationParams, audField);
 
-        return new SDJWT(payload.toString(), disclosures);
+        JWSHeader header =
+            new JWSHeader.Builder(JWSAlgorithm.RS256)
+                // signature padding is supported
+                .type(new JOSEObjectType(SESSION_TOKEN_JWT_TYP))
+                .build();
+
+        SignedJWT jwt = new SignedJWT(header, payload);
+
+        String headerString = jwt.getHeader().toBase64URL().toString();
+        String payloadString = jwt.getPayload().toBase64URL().toString();
+
+        return new SDJWT(headerString + "." + payloadString, disclosures);
     }
 
     private static JWTClaimsSet createPayload(

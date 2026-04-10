@@ -5,19 +5,22 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.nimbusds.jose.util.Base64URL;
+
 import ee.cyber.cdoc2.server.adapter.generated.api.Cdoc2AuthApiDelegate;
 import ee.cyber.cdoc2.server.adapter.generated.model.AuthIdentity;
 import ee.cyber.cdoc2.server.adapter.generated.model.AuthProcessStatusResponse;
 import ee.cyber.cdoc2.server.adapter.generated.model.StartAuthProcessResponse;
 import ee.cyber.cdoc2.server.adapter.generated.model.WellKnownResponse;
-import ee.cyber.cdoc2.server.app.usecase.GetStatus;
 import ee.cyber.cdoc2.server.app.usecase.startauth.StartAuth;
+import ee.cyber.cdoc2.server.app.usecase.status.GetStatus;
 
 @Component
 @RequiredArgsConstructor
@@ -46,9 +49,18 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
 
     @Override
     public ResponseEntity<AuthProcessStatusResponse> getAuthProcessStatus(String authProcessUuid) {
-        String status = getStatus.execute(authProcessUuid);
-        AuthProcessStatusResponse response = new AuthProcessStatusResponse(status);
-        return ResponseEntity.ok(response);
+        GetStatus.Response response = getStatus.execute(authProcessUuid);
+
+        AuthProcessStatusResponse responseBody = new AuthProcessStatusResponse(response.status())
+            .sessionToken(response.sessionToken())
+            .signingCertificate(response.signingCertificate())
+            .signatureParameters(
+                Optional.ofNullable(response.signatureParameters())
+                    .map(this::toJsonBase64Url)
+                    .orElse(null)
+            );
+
+        return ResponseEntity.ok(responseBody);
     }
 
     @Override
@@ -62,7 +74,13 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
         return ResponseEntity.ok(response);
     }
 
+    //TODO should be created dynamically based on controller URI
     private URI getAuthStatusProcessLocation(UUID authProcessUuid) {
         return URI.create("/auth/status/" + authProcessUuid);
+    }
+
+    private String toJsonBase64Url(Object object) {
+        String json = OBJECT_MAPPER.writeValueAsString(object);
+        return Base64URL.encode(json).toString();
     }
 }

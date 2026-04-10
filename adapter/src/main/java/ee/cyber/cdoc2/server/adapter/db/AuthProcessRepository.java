@@ -16,15 +16,18 @@ import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessEntity;
 import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessJpaRepository;
 import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessSessionNonceEntity;
 import ee.cyber.cdoc2.server.adapter.db.jpa.ServerSessionNonceUriEntity;
-import ee.cyber.cdoc2.server.app.usecase.AuthProcessStatus;
-import ee.cyber.cdoc2.server.app.usecase.FailAuthProcess;
-import ee.cyber.cdoc2.server.app.usecase.GetAuthProcess;
+import ee.cyber.cdoc2.server.adapter.db.jpa.projection.AuthProcessStatusMidSidSession;
+import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessStatus;
 import ee.cyber.cdoc2.server.app.usecase.startauth.StoreAuthProcess;
+import ee.cyber.cdoc2.server.app.usecase.status.FailAuthProcess;
+import ee.cyber.cdoc2.server.app.usecase.status.GetAuthProcess;
+import ee.cyber.cdoc2.server.app.usecase.status.GetUnsignedJwt;
 
 @NullMarked
 @Repository
 @RequiredArgsConstructor
-public class AuthProcessRepository implements StoreAuthProcess, GetAuthProcess, FailAuthProcess {
+public class AuthProcessRepository implements StoreAuthProcess, GetAuthProcess, FailAuthProcess,
+    GetUnsignedJwt {
     private final AuthProcessJpaRepository authProcessJpaRepository;
     private final SessionNonceUriDbCache sessionNonceUriDbCache;
     private final EntityManager entityManager;
@@ -60,13 +63,13 @@ public class AuthProcessRepository implements StoreAuthProcess, GetAuthProcess, 
 
     @Override
     public GetAuthProcess.Response execute(UUID uuid) {
-        AuthProcessEntity entity = authProcessJpaRepository.findByUuid(uuid.toString());
+        AuthProcessStatusMidSidSession projection =
+            authProcessJpaRepository.findStatusMidSidSessionByUuid(uuid.toString());
         return new Response(
-            AuthProcessStatus.valueOf(entity.getStatus()),
-            entity.getMidSidSessionId()
+            AuthProcessStatus.valueOf(projection.getStatus()),
+            projection.getMidSidSessionId()
         );
     }
-
 
     @Override
     public void execute(FailAuthProcess.Request request) {
@@ -87,4 +90,9 @@ public class AuthProcessRepository implements StoreAuthProcess, GetAuthProcess, 
         );
     }
 
+    @Override
+    public String execute(GetUnsignedJwt.Request request) {
+        return authProcessJpaRepository.findUnsignedJwtByUuid(request.uuid().toString())
+            .getUnsignedSdJwt();
+    }
 }

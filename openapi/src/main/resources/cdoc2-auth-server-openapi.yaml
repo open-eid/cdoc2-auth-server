@@ -134,6 +134,23 @@ components:
           minLength: 1
           maxLength: 16
           description: 'auth process status'
+        endResult:
+          type: string
+          maxLength: 60
+          description: 'End result of SID/MID auth session'
+          nullable: true
+        sessionToken:
+          type: string
+          description: 'base64 encoded SD-JWT with all disclosures'
+          nullable: true
+        signingCertificate:
+          type: string
+          description: 'base64 encoded X509 certificate'
+          nullable: true
+        signatureParameters:
+          type: string
+          description: 'signature details returned by the SID RPv3 signing process'
+          nullable: true
       required:
         - status
 
