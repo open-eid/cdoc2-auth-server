@@ -141,7 +141,7 @@ components:
           nullable: true
         sessionToken:
           type: string
-          description: 'base64 encoded SD-JWT with all disclosures'
+          description: 'base64url encoded SD-JWT with all disclosures'
           nullable: true
         signingCertificate:
           type: string
@@ -149,7 +149,8 @@ components:
           nullable: true
         signatureParameters:
           type: string
-          description: 'signature details returned by the SID RPv3 signing process'
+          description: 'base64url encoded JSON structure with signature details returned by the SID
+           RPv3 signing process'
           nullable: true
       required:
         - status
