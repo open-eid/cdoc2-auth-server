@@ -84,7 +84,7 @@ public class GetStatusImpl implements GetStatus {
             }
         }
 
-        throw new RuntimeException("SID session in unkown state");
+        throw new RuntimeException("SID session in unknown state");
     }
 }
 
