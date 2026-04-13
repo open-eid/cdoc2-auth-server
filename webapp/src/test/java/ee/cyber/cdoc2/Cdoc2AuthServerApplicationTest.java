@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 
-import ee.cyber.cdoc2.server.app.usecase.status.GetStatus;
+import ee.cyber.cdoc2.server.adapter.generated.model.AuthProcessStatusResponse;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -85,7 +85,7 @@ class Cdoc2AuthServerApplicationTest {
             ).andExpect(status().isCreated())
             .andReturn().getResponse();
 
-        GetStatus.Response authStatusResponseBody = performAuthStatusRequest(
+        AuthProcessStatusResponse authStatusResponseBody = performAuthStatusRequest(
             startAuthResponse,
             1
         );
@@ -97,12 +97,12 @@ class Cdoc2AuthServerApplicationTest {
         verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_2)));
     }
 
-    private GetStatus.Response performAuthStatusRequest(
+    private AuthProcessStatusResponse performAuthStatusRequest(
         MockHttpServletResponse startAuthResponse,
         int maxPollCount
     ) throws Exception {
         assertNotNull(startAuthResponse);
-        GetStatus.Response authStatusResponseBody = null;
+        AuthProcessStatusResponse authStatusResponseBody = null;
 
         for (int i = 0; i < maxPollCount; i++) {
             MockHttpServletResponse authStatusResponse = mockMvc.perform(
@@ -114,10 +114,10 @@ class Cdoc2AuthServerApplicationTest {
 
             authStatusResponseBody = OBJECT_MAPPER.readValue(
                 authStatusResponse.getContentAsString(),
-                GetStatus.Response.class
+                AuthProcessStatusResponse.class
             );
 
-            if (!"STARTED".equals(authStatusResponseBody.status())) {
+            if (!"STARTED".equals(authStatusResponseBody.getStatus())) {
                 break;
             }
         }
