@@ -49,6 +49,11 @@
                 <constraints nullable="false"/>
             </column>
 
+            <column name="END_RESULT"
+                    remarks="End result of the MID/SID session."
+                    type="VARCHAR(255)">
+            </column>
+
             <column name="UNSIGNED_SDJWT" type="CLOB"
                     remarks="Unsigned session token SDJWT">
                 <constraints nullable="false"/>
@@ -69,7 +74,7 @@
 
         <rollback>
             <dropIndex tableName="AUTH_PROCESS"
-                       indexName="IDX_AUTH_PROCESS__UUID" />
+                       indexName="IDX_AUTH_PROCESS__UUID"/>
 
             <dropTable tableName="AUTH_PROCESS"/>
         </rollback>

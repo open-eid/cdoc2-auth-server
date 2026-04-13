@@ -33,6 +33,9 @@ public class AuthProcessEntity {
     @Column(name = "status", nullable = false)
     private String status;
 
+    @Column(name = "end_result")
+    private String endResult;
+
     @Column(name = "uuid", nullable = false)
     private String uuid;
 

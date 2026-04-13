@@ -20,6 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 
+import ee.cyber.cdoc2.server.app.usecase.status.GetStatus;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static ee.cyber.cdoc2.SessionNonceUriHelper.SESSION_NONCE_URI_1;
@@ -83,7 +85,7 @@ class Cdoc2AuthServerApplicationTest {
             ).andExpect(status().isCreated())
             .andReturn().getResponse();
 
-        AuthStatusResponseBody authStatusResponseBody = performAuthStatusRequest(
+        GetStatus.Response authStatusResponseBody = performAuthStatusRequest(
             startAuthResponse,
             1
         );
@@ -95,12 +97,12 @@ class Cdoc2AuthServerApplicationTest {
         verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_2)));
     }
 
-    private AuthStatusResponseBody performAuthStatusRequest(
+    private GetStatus.Response performAuthStatusRequest(
         MockHttpServletResponse startAuthResponse,
         int maxPollCount
     ) throws Exception {
         assertNotNull(startAuthResponse);
-        AuthStatusResponseBody authStatusResponseBody = null;
+        GetStatus.Response authStatusResponseBody = null;
 
         for (int i = 0; i < maxPollCount; i++) {
             MockHttpServletResponse authStatusResponse = mockMvc.perform(
@@ -112,10 +114,10 @@ class Cdoc2AuthServerApplicationTest {
 
             authStatusResponseBody = OBJECT_MAPPER.readValue(
                 authStatusResponse.getContentAsString(),
-                AuthStatusResponseBody.class
+                GetStatus.Response.class
             );
 
-            if (!"STARTED".equals(authStatusResponseBody.status)) {
+            if (!"STARTED".equals(authStatusResponseBody.status())) {
                 break;
             }
         }
@@ -141,9 +143,6 @@ class Cdoc2AuthServerApplicationTest {
             getWellKnownResponseBody.keys.stream()
                 .allMatch(key -> key.kid != null && key.kty != null)
         );
-    }
-
-    private record AuthStatusResponseBody(String status) {
     }
 
     private record StartAuthRequest(String identifier, String mobileNr) {

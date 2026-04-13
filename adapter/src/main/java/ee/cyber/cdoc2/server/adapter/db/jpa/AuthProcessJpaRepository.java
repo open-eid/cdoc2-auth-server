@@ -17,6 +17,11 @@ public interface AuthProcessJpaRepository extends JpaRepository<AuthProcessEntit
 
     @Modifying
     @Transactional
-    @Query("UPDATE AuthProcessEntity ap SET ap.status = :status WHERE ap.uuid = :uuid")
-    int updateStatus(@Param("uuid") String uuid, @Param("status") String status);
+    @Query("UPDATE AuthProcessEntity ap SET ap.status = :status, ap.endResult = :endResult "
+        + "WHERE ap.uuid = :uuid")
+    int updateStatus(
+        @Param("uuid") String uuid,
+        @Param("status") String status,
+        @Param("endResult") String endResult
+    );
 }

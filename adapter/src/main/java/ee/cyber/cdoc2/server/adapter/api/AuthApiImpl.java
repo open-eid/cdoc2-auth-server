@@ -52,6 +52,7 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
         GetStatus.Response response = getStatus.execute(authProcessUuid);
 
         AuthProcessStatusResponse responseBody = new AuthProcessStatusResponse(response.status())
+            .endResult(response.endResult())
             .sessionToken(response.sessionToken())
             .signingCertificate(response.signingCertificate())
             .signatureParameters(

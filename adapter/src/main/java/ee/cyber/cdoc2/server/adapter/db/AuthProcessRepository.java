@@ -19,6 +19,7 @@ import ee.cyber.cdoc2.server.adapter.db.jpa.ServerSessionNonceUriEntity;
 import ee.cyber.cdoc2.server.adapter.db.jpa.projection.AuthProcessStatusMidSidSession;
 import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessStatus;
 import ee.cyber.cdoc2.server.app.usecase.startauth.StoreAuthProcess;
+import ee.cyber.cdoc2.server.app.usecase.status.CompleteAuthProcess;
 import ee.cyber.cdoc2.server.app.usecase.status.FailAuthProcess;
 import ee.cyber.cdoc2.server.app.usecase.status.GetAuthProcess;
 import ee.cyber.cdoc2.server.app.usecase.status.GetUnsignedJwt;
@@ -27,7 +28,7 @@ import ee.cyber.cdoc2.server.app.usecase.status.GetUnsignedJwt;
 @Repository
 @RequiredArgsConstructor
 public class AuthProcessRepository implements StoreAuthProcess, GetAuthProcess, FailAuthProcess,
-    GetUnsignedJwt {
+    CompleteAuthProcess, GetUnsignedJwt {
     private final AuthProcessJpaRepository authProcessJpaRepository;
     private final SessionNonceUriDbCache sessionNonceUriDbCache;
     private final EntityManager entityManager;
@@ -67,6 +68,7 @@ public class AuthProcessRepository implements StoreAuthProcess, GetAuthProcess, 
             authProcessJpaRepository.findStatusMidSidSessionByUuid(uuid.toString());
         return new Response(
             AuthProcessStatus.valueOf(projection.getStatus()),
+            projection.getEndResult(),
             projection.getMidSidSessionId()
         );
     }
@@ -75,7 +77,8 @@ public class AuthProcessRepository implements StoreAuthProcess, GetAuthProcess, 
     public void execute(FailAuthProcess.Request request) {
         int updated = authProcessJpaRepository.updateStatus(
             request.uuid().toString(),
-            AuthProcessStatus.FAILED.name()
+            AuthProcessStatus.FAILED.name(),
+            request.endResult()
         );
 
         if (updated != 1) {
@@ -83,16 +86,29 @@ public class AuthProcessRepository implements StoreAuthProcess, GetAuthProcess, 
         }
     }
 
-    private ServerSessionNonceUriEntity createNonceUriEntityReference(URI uri) {
-        return entityManager.getReference(
-            ServerSessionNonceUriEntity.class,
-            sessionNonceUriDbCache.sessionNonceUriEntityIdByUri(uri)
+    @Override
+    public void execute(CompleteAuthProcess.Request request) {
+        int updated = authProcessJpaRepository.updateStatus(
+            request.uuid().toString(),
+            AuthProcessStatus.COMPLETE.name(),
+            request.endResult()
         );
+
+        if (updated != 1) {
+            throw new RuntimeException("Auth process state update unsuccessful");
+        }
     }
 
     @Override
     public String execute(GetUnsignedJwt.Request request) {
         return authProcessJpaRepository.findUnsignedJwtByUuid(request.uuid().toString())
             .getUnsignedSdJwt();
+    }
+
+    private ServerSessionNonceUriEntity createNonceUriEntityReference(URI uri) {
+        return entityManager.getReference(
+            ServerSessionNonceUriEntity.class,
+            sessionNonceUriDbCache.sessionNonceUriEntityIdByUri(uri)
+        );
     }
 }

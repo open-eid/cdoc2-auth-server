@@ -18,6 +18,7 @@ import static ee.cyber.cdoc2.server.app.usecase.common.AuthProcessStatus.*;
 public class GetStatusImpl implements GetStatus {
     private final GetAuthProcess getAuthProcess;
     private final FailAuthProcess failAuthProcess;
+    private final CompleteAuthProcess completeAuthProcess;
     private final GetSidSession getSidSession;
     private final GetUnsignedJwt getUnsignedJwt;
 
@@ -28,7 +29,15 @@ public class GetStatusImpl implements GetStatus {
         GetAuthProcess.Response authProcess = getAuthProcess.execute(authProcessUuid);
 
         if (FAILED == authProcess.status()) {
-            return new Response(FAILED.name());
+            return new Response(FAILED.name(), authProcess.endResult());
+        }
+
+        //TODO
+        // if we want repeat calls to /auth/status/{authProcessUuid} for an already COMPLETED auth
+        // process to return signature data, we need to store signature, certificate and
+        // signature params in db.
+        if (COMPLETE == authProcess.status()) {
+            return new Response(COMPLETE.name(), authProcess.endResult());
         }
 
         if (STARTED == authProcess.status()) {
@@ -44,7 +53,10 @@ public class GetStatusImpl implements GetStatus {
             }
 
             if (sidSession.isCompletedNotOk()) {
-                failAuthProcess.execute(new FailAuthProcess.Request(authProcessUuid));
+                failAuthProcess.execute(new FailAuthProcess.Request(
+                    authProcessUuid,
+                    sidSession.response().endResult()
+                ));
                 return new Response(FAILED.name(), sidSession.response().endResult());
             }
 
@@ -59,6 +71,11 @@ public class GetStatusImpl implements GetStatus {
                 }
 
                 String signedSdJwt = SignSdJwt.execute(unsignedSdJwtString, signature.value());
+
+                completeAuthProcess.execute(new CompleteAuthProcess.Request(
+                    authProcessUuid,
+                    sidSession.response().endResult()
+                ));
 
                 return new Response(
                     COMPLETE.name(),
