@@ -22,9 +22,9 @@ import com.nimbusds.jwt.SignedJWT;
 import ee.cyber.cdoc2.auth.EtsiIdentifier;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce.UriSessionNonce;
 
-public final class SessionToken {
-    private static final String SESSION_TOKEN_JWT_TYP = "vnd.cdoc2.session-token.v2+sd-jwt";
+import static ee.cyber.cdoc2.server.app.Constants.SESSION_TOKEN_JWT_TYP;
 
+public final class SessionToken {
     private SessionToken() {
         // utility class
     }
