@@ -1,6 +1,7 @@
 package ee.cyber.cdoc2.server.app.usecase.startauth;
 
 
+import ee.sk.smartid.VerificationCodeCalculator;
 import lombok.RequiredArgsConstructor;
 
 import java.net.URI;
@@ -15,7 +16,6 @@ import com.authlete.sd.SDJWT;
 import ee.cyber.cdoc2.auth.EtsiIdentifier;
 import ee.cyber.cdoc2.server.app.conf.SessionNonceUriConf;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce.UriSessionNonce;
-import ee.cyber.cdoc2.server.app.usecase.startauth.sid.NotificationVerificationCode;
 import ee.cyber.cdoc2.server.app.usecase.common.SessionToken;
 import ee.cyber.cdoc2.server.app.usecase.common.SessionToken.SessionTokenCreationParams;
 
@@ -46,9 +46,7 @@ public class StartAuthImpl implements StartAuth {
 
         byte[] rpChallenge = SessionToken.getHashForCredentialJwt(unsignedSdJWT);
 
-        String verificationCode = NotificationVerificationCode.create(
-            rpChallenge
-        );
+        String verificationCode = VerificationCodeCalculator.calculate(rpChallenge);
 
         UUID sidAuthSessionUuid = sidAuthenticate.execute(new SidAuthenticate.Request(
             "",

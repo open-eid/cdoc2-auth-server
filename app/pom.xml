@@ -46,6 +46,12 @@
         </dependency>
 
         <dependency>
+            <groupId>ee.sk.smartid</groupId>
+            <artifactId>smart-id-java-client</artifactId>
+            <version>3.2</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>${junit-jupiter.version}</version>
