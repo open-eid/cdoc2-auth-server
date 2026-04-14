@@ -49,6 +49,12 @@
                 <constraints nullable="false"/>
             </column>
 
+            <column name="RP_CHALLENGE"
+                    remarks="base64 encoded RP challenge"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
             <column name="STATUS"
                     remarks="Status of the authentication process"
                     type="VARCHAR(255)">

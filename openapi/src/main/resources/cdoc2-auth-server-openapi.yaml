@@ -147,11 +147,6 @@ components:
           type: string
           description: 'base64 encoded X509 certificate'
           nullable: true
-        signatureParameters:
-          type: string
-          description: 'base64url encoded JSON structure with signature details returned by the SID
-           RPv3 signing process'
-          nullable: true
       required:
         - status
 

@@ -20,7 +20,8 @@ public class GetStatusImpl implements GetStatus {
     private final FailAuthProcess failAuthProcess;
     private final CompleteAuthProcess completeAuthProcess;
     private final GetSidSession getSidSession;
-    private final GetUnsignedJwt getUnsignedJwt;
+    private final GetSessionTokenMaterial getSessionTokenMaterial;
+    private final SdJwtSigner sdJwtSigner;
 
     @Override
     public Response execute(String uuidStr) {
@@ -61,8 +62,10 @@ public class GetStatusImpl implements GetStatus {
             }
 
             if (sidSession.isCompletedOk()) {
-                String unsignedSdJwtString =
-                    getUnsignedJwt.execute(new GetUnsignedJwt.Request(authProcessUuid));
+                GetSessionTokenMaterial.Response sessionTokenMaterial =
+                    getSessionTokenMaterial.execute(
+                        new GetSessionTokenMaterial.Request(authProcessUuid)
+                    );
 
                 GetSidSession.Signature signature = sidSession.response().signature();
                 if (signature == null) {
@@ -70,7 +73,12 @@ public class GetStatusImpl implements GetStatus {
                         + "completed successfully");
                 }
 
-                String signedSdJwt = SignSdJwt.execute(unsignedSdJwtString, signature.value());
+                String signedSdJwt = sdJwtSigner.execute(sessionTokenMaterial.unsignedJwt(),
+                    new SdJwtSigner.SdJwtSignatureParams(
+                        signature,
+                        sessionTokenMaterial.rpChallenge(),
+                        sessionTokenMaterial.interactionsDigest()
+                    ));
 
                 completeAuthProcess.execute(new CompleteAuthProcess.Request(
                     authProcessUuid,
@@ -81,28 +89,7 @@ public class GetStatusImpl implements GetStatus {
                     COMPLETE.name(),
                     sidSession.response().endResult(),
                     signedSdJwt,
-                    sidSession.response().cert().value(),
-                    new SignatureParameters(
-                        signature.value(),
-                        signature.serverRandom(),
-                        signature.userChallenge(),
-                        signature.signatureAlgorithm(),
-                        new SignatureAlgorithmParameters(
-                            signature.signatureAlgorithmParameters().hashAlgorithm(),
-                            new MaskGenAlgorithm(
-                                signature.signatureAlgorithmParameters().maskGenAlgorithm().algorithm(),
-                                new MaskGenAlgorithm.Parameters(
-                                    signature.signatureAlgorithmParameters()
-                                        .maskGenAlgorithm().parameters().hashAlgorithm()
-                                )
-                            ),
-                            signature.signatureAlgorithmParameters().saltLength(),
-                            signature.signatureAlgorithmParameters().trailerField()
-                        ),
-                        signature.flowType(),
-                        authProcess.interactionsDigest(),
-                        sidSession.response().interactionTypeUsed()
-                    )
+                    sidSession.response().cert().value()
                 );
             }
         }

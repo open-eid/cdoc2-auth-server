@@ -3,6 +3,7 @@ package ee.cyber.cdoc2;
 import tools.jackson.databind.ObjectMapper;
 
 import java.net.URI;
+import java.security.interfaces.ECPublicKey;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -17,8 +18,14 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.authlete.sd.SDJWT;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.crypto.ECDSAVerifier;
+import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jwt.SignedJWT;
 
 import ee.cyber.cdoc2.server.adapter.generated.model.AuthProcessStatusResponse;
 
@@ -87,11 +94,41 @@ class Cdoc2AuthServerApplicationTest {
 
         AuthProcessStatusResponse authStatusResponseBody = performAuthStatusRequest(
             startAuthResponse,
-            1
+            2
         );
 
         assertNotNull(authStatusResponseBody);
-//        assertEquals("COMPLETE", authStatusResponseBody.status);
+        assertEquals("COMPLETE", authStatusResponseBody.getStatus());
+
+        MockHttpServletResponse getWellKnownResponse = mockMvc.perform(
+                get(URI.create("/.well-known/jwks.jws"))
+            ).andExpect(status().isOk())
+            .andReturn().getResponse();
+
+        GetWellKnownResponseBody getWellKnownResponseBody = OBJECT_MAPPER.readValue(
+            getWellKnownResponse.getContentAsString(),
+            GetWellKnownResponseBody.class
+        );
+
+        WellKnownKey ecPublicKey = getWellKnownResponseBody.keys.stream()
+            .filter(k -> "ec-key-2026".equals(k.kid))
+            .findFirst().orElse(null);
+
+        assertNotNull(ecPublicKey);
+
+        String jwk = OBJECT_MAPPER.writeValueAsString(ecPublicKey);
+
+        JWK ecPublicJWK = JWK.parse(jwk);
+
+        ECKey ecKey = (ECKey) ecPublicJWK;
+        ECPublicKey publicKey = ecKey.toECPublicKey();
+
+        SDJWT sdjwt = SDJWT.parse(authStatusResponseBody.getSessionToken());
+        SignedJWT signedJWT = SignedJWT.parse(sdjwt.getCredentialJwt());
+
+        JWSVerifier verifier = new ECDSAVerifier(publicKey);
+
+        assertTrue(signedJWT.verify(verifier));
 
         verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_1)));
         verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_2)));
@@ -149,13 +186,16 @@ class Cdoc2AuthServerApplicationTest {
     }
 
     private record GetWellKnownResponseBody(
-        List<WellKnownKeys> keys
+        List<WellKnownKey> keys
     ) {
     }
 
-    private record WellKnownKeys(
+    private record WellKnownKey(
         String kid,
-        String kty
+        String kty,
+        String crv,
+        String x,
+        String y
     ) {
     }
 }

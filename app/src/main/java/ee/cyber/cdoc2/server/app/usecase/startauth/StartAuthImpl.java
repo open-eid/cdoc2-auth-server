@@ -8,6 +8,8 @@ import ee.sk.smartid.util.InteractionUtil;
 import lombok.RequiredArgsConstructor;
 
 import java.net.URI;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,6 +28,8 @@ import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce.UriSessionNonce;
 @RequiredArgsConstructor
 @Component
 public class StartAuthImpl implements StartAuth {
+    private static final int RP_CHALLENGE_BYTES_LENGTH = 64;
+
     private final StoreAuthProcess storeAuthProcess;
     private final SessionNonce sessionNonce;
     private final SessionNonceUriConf sessionNonceUriConf;
@@ -47,7 +51,7 @@ public class StartAuthImpl implements StartAuth {
 
         SDJWT unsignedSdJWT = SessionToken.unsignedSdJwtWithAllDisclosures(tokenCreationParams);
 
-        byte[] rpChallenge = SessionToken.getHashForCredentialJwt(unsignedSdJWT);
+        byte[] rpChallenge = createRpChallengeBytes();
 
         String verificationCode = VerificationCodeCalculator.calculate(rpChallenge);
 
@@ -72,12 +76,19 @@ public class StartAuthImpl implements StartAuth {
             sidAuthSessionUuid,
             sessionNonces,
             unsignedSdJWT.toString(),
-            interactionsDigest
+            interactionsDigest,
+            Base64.getEncoder().encodeToString(rpChallenge)
         ));
 
         return new Response(
             authUuid,
             verificationCode
         );
+    }
+
+    private static byte[] createRpChallengeBytes() {
+        byte[] rpChallengeBytes = new byte[RP_CHALLENGE_BYTES_LENGTH];
+        new SecureRandom().nextBytes(rpChallengeBytes);
+        return rpChallengeBytes;
     }
 }

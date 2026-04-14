@@ -1,8 +1,5 @@
 package ee.cyber.cdoc2.server.app.usecase.common;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -14,17 +11,10 @@ import java.util.Map;
 import com.authlete.sd.Disclosure;
 import com.authlete.sd.SDJWT;
 import com.authlete.sd.SDObjectBuilder;
-import com.nimbusds.jose.JOSEObjectType;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
 
 import ee.cyber.cdoc2.auth.EtsiIdentifier;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce.UriSessionNonce;
-
-import static ee.cyber.cdoc2.server.app.Constants.RP_V3_SIGNATURE_ALGORITHM_NAME;
-import static ee.cyber.cdoc2.server.app.Constants.SESSION_TOKEN_JWT_TYP;
 
 public final class SessionToken {
     private SessionToken() {
@@ -47,16 +37,6 @@ public final class SessionToken {
         );
     }
 
-    public static byte[] getHashForCredentialJwt(SDJWT sdjwt) {
-        try {
-            String input = sdjwt.getCredentialJwt();
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            return digest.digest(input.getBytes(StandardCharsets.UTF_8));
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-256 algorithm not available", e);
-        }
-    }
-
     public static SDJWT unsignedSdJwtWithAllDisclosures(
         SessionTokenCreationParams creationParams
     ) {
@@ -69,18 +49,7 @@ public final class SessionToken {
 
         JWTClaimsSet payload = createPayload(creationParams, audField);
 
-        JWSHeader header =
-            new JWSHeader.Builder(new JWSAlgorithm(RP_V3_SIGNATURE_ALGORITHM_NAME))
-                // signature padding is supported
-                .type(new JOSEObjectType(SESSION_TOKEN_JWT_TYP))
-                .build();
-
-        SignedJWT jwt = new SignedJWT(header, payload);
-
-        String headerString = jwt.getHeader().toBase64URL().toString();
-        String payloadString = jwt.getPayload().toBase64URL().toString();
-
-        return new SDJWT(headerString + "." + payloadString, disclosures);
+        return new SDJWT(payload.toString(), disclosures);
     }
 
     private static JWTClaimsSet createPayload(

@@ -11,15 +11,14 @@ public interface GetStatus {
         String status,
         @Nullable String endResult,
         @Nullable String sessionToken,
-        @Nullable String signingCertificate,
-        @Nullable SignatureParameters signatureParameters
+        @Nullable String signingCertificate
     ) {
         Response(String status) {
-            this(status, null, null, null, null);
+            this(status, null, null, null);
         }
 
         Response(String status, @Nullable String endResult) {
-            this(status, endResult, null, null, null);
+            this(status, endResult, null, null);
         }
     }
 

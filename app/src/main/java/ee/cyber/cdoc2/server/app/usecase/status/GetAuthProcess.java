@@ -10,8 +10,7 @@ public interface GetAuthProcess {
     record Response(
         AuthProcessStatus status,
         String endResult,
-        String midSidSessionUuid,
-        String interactionsDigest
+        String midSidSessionUuid
     ) {
     }
 }

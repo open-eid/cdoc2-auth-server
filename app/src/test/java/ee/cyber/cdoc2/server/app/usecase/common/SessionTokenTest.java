@@ -1,8 +1,10 @@
 package ee.cyber.cdoc2.server.app.usecase.common;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import com.authlete.sd.Disclosure;
 import com.authlete.sd.SDJWT;
 import com.authlete.sd.SDObjectDecoder;
-import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
@@ -21,8 +22,6 @@ import ee.cyber.cdoc2.auth.EtsiIdentifier;
 import ee.cyber.cdoc2.server.app.usecase.common.SessionToken.SessionTokenCreationParams;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce;
 
-import static ee.cyber.cdoc2.server.app.Constants.RP_V3_SIGNATURE_ALGORITHM_NAME;
-import static ee.cyber.cdoc2.server.app.Constants.SESSION_TOKEN_JWT_TYP;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SessionTokenTest {
@@ -33,8 +32,9 @@ class SessionTokenTest {
     private static final URI URI_2 = URI.create("http://localhost/2");
     private static final String ISS = "test.example.com";
     private static final int EXPECTED_DISCLOSURES_COUNT = 3;
-    private static final int EXPECTED_HEADER_SIZE = 2;
     private static final int EXPECTED_PAYLOAD_SIZE = 6;
+    private static final String MOCK_HEADER = "eyJraWQiOiJlYy1rZXktMjAyNiIsInR5cCI6InZuZC5jZG9jMi"
+        + "5zZXNzaW9uLXRva2VuLnYyK3NkLWp3dCIsImFsZyI6IkVTMjU2In0";
 
     @Test
     void sdJwtHasCorrectDisclosures() {
@@ -62,23 +62,10 @@ class SessionTokenTest {
     }
 
     @Test
-    void sdJwtHasCorrectHeader() throws ParseException {
-        SDJWT sdjwt = createSessionToken();
-
-        Base64URL headerBase64 = new Base64URL(getHeaderPart(sdjwt.getCredentialJwt()));
-        Map<String, Object> header = JSONObjectUtils.parse(headerBase64.decodeToString());
-
-        assertEquals(EXPECTED_HEADER_SIZE, header.size());
-        assertEquals(SESSION_TOKEN_JWT_TYP, header.get("typ"));
-        assertEquals(RP_V3_SIGNATURE_ALGORITHM_NAME, header.get("alg"));
-    }
-
-    @Test
     void sdJwtHasCorrectPayload() throws ParseException {
         SDJWT sdjwt = createSessionToken();
 
-        Base64URL payloadBase64 = new Base64URL(getPayloadPart(sdjwt.getCredentialJwt()));
-        Map<String, Object> payload = JSONObjectUtils.parse(payloadBase64.decodeToString());
+        Map<String, Object> payload = JSONObjectUtils.parse(sdjwt.getCredentialJwt());
 
         assertEquals(EXPECTED_PAYLOAD_SIZE, payload.size());
         assertEquals(ETSI_IDENTIFIER, payload.get("sub"));
@@ -94,9 +81,12 @@ class SessionTokenTest {
         SDObjectDecoder decoder = new SDObjectDecoder();
         SDJWT sdjwt = createSessionToken();
 
-        String credentialJwtWithMockSignature = sdjwt.getCredentialJwt() + ".ABC123";
+        String credentialJwtWithMockHeaderAndSignature = MOCK_HEADER
+            + "." + Base64.getUrlEncoder().encodeToString(sdjwt.getCredentialJwt()
+            .getBytes(StandardCharsets.UTF_8))
+            + ".ABC123";
 
-        SignedJWT signedJWT = SignedJWT.parse(credentialJwtWithMockSignature);
+        SignedJWT signedJWT = SignedJWT.parse(credentialJwtWithMockHeaderAndSignature);
         JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
         Map<String, Object> claimsMap = claimsSet.getClaims();
 
@@ -122,13 +112,5 @@ class SessionTokenTest {
             ISS
         );
         return SessionToken.unsignedSdJwtWithAllDisclosures(params);
-    }
-
-    private String getHeaderPart(String jwt) {
-        return jwt.substring(0, jwt.indexOf("."));
-    }
-
-    private String getPayloadPart(String jwt) {
-        return jwt.substring(jwt.indexOf(".") + 1);
     }
 }

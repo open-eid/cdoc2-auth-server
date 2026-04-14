@@ -7,13 +7,13 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import ee.cyber.cdoc2.server.adapter.db.jpa.projection.AuthProcessSessionTokenMaterial;
 import ee.cyber.cdoc2.server.adapter.db.jpa.projection.AuthProcessStatusMidSidSession;
-import ee.cyber.cdoc2.server.adapter.db.jpa.projection.AuthProcessUnsignedSdJwt;
 
 public interface AuthProcessJpaRepository extends JpaRepository<AuthProcessEntity, Long> {
     AuthProcessStatusMidSidSession findStatusMidSidSessionByUuid(String uuid);
 
-    AuthProcessUnsignedSdJwt findUnsignedJwtByUuid(String uuid);
+    AuthProcessSessionTokenMaterial findSessionTokenMaterialByUuid(String uuid);
 
     @Modifying
     @Transactional
