@@ -89,6 +89,13 @@ public class GetStatusImpl implements GetStatus {
                         signature.signatureAlgorithm(),
                         new SignatureAlgorithmParameters(
                             signature.signatureAlgorithmParameters().hashAlgorithm(),
+                            new MaskGenAlgorithm(
+                                signature.signatureAlgorithmParameters().maskGenAlgorithm().algorithm(),
+                                new MaskGenAlgorithm.Parameters(
+                                    signature.signatureAlgorithmParameters()
+                                        .maskGenAlgorithm().parameters().hashAlgorithm()
+                                )
+                            ),
                             signature.signatureAlgorithmParameters().saltLength(),
                             signature.signatureAlgorithmParameters().trailerField()
                         ),

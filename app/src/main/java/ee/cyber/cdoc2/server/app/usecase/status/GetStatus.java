@@ -37,8 +37,17 @@ public interface GetStatus {
 
     record SignatureAlgorithmParameters(
         String hashAlgorithm,
+        MaskGenAlgorithm maskGenAlgorithm,
         Integer saltLength,
         String trailerField
     ) {
+    }
+
+    record MaskGenAlgorithm(
+        String algorithm,
+        Parameters parameters
+    ) {
+        public record Parameters(String hashAlgorithm) {
+        }
     }
 }

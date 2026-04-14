@@ -68,6 +68,13 @@ public class SidClient implements SidAuthenticate, GetSidSession {
                 signature.getFlowType(),
                 new SignatureAlgorithmParameters(
                     signatureAlgorithmParameters.getHashAlgorithm(),
+                    new MaskGenAlgorithm(
+                        signatureAlgorithmParameters.getMaskGenAlgorithm().getAlgorithm(),
+                        new MaskGenAlgorithm.Parameters(
+                            signatureAlgorithmParameters.getMaskGenAlgorithm()
+                            .getParameters().getHashAlgorithm()
+                        )
+                    ),
                     signatureAlgorithmParameters.getSaltLength(),
                     signatureAlgorithmParameters.getTrailerField()
                 )

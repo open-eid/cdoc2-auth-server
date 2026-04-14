@@ -30,9 +30,21 @@ public interface GetSidSession {
 
     record SignatureAlgorithmParameters(
         String hashAlgorithm,
+        MaskGenAlgorithm maskGenAlgorithm,
         Integer saltLength,
         String trailerField
     ) {
+    }
+
+    record MaskGenAlgorithm(
+        String algorithm,
+        Parameters parameters
+    ) {
+
+        public record Parameters(
+            String hashAlgorithm
+        ) {
+        }
     }
 
     record Certificate(String value, String certificateLevel) {
