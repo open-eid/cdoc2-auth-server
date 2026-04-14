@@ -74,7 +74,6 @@ public class StartAuthImpl implements StartAuth {
         storeAuthProcess.execute(new StoreAuthProcess.Request(
             authUuid,
             sidAuthSessionUuid,
-            sessionNonces,
             unsignedSdJWT.toString(),
             interactionsDigest,
             Base64.getEncoder().encodeToString(rpChallenge)
