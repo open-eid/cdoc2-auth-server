@@ -2,6 +2,7 @@ package ee.cyber.cdoc2.server.app.usecase.common;
 
 import java.net.URI;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -10,13 +11,17 @@ import org.junit.jupiter.api.Test;
 
 import com.authlete.sd.Disclosure;
 import com.authlete.sd.SDJWT;
+import com.authlete.sd.SDObjectDecoder;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jose.util.JSONObjectUtils;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 
 import ee.cyber.cdoc2.auth.EtsiIdentifier;
 import ee.cyber.cdoc2.server.app.usecase.common.SessionToken.SessionTokenCreationParams;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce;
 
+import static ee.cyber.cdoc2.server.app.Constants.RP_V3_SIGNATURE_ALGORITHM_NAME;
 import static ee.cyber.cdoc2.server.app.Constants.SESSION_TOKEN_JWT_TYP;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -45,12 +50,14 @@ class SessionTokenTest {
 
         assertTrue(audArrayDisclosure.isPresent());
 
-        assertTrue(disclosures.stream().anyMatch(d -> d.getClaimValue().toString().startsWith(
-            URI_1.toString()) && d.getClaimValue().toString().endsWith(URI_1_NONCE)
+        assertTrue(disclosures.stream().anyMatch(d -> d.getClaimValue().toString().equals(
+                URI_1 + "/" + URI_1_NONCE
+            )
         ));
 
-        assertTrue(disclosures.stream().anyMatch(d -> d.getClaimValue().toString().startsWith(
-            URI_2.toString()) && d.getClaimValue().toString().endsWith(URI_2_NONCE)
+        assertTrue(disclosures.stream().anyMatch(d -> d.getClaimValue().toString().equals(
+                URI_2 + "/" + URI_2_NONCE
+            )
         ));
     }
 
@@ -63,7 +70,7 @@ class SessionTokenTest {
 
         assertEquals(EXPECTED_HEADER_SIZE, header.size());
         assertEquals(SESSION_TOKEN_JWT_TYP, header.get("typ"));
-        assertEquals("RS256", header.get("alg"));
+        assertEquals(RP_V3_SIGNATURE_ALGORITHM_NAME, header.get("alg"));
     }
 
     @Test
@@ -80,6 +87,29 @@ class SessionTokenTest {
         assertNotNull(payload.get("iat"));
         assertNotNull(payload.get("exp"));
         assertNotNull(payload.get("_sd"));
+    }
+
+    @Test
+    void sdJwtIsDecodedCorrectly() throws ParseException {
+        SDObjectDecoder decoder = new SDObjectDecoder();
+        SDJWT sdjwt = createSessionToken();
+
+        String credentialJwtWithMockSignature = sdjwt.getCredentialJwt() + ".ABC123";
+
+        SignedJWT signedJWT = SignedJWT.parse(credentialJwtWithMockSignature);
+        JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
+        Map<String, Object> claimsMap = claimsSet.getClaims();
+
+        Map<String, Object> decodedClaims = decoder.decode(claimsMap, sdjwt.getDisclosures());
+        Object aud = decodedClaims.get("aud");
+
+        assertInstanceOf(ArrayList.class, aud);
+
+        ArrayList<?> audArray = (ArrayList<?>) aud;
+        assertEquals(2, audArray.size());
+
+        assertEquals(URI_1 + "/" + URI_1_NONCE, audArray.get(0));
+        assertEquals(URI_2 + "/" + URI_2_NONCE, audArray.get(1));
     }
 
     private static SDJWT createSessionToken() {

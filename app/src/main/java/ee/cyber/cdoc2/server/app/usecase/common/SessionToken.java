@@ -22,6 +22,7 @@ import com.nimbusds.jwt.SignedJWT;
 import ee.cyber.cdoc2.auth.EtsiIdentifier;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce.UriSessionNonce;
 
+import static ee.cyber.cdoc2.server.app.Constants.RP_V3_SIGNATURE_ALGORITHM_NAME;
 import static ee.cyber.cdoc2.server.app.Constants.SESSION_TOKEN_JWT_TYP;
 
 public final class SessionToken {
@@ -68,7 +69,7 @@ public final class SessionToken {
         JWTClaimsSet payload = createPayload(creationParams, audField);
 
         JWSHeader header =
-            new JWSHeader.Builder(JWSAlgorithm.RS256)
+            new JWSHeader.Builder(new JWSAlgorithm(RP_V3_SIGNATURE_ALGORITHM_NAME))
                 // signature padding is supported
                 .type(new JOSEObjectType(SESSION_TOKEN_JWT_TYP))
                 .build();
