@@ -21,32 +21,4 @@ public interface GetStatus {
             this(status, endResult, null, null);
         }
     }
-
-    record SignatureParameters(
-        String value,
-        String serverRandom,
-        String userChallenge,
-        String signatureAlgorithm,
-        SignatureAlgorithmParameters signatureAlgorithmParameters,
-        String flowType,
-        String interactionsDigest,
-        String interactionTypeUsed
-    ) {
-    }
-
-    record SignatureAlgorithmParameters(
-        String hashAlgorithm,
-        MaskGenAlgorithm maskGenAlgorithm,
-        Integer saltLength,
-        String trailerField
-    ) {
-    }
-
-    record MaskGenAlgorithm(
-        String algorithm,
-        Parameters parameters
-    ) {
-        public record Parameters(String hashAlgorithm) {
-        }
-    }
 }
