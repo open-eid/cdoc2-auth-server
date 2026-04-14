@@ -4,7 +4,6 @@ import ee.sk.smartid.AuthenticationCertificateLevel;
 import ee.sk.smartid.HashAlgorithm;
 import ee.sk.smartid.RpChallenge;
 import ee.sk.smartid.SmartIdClient;
-import ee.sk.smartid.common.notification.interactions.NotificationInteraction;
 import ee.sk.smartid.rest.SessionStatusPoller;
 import ee.sk.smartid.rest.dao.SessionSignature;
 import ee.sk.smartid.rest.dao.SessionSignatureAlgorithmParameters;
@@ -12,7 +11,6 @@ import ee.sk.smartid.rest.dao.SessionStatus;
 import ee.sk.smartid.signature.AuthenticationSignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.jspecify.annotations.NullMarked;
@@ -36,10 +34,7 @@ public class SidClient implements SidAuthenticate, GetSidSession {
             .withRpChallenge(rpChallenge.toBase64EncodedValue())
             .withRelyingPartyUUID(String.valueOf(relyingPartyConf.getUuid()))
             .withRelyingPartyName(relyingPartyConf.getName())
-            .withInteractions(List.of(
-                NotificationInteraction
-                    .confirmationMessageAndVerificationCodeChoice("Creating CDOC2 session")
-            ))
+            .withInteractions(request.interactions())
             .withHashAlgorithm(HashAlgorithm.SHA_256)
             .withSignatureAlgorithm(AuthenticationSignatureAlgorithm.RSASSA_PSS)
             .withCertificateLevel(AuthenticationCertificateLevel.QUALIFIED)
@@ -70,6 +65,7 @@ public class SidClient implements SidAuthenticate, GetSidSession {
                 signature.getServerRandom(),
                 signature.getUserChallenge(),
                 signature.getSignatureAlgorithm(),
+                signature.getFlowType(),
                 new SignatureAlgorithmParameters(
                     signatureAlgorithmParameters.getHashAlgorithm(),
                     signatureAlgorithmParameters.getSaltLength(),

@@ -92,9 +92,8 @@ public class GetStatusImpl implements GetStatus {
                             signature.signatureAlgorithmParameters().saltLength(),
                             signature.signatureAlgorithmParameters().trailerField()
                         ),
-                        //TODO interactions should be the exact same base64 string used when
-                        // creating signature.
-                        "",
+                        signature.flowType(),
+                        authProcess.interactionsDigest(),
                         sidSession.response().interactionTypeUsed()
                     )
                 );

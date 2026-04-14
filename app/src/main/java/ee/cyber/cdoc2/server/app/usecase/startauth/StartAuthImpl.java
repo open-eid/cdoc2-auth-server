@@ -2,6 +2,9 @@ package ee.cyber.cdoc2.server.app.usecase.startauth;
 
 
 import ee.sk.smartid.VerificationCodeCalculator;
+import ee.sk.smartid.common.InteractionsMapper;
+import ee.sk.smartid.common.notification.interactions.NotificationInteraction;
+import ee.sk.smartid.util.InteractionUtil;
 import lombok.RequiredArgsConstructor;
 
 import java.net.URI;
@@ -48,8 +51,18 @@ public class StartAuthImpl implements StartAuth {
 
         String verificationCode = VerificationCodeCalculator.calculate(rpChallenge);
 
+        List<NotificationInteraction> interactions = List.of(
+            NotificationInteraction
+                .confirmationMessageAndVerificationCodeChoice("Creating CDOC2 session:"
+                    + " " + etsiIdentifier.getSemanticsIdentifier())
+        );
+
+        String interactionsBase64 =
+            InteractionUtil.encodeToBase64(InteractionsMapper.from(interactions));
+        String interactionsDigest = InteractionUtil.calculateDigest(interactionsBase64);
+
         UUID sidAuthSessionUuid = sidAuthenticate.execute(new SidAuthenticate.Request(
-            "",
+            interactions,
             rpChallenge,
             etsiIdentifier.getSemanticsIdentifier()
         ));
@@ -58,7 +71,8 @@ public class StartAuthImpl implements StartAuth {
             authUuid,
             sidAuthSessionUuid,
             sessionNonces,
-            unsignedSdJWT.toString()
+            unsignedSdJWT.toString(),
+            interactionsDigest
         ));
 
         return new Response(

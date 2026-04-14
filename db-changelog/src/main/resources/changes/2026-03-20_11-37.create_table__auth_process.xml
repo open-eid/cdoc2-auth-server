@@ -43,6 +43,12 @@
                 <constraints nullable="false"/>
             </column>
 
+            <column name="INTERACTIONS_DIGEST"
+                    remarks="SHA-256 digest of the interactions string, base64 encoded"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
             <column name="STATUS"
                     remarks="Status of the authentication process"
                     type="VARCHAR(255)">

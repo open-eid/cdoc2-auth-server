@@ -14,7 +14,8 @@ public interface StoreAuthProcess {
         UUID authUuid,
         UUID midSidSessionId,
         List<SessionNonce.UriSessionNonce> sessionNonces,
-        String unsignedSdJwt
+        String unsignedSdJwt,
+        String interactionsDigest
     ) {
     }
 }

@@ -1,5 +1,6 @@
 package ee.cyber.cdoc2.server.app.usecase.common;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -50,7 +51,7 @@ public final class SessionToken {
         try {
             String input = sdjwt.getCredentialJwt();
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            return digest.digest(input.getBytes());
+            return digest.digest(input.getBytes(StandardCharsets.UTF_8));
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("SHA-256 algorithm not available", e);
         }

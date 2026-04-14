@@ -56,6 +56,7 @@ public class AuthProcessRepository implements StoreAuthProcess, GetAuthProcess, 
         authProcessEntity.setServerSessionNonce(nonceEntities);
         authProcessEntity.setUuid(request.authUuid().toString());
         authProcessEntity.setMidSidSessionId(request.midSidSessionId().toString());
+        authProcessEntity.setInteractionsDigest(request.interactionsDigest());
         authProcessEntity.setUnsignedSdJwt(request.unsignedSdJwt());
         authProcessEntity.setStatus(AuthProcessStatus.STARTED.name());
 
@@ -69,7 +70,8 @@ public class AuthProcessRepository implements StoreAuthProcess, GetAuthProcess, 
         return new Response(
             AuthProcessStatus.valueOf(projection.getStatus()),
             projection.getEndResult(),
-            projection.getMidSidSessionId()
+            projection.getMidSidSessionId(),
+            projection.getInteractionsDigest()
         );
     }
 

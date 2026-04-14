@@ -23,6 +23,7 @@ public interface GetSidSession {
         String serverRandom,
         String userChallenge,
         String signatureAlgorithm,
+        String flowType,
         SignatureAlgorithmParameters signatureAlgorithmParameters
     ) {
     }

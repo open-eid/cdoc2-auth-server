@@ -29,7 +29,8 @@ public interface GetStatus {
         String userChallenge,
         String signatureAlgorithm,
         SignatureAlgorithmParameters signatureAlgorithmParameters,
-        String interactions,
+        String flowType,
+        String interactionsDigest,
         String interactionTypeUsed
     ) {
     }
