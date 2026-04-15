@@ -1,9 +1,9 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   contact:
     url: http://ria.ee
   title: cdoc2-auth-server
-  version: 1.0.1
+  version: 0.9.0
   description: |
     API for the session creation process for MID/SID CDOC
 
@@ -26,9 +26,9 @@ paths:
             Location:
               schema:
                 type: string
-                example: /auth/status/9a7c3717d21f5cf19d18fa4fa5adee21
               description: 'URI of created resource. Auth process UUID can be extracted from URI as
                it follows pattern /auth/status/{authProcessUuid}'
+              example: '/auth/status/9a7c3717d21f5cf19d18fa4fa5adee21'
           content:
             application/json:
               schema:
