@@ -1,4 +1,4 @@
-package ee.cyber.cdoc2.server.app.usecase;
+package ee.cyber.cdoc2.server.app.usecase.startauth;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,7 +13,8 @@ public interface StoreAuth {
     record Request(
         UUID authUuid,
         String midSidSessionId,
-        List<SessionNonce.UriSessionNonce> sessionNonces
+        List<SessionNonce.UriSessionNonce> sessionNonces,
+        String unsignedSdJwt
     ) {
     }
 }

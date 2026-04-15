@@ -49,6 +49,11 @@
                 <constraints nullable="false"/>
             </column>
 
+            <column name="UNSIGNED_SDJWT" type="CLOB"
+                    remarks="Unsigned session token SDJWT">
+                <constraints nullable="false"/>
+            </column>
+
             <column name="CREATED_AT"
                     remarks="Instant of process creation"
                     type="timestamp with time zone">

@@ -7,15 +7,17 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.UUID;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import ee.cyber.cdoc2.server.adapter.generated.api.Cdoc2AuthApiDelegate;
-import ee.cyber.cdoc2.server.adapter.generated.model.AuhtProcessStatusResponse;
 import ee.cyber.cdoc2.server.adapter.generated.model.AuthIdentity;
+import ee.cyber.cdoc2.server.adapter.generated.model.AuthProcessStatusResponse;
+import ee.cyber.cdoc2.server.adapter.generated.model.StartAuthProcessResponse;
 import ee.cyber.cdoc2.server.adapter.generated.model.WellKnownResponse;
 import ee.cyber.cdoc2.server.app.usecase.GetStatus;
-import ee.cyber.cdoc2.server.app.usecase.StartAuth;
+import ee.cyber.cdoc2.server.app.usecase.startauth.StartAuth;
 
 @Component
 @RequiredArgsConstructor
@@ -25,19 +27,27 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
-    public ResponseEntity<Void> startAuth(AuthIdentity authIdentity) {
-        UUID authProcessUd = startAuth.execute(new StartAuth.Request(
-            authIdentity.getIdentifier(),
-            authIdentity.getMobileNr()
-        ));
+    public ResponseEntity<StartAuthProcessResponse> startAuth(AuthIdentity authIdentity) {
+        StartAuth.Response response =
+            startAuth.execute(new StartAuth.Request(
+                authIdentity.getIdentifier(),
+                authIdentity.getMobileNr()
+            ));
 
-        return ResponseEntity.created(getAuthStatusProcessLocation(authProcessUd)).build();
+        StartAuthProcessResponse responseBody = new StartAuthProcessResponse(
+            response.verificationCode()
+        );
+
+        return ResponseEntity.created(getAuthStatusProcessLocation(
+                response.uuid()))
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(responseBody);
     }
 
     @Override
-    public ResponseEntity<AuhtProcessStatusResponse> getAuthProcessStatus(String authProcessUuid) {
+    public ResponseEntity<AuthProcessStatusResponse> getAuthProcessStatus(String authProcessUuid) {
         String status = getStatus.execute(authProcessUuid);
-        AuhtProcessStatusResponse response = new AuhtProcessStatusResponse(status);
+        AuthProcessStatusResponse response = new AuthProcessStatusResponse(status);
         return ResponseEntity.ok(response);
     }
 

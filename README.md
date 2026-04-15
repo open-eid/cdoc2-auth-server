@@ -19,3 +19,11 @@
 - `webapp`
     - Spring boot application
     - May depend on `adapter`, `db-changelog`
+
+### Running from JAR
+
+- Create database (see README.md under /db-changelog)
+- `mvn clean install`. JAR is created under /webapp/target.
+- run JAR - `java -jar cdoc2-rp-server-app.jar`. Provide custom `application.properties` in same
+  folder as needed
+

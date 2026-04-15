@@ -18,7 +18,7 @@ import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessSessionNonceEntity;
 import ee.cyber.cdoc2.server.adapter.db.jpa.ServerSessionNonceUriEntity;
 import ee.cyber.cdoc2.server.app.usecase.AuthProcessStatus;
 import ee.cyber.cdoc2.server.app.usecase.GetAuthState;
-import ee.cyber.cdoc2.server.app.usecase.StoreAuth;
+import ee.cyber.cdoc2.server.app.usecase.startauth.StoreAuth;
 
 @NullMarked
 @Repository
@@ -51,6 +51,7 @@ public class AuthRepository implements StoreAuth, GetAuthState {
         authProcessEntity.setServerSessionNonce(nonceEntities);
         authProcessEntity.setUuid(request.authUuid().toString());
         authProcessEntity.setMidSidSessionId(request.midSidSessionId());
+        authProcessEntity.setUnsignedSdJwt(request.unsignedSdJwt());
         authProcessEntity.setStatus(AuthProcessStatus.STARTED.name());
 
         authProcessJpaRepository.save(authProcessEntity);

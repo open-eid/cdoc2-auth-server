@@ -18,7 +18,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 
 import ee.cyber.cdoc2.server.adapter.rest.configuration.SessionNonceRestClientConfiguration;
-import ee.cyber.cdoc2.server.app.usecase.SessionNonce;
+import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;

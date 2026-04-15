@@ -71,7 +71,7 @@ class Cdoc2AuthServerApplicationTest {
         );
 
         StartAuthRequest startAuthRequest = new StartAuthRequest(
-            "ETSI-00223355",
+            "etsi/PNOEE-30303039914",
             "1234567890"
         );
 

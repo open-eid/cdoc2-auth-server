@@ -1,4 +1,4 @@
-package ee.cyber.cdoc2.server.app.usecase;
+package ee.cyber.cdoc2.server.app.usecase.startauth;
 
 import java.net.URI;
 import java.util.List;
