@@ -1,20 +1,20 @@
 package ee.cyber.cdoc2.server.app.usecase.startauth;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public interface StoreAuth {
+public interface StoreAuthProcess {
 
     void execute(Request request);
 
     record Request(
         UUID authUuid,
-        String midSidSessionId,
-        List<SessionNonce.UriSessionNonce> sessionNonces,
-        String unsignedSdJwt
+        UUID midSidSessionId,
+        String unsignedSdJwt,
+        String interactionsDigest,
+        String rpChallenge
     ) {
     }
 }

@@ -16,8 +16,8 @@ import ee.cyber.cdoc2.server.adapter.generated.model.AuthIdentity;
 import ee.cyber.cdoc2.server.adapter.generated.model.AuthProcessStatusResponse;
 import ee.cyber.cdoc2.server.adapter.generated.model.StartAuthProcessResponse;
 import ee.cyber.cdoc2.server.adapter.generated.model.WellKnownResponse;
-import ee.cyber.cdoc2.server.app.usecase.GetStatus;
 import ee.cyber.cdoc2.server.app.usecase.startauth.StartAuth;
+import ee.cyber.cdoc2.server.app.usecase.status.GetStatus;
 
 @Component
 @RequiredArgsConstructor
@@ -46,9 +46,14 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
 
     @Override
     public ResponseEntity<AuthProcessStatusResponse> getAuthProcessStatus(String authProcessUuid) {
-        String status = getStatus.execute(authProcessUuid);
-        AuthProcessStatusResponse response = new AuthProcessStatusResponse(status);
-        return ResponseEntity.ok(response);
+        GetStatus.Response response = getStatus.execute(authProcessUuid);
+
+        AuthProcessStatusResponse responseBody = new AuthProcessStatusResponse(response.status())
+            .endResult(response.endResult())
+            .sessionToken(response.sessionToken())
+            .signingCertificate(response.signingCertificate());
+
+        return ResponseEntity.ok(responseBody);
     }
 
     @Override
@@ -62,6 +67,7 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
         return ResponseEntity.ok(response);
     }
 
+    //TODO should be created dynamically based on controller URI
     private URI getAuthStatusProcessLocation(UUID authProcessUuid) {
         return URI.create("/auth/status/" + authProcessUuid);
     }

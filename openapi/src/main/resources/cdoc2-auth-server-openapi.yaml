@@ -1,9 +1,9 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   contact:
     url: http://ria.ee
   title: cdoc2-auth-server
-  version: 1.0.1
+  version: 0.9.0
   description: |
     API for the session creation process for MID/SID CDOC
 
@@ -15,7 +15,7 @@ paths:
   '/auth/start':
     post:
       summary: Start auth
-      description: Start auth
+      description: Start auth process
       tags:
         - cdoc2-auth
       operationId: startAuth
@@ -26,9 +26,9 @@ paths:
             Location:
               schema:
                 type: string
-                example: /auth/status/9a7c3717d21f5cf19d18fa4fa5adee21
               description: 'URI of created resource. Auth process UUID can be extracted from URI as
                it follows pattern /auth/status/{authProcessUuid}'
+              example: '/auth/status/9a7c3717d21f5cf19d18fa4fa5adee21'
           content:
             application/json:
               schema:
@@ -46,7 +46,8 @@ paths:
   '/auth/status/{authProcessUuid}':
     get:
       summary: Get auth process status
-      description: Get auth process status
+      description: Get auth process status. When status is COMPLETE will also return the session
+        token and signing certificate.
       tags:
         - cdoc2-auth
       operationId: getAuthProcessStatus
@@ -122,6 +123,7 @@ components:
           minLength: 4
           maxLength: 4
           description: 'SmartId verification code'
+          example: '5702'
       required:
         - vc
 
@@ -134,6 +136,21 @@ components:
           minLength: 1
           maxLength: 16
           description: 'auth process status'
+          example: "COMPLETE"
+        endResult:
+          type: string
+          maxLength: 60
+          description: 'End result of SID/MID auth session'
+          nullable: true
+          example: "OK"
+        sessionToken:
+          type: string
+          description: 'base64url encoded SD-JWT with all disclosures'
+          nullable: true
+        signingCertificate:
+          type: string
+          description: 'base64url encoded X509 certificate'
+          nullable: true
       required:
         - status
 
@@ -166,7 +183,7 @@ components:
                 nullable: true
               crv:
                 type: string
-                description: ''
+                description: 'curve'
                 example: 'P-256'
                 nullable: true
               x:

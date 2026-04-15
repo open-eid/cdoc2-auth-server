@@ -43,10 +43,27 @@
                 <constraints nullable="false"/>
             </column>
 
+            <column name="INTERACTIONS_DIGEST"
+                    remarks="SHA-256 digest of the interactions string, base64 encoded"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="RP_CHALLENGE"
+                    remarks="base64 encoded RP challenge"
+                    type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
             <column name="STATUS"
                     remarks="Status of the authentication process"
                     type="VARCHAR(255)">
                 <constraints nullable="false"/>
+            </column>
+
+            <column name="END_RESULT"
+                    remarks="End result of the MID/SID session."
+                    type="VARCHAR(255)">
             </column>
 
             <column name="UNSIGNED_SDJWT" type="CLOB"
@@ -69,7 +86,7 @@
 
         <rollback>
             <dropIndex tableName="AUTH_PROCESS"
-                       indexName="IDX_AUTH_PROCESS__UUID" />
+                       indexName="IDX_AUTH_PROCESS__UUID"/>
 
             <dropTable tableName="AUTH_PROCESS"/>
         </rollback>

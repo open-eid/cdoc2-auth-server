@@ -2,9 +2,14 @@ package ee.cyber.cdoc2.server.app.usecase.startauth;
 
 
 import ee.sk.smartid.VerificationCodeCalculator;
+import ee.sk.smartid.common.InteractionsMapper;
+import ee.sk.smartid.common.notification.interactions.NotificationInteraction;
+import ee.sk.smartid.util.InteractionUtil;
 import lombok.RequiredArgsConstructor;
 
 import java.net.URI;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,17 +20,20 @@ import com.authlete.sd.SDJWT;
 
 import ee.cyber.cdoc2.auth.EtsiIdentifier;
 import ee.cyber.cdoc2.server.app.conf.SessionNonceUriConf;
+import ee.cyber.cdoc2.server.app.usecase.common.SessionToken;
+import ee.cyber.cdoc2.server.app.usecase.common.SessionToken.SessionTokenCreationParams;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce.UriSessionNonce;
-import ee.cyber.cdoc2.server.app.usecase.startauth.token.SessionToken;
-import ee.cyber.cdoc2.server.app.usecase.startauth.token.SessionToken.SessionTokenCreationParams;
 
 @NullMarked
 @RequiredArgsConstructor
 @Component
 public class StartAuthImpl implements StartAuth {
-    private final StoreAuth storeAuth;
+    private static final int RP_CHALLENGE_BYTES_LENGTH = 64;
+
+    private final StoreAuthProcess storeAuthProcess;
     private final SessionNonce sessionNonce;
     private final SessionNonceUriConf sessionNonceUriConf;
+    private final SidAuthenticate sidAuthenticate;
 
     @Override
     public Response execute(Request request) {
@@ -43,20 +51,43 @@ public class StartAuthImpl implements StartAuth {
 
         SDJWT unsignedSdJWT = SessionToken.unsignedSdJwtWithAllDisclosures(tokenCreationParams);
 
-        byte[] rpChallenge = SessionToken.getHashForCredentialJwt(unsignedSdJWT);
+        byte[] rpChallenge = createRpChallengeBytes();
 
         String verificationCode = VerificationCodeCalculator.calculate(rpChallenge);
 
-        storeAuth.execute(new StoreAuth.Request(
+        List<NotificationInteraction> interactions = List.of(
+            NotificationInteraction
+                .confirmationMessageAndVerificationCodeChoice("Creating CDOC2 session:"
+                    + " " + etsiIdentifier.getSemanticsIdentifier())
+        );
+
+        String interactionsBase64 =
+            InteractionUtil.encodeToBase64(InteractionsMapper.from(interactions));
+        String interactionsDigest = InteractionUtil.calculateDigest(interactionsBase64);
+
+        UUID sidAuthSessionUuid = sidAuthenticate.execute(new SidAuthenticate.Request(
+            interactions,
+            rpChallenge,
+            etsiIdentifier.getSemanticsIdentifier()
+        ));
+
+        storeAuthProcess.execute(new StoreAuthProcess.Request(
             authUuid,
-            UUID.randomUUID().toString(),
-            sessionNonces,
-            unsignedSdJWT.toString()
+            sidAuthSessionUuid,
+            unsignedSdJWT.toString(),
+            interactionsDigest,
+            Base64.getEncoder().encodeToString(rpChallenge)
         ));
 
         return new Response(
             authUuid,
             verificationCode
         );
+    }
+
+    private static byte[] createRpChallengeBytes() {
+        byte[] rpChallengeBytes = new byte[RP_CHALLENGE_BYTES_LENGTH];
+        new SecureRandom().nextBytes(rpChallengeBytes);
+        return rpChallengeBytes;
     }
 }

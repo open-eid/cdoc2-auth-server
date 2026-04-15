@@ -1,7 +1,5 @@
-package ee.cyber.cdoc2.server.app.usecase.startauth.token;
+package ee.cyber.cdoc2.server.app.usecase.common;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -19,7 +17,6 @@ import ee.cyber.cdoc2.auth.EtsiIdentifier;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce.UriSessionNonce;
 
 public final class SessionToken {
-
     private SessionToken() {
         // utility class
     }
@@ -38,16 +35,6 @@ public final class SessionToken {
                 .map(Disclosure::toArrayElement
                 ).toList()
         );
-    }
-
-    public static byte[] getHashForCredentialJwt(SDJWT sdjwt) {
-        try {
-            String input = sdjwt.getCredentialJwt();
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            return digest.digest(input.getBytes());
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-256 algorithm not available", e);
-        }
     }
 
     public static SDJWT unsignedSdJwtWithAllDisclosures(
