@@ -67,11 +67,12 @@ public class GetStatusImpl implements GetStatus {
                         new GetSessionTokenMaterial.Request(authProcessUuid)
                     );
 
-                GetSidSession.Signature signature = sidSession.response().signature();
-                if (signature == null) {
-                    throw new RuntimeException("Signature missing after authentication session "
-                        + "completed successfully");
-                }
+                GetSidSession.Signature signature = getSidSignature(
+                    sidSession.response()
+                );
+                GetSidSession.Certificate signingCertificate = getSigningCertificate(
+                    sidSession.response()
+                );
 
                 String signedSdJwt = sdJwtSigner.execute(sessionTokenMaterial.unsignedJwt(),
                     new SdJwtSigner.SdJwtSignatureParams(
@@ -90,12 +91,28 @@ public class GetStatusImpl implements GetStatus {
                     COMPLETE.name(),
                     sidSession.response().endResult(),
                     signedSdJwt,
-                    sidSession.response().cert().value()
+                    signingCertificate.value()
                 );
             }
         }
 
         throw new RuntimeException("SID session in unknown state");
+    }
+
+    private GetSidSession.Certificate getSigningCertificate(GetSidSession.Response response) {
+        if (response.cert() == null) {
+            throw new RuntimeException("Certificate missing in SID session response");
+        }
+
+        return response.cert();
+    }
+
+    private GetSidSession.Signature getSidSignature(GetSidSession.Response response) {
+        if (response.signature() == null) {
+            throw new RuntimeException("Signature missing in SID session response");
+        }
+
+        return response.signature();
     }
 }
 

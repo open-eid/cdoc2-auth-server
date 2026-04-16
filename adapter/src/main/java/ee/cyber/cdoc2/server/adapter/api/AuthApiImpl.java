@@ -5,6 +5,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Base64;
 import java.util.UUID;
 
 import org.springframework.http.MediaType;
@@ -51,7 +52,9 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
         AuthProcessStatusResponse responseBody = new AuthProcessStatusResponse(response.status())
             .endResult(response.endResult())
             .sessionToken(response.sessionToken())
-            .signingCertificate(response.signingCertificate());
+            .signingCertificate(
+                base64toBase64Url(response.signingCertificate())
+            );
 
         return ResponseEntity.ok(responseBody);
     }
@@ -70,5 +73,15 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
     //TODO should be created dynamically based on controller URI
     private URI getAuthStatusProcessLocation(UUID authProcessUuid) {
         return URI.create("/auth/status/" + authProcessUuid);
+    }
+
+    private static String base64toBase64Url(String base64String) {
+        if (base64String == null) {
+            return null;
+        }
+
+        return Base64.getUrlEncoder().encodeToString(
+            Base64.getDecoder().decode(base64String)
+        );
     }
 }
