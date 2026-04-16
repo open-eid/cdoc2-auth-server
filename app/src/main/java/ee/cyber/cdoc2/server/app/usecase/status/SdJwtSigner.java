@@ -38,7 +38,8 @@ class SdJwtSigner {
 
             claimsMap.put("signatureProtocol", RP_V3_SIGNATURE_ALGORITHM_NAME);
             claimsMap.put("rpChallenge", params.rpChallenge());
-            claimsMap.put("interactions", params.interactionsDigest());
+            claimsMap.put("interactionsDigest", params.interactionsDigest());
+            claimsMap.put("interactionTypeUsed", params.interactionTypeUsed());
             claimsMap.put("signature", params.sidSignature());
 
             JWTClaimsSet claimsWithRpV3Data = JWTClaimsSet.parse(claimsMap);
@@ -67,7 +68,8 @@ class SdJwtSigner {
     record SdJwtSignatureParams(
         GetSidSession.Signature sidSignature,
         String rpChallenge,
-        String interactionsDigest
+        String interactionsDigest,
+        String interactionTypeUsed
     ) {
     }
 }

@@ -67,6 +67,7 @@ class SessionTokenTest {
 
         Map<String, Object> payload = JSONObjectUtils.parse(sdjwt.getCredentialJwt());
 
+        assertNull(payload.get("aud"));
         assertEquals(EXPECTED_PAYLOAD_SIZE, payload.size());
         assertEquals(ETSI_IDENTIFIER, payload.get("sub"));
         assertEquals(ISS, payload.get("iss"));

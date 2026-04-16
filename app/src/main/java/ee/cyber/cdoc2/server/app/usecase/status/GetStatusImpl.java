@@ -77,7 +77,8 @@ public class GetStatusImpl implements GetStatus {
                     new SdJwtSigner.SdJwtSignatureParams(
                         signature,
                         sessionTokenMaterial.rpChallenge(),
-                        sessionTokenMaterial.interactionsDigest()
+                        sessionTokenMaterial.interactionsDigest(),
+                        sidSession.response().interactionTypeUsed()
                     ));
 
                 completeAuthProcess.execute(new CompleteAuthProcess.Request(

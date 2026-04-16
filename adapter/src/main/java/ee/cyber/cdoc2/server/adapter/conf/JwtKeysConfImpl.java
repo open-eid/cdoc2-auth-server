@@ -25,7 +25,6 @@ public class JwtKeysConfImpl implements JwtKeysConf {
         this.ecKeyKid = props.ecKeyKid();
     }
 
-
     @ConfigurationProperties(prefix = "app.well-known")
     public record AppProperties(
         String ecPrivateKeyName,
