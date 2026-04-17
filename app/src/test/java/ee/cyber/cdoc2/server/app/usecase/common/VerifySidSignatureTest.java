@@ -73,7 +73,7 @@ public class VerifySidSignatureTest {
         ));
 
         String separator = "|";
-        String schemeName = "smart-id";
+        String schemeName = "smart-id-demo";
         String signatureProtocol = "ACSP_V2";
         String relyingPartyNameBase64 = Base64.getEncoder()
             .encodeToString("DEMO".getBytes(StandardCharsets.UTF_8));
