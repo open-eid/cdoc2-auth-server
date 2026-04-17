@@ -44,8 +44,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class Cdoc2AuthServerApplicationTest {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final int WIREMOCK_PORT = 8080;
-    private static final String IDENTIFIER_OK = "PNOEE-40504040001-DEM0-Q";
-    private static final String IDENTIFIER_USER_REFUSED = "PNOEE-30403039917-MOCK-Q";
+    private static final String IDENTIFIER_OK = "PNOEE-40504040001";
+    private static final String IDENTIFIER_USER_REFUSED = "PNOEE-30403039917";
 
     @RegisterExtension
     static WireMockExtension wiremock = WireMockExtension.newInstance()
