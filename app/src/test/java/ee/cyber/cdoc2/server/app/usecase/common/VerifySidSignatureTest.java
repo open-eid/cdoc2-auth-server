@@ -1,13 +1,9 @@
 package ee.cyber.cdoc2.server.app.usecase.common;
 
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 import java.security.Signature;
-import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PSSParameterSpec;
@@ -48,8 +44,7 @@ public class VerifySidSignatureTest {
     private static final String EXPECTED_INTERACTION_TYPE_USED = "confirmationMessageAndVerificationCodeChoice";
 
     @Test
-    void verifyRpV3Signature() throws ParseException, NoSuchAlgorithmException,
-        SignatureException, InvalidKeyException, InvalidAlgorithmParameterException {
+    void verifyRpV3Signature() throws ParseException, GeneralSecurityException {
 
         SDJWT sdJwt = SDJWT.parse(SESSION_TOKEN_BASE64URL);
         SignedJWT signedJWT = SignedJWT.parse(sdJwt.getCredentialJwt());
@@ -101,14 +96,7 @@ public class VerifySidSignatureTest {
         };
 
         String acspV2Payload = String.join(separator, payloadParts);
-
         byte[] acspV2PayloadBytes = acspV2Payload.getBytes(StandardCharsets.UTF_8);
-
-        MessageDigest md = MessageDigest.getInstance(
-            signature.signatureAlgorithmParameters().hashAlgorithm()
-        );
-        md.update(acspV2PayloadBytes);
-        byte[] acspDigest = md.digest();
 
         PublicKey publicKey = cert.getPublicKey();
 
@@ -127,7 +115,7 @@ public class VerifySidSignatureTest {
         Signature verifier = Signature.getInstance(signature.signatureAlgorithm());
         verifier.setParameter(pssSpec);
         verifier.initVerify(publicKey);
-        verifier.update(acspDigest);
+        verifier.update(acspV2PayloadBytes);
 
         byte[] sidSignatureBytes = Base64.getDecoder().decode(signatureValueBase64);
         boolean isVerified = verifier.verify(sidSignatureBytes);
