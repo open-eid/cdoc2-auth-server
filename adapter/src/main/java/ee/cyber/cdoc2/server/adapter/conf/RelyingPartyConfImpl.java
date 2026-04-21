@@ -14,11 +14,13 @@ public class RelyingPartyConfImpl implements RelyingPartyConf {
     private final String name;
     private final UUID uuid;
     private final CertificateLevel certificateLevel;
+    private final String schemeName;
 
     public RelyingPartyConfImpl(AppProperties props) {
         this.name = props.name;
         this.uuid = UUID.fromString(props.uuid);
         this.certificateLevel = CertificateLevel.valueOf(props.certificateLevel);
+        this.schemeName = props.schemeName;
     }
 
     @Override
@@ -36,11 +38,17 @@ public class RelyingPartyConfImpl implements RelyingPartyConf {
         return this.certificateLevel;
     }
 
+    @Override
+    public String getSchemeName() {
+        return schemeName;
+    }
+
     @ConfigurationProperties(prefix = "app.rp")
     public record AppProperties(
         String name,
         String uuid,
-        @DefaultValue("ADVANCED") String certificateLevel
+        @DefaultValue("ADVANCED") String certificateLevel,
+        @DefaultValue("smart-id-demo") String schemeName
     ) {
     }
 }

@@ -21,7 +21,7 @@ public class GetStatusImpl implements GetStatus {
     private final CompleteAuthProcess completeAuthProcess;
     private final GetSidSession getSidSession;
     private final GetSessionTokenMaterial getSessionTokenMaterial;
-    private final SdJwtSigner sdJwtSigner;
+    private final CreateSignedSdJwtWithSidSignature createSignedSdJwtWithSidSignature;
 
     @Override
     public Response execute(String uuidStr) {
@@ -74,8 +74,9 @@ public class GetStatusImpl implements GetStatus {
                     sidSession.response()
                 );
 
-                String signedSdJwt = sdJwtSigner.execute(sessionTokenMaterial.unsignedJwt(),
-                    new SdJwtSigner.SdJwtSignatureParams(
+                String signedSdJwt = createSignedSdJwtWithSidSignature.execute(
+                    sessionTokenMaterial.unsignedJwt(),
+                    new CreateSignedSdJwtWithSidSignature.SidSignatureParams(
                         signature,
                         sessionTokenMaterial.rpChallenge(),
                         sessionTokenMaterial.interactionsDigest(),

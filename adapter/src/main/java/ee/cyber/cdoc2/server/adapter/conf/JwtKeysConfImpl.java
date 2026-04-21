@@ -11,16 +11,22 @@ import org.springframework.context.annotation.Configuration;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 
+import ee.cyber.cdoc2.server.adapter.resource.ResourceLoaderWrapper;
 import ee.cyber.cdoc2.server.app.conf.JwtKeysConf;
 
 @Configuration
 public class JwtKeysConfImpl implements JwtKeysConf {
+    private final ResourceLoaderWrapper resourceLoader;
     private final ECPrivateKey ecPrivateKey;
     private final String ecKeyKid;
 
-    public JwtKeysConfImpl(AppProperties props) throws JOSEException, IOException {
+    public JwtKeysConfImpl(
+        AppProperties props,
+        ResourceLoaderWrapper resourceLoader
+    ) throws JOSEException,
+        IOException {
+        this.resourceLoader = resourceLoader;
         String ecPrivatePem = readFile(props.ecPrivateKeyName());
-
         this.ecPrivateKey = JWK.parseFromPEMEncodedObjects(ecPrivatePem).toECKey().toECPrivateKey();
         this.ecKeyKid = props.ecKeyKid();
     }
@@ -43,10 +49,7 @@ public class JwtKeysConfImpl implements JwtKeysConf {
     }
 
     private String readFile(String name) throws IOException {
-        try (InputStream is = getClass().getClassLoader().getResourceAsStream(name)) {
-            if (is == null) {
-                throw new IllegalStateException("Resource not found: " + name);
-            }
+        try (InputStream is = resourceLoader.loadResource(name).getInputStream()) {
             return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         }
     }

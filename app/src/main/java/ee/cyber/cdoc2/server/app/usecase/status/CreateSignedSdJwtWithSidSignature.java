@@ -18,6 +18,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
 import ee.cyber.cdoc2.server.app.conf.JwtKeysConf;
+import ee.cyber.cdoc2.server.app.conf.RelyingPartyConf;
 import ee.cyber.cdoc2.server.app.usecase.status.sid.GetSidSession;
 
 import static ee.cyber.cdoc2.server.app.Constants.RP_V3_SIGNATURE_ALGORITHM_NAME;
@@ -25,10 +26,11 @@ import static ee.cyber.cdoc2.server.app.Constants.SESSION_TOKEN_JWT_TYP;
 
 @Component
 @RequiredArgsConstructor
-class SdJwtSigner {
+class CreateSignedSdJwtWithSidSignature {
     private final JwtKeysConf jwtKeysConf;
+    private final RelyingPartyConf relyingPartyConf;
 
-    String execute(String unsignedSdJwtString, SdJwtSignatureParams params) {
+    String execute(String unsignedSdJwtString, SidSignatureParams params) {
         SDJWT unsignedSdJwt = SDJWT.parse(unsignedSdJwtString);
         String credentialJwt = unsignedSdJwt.getCredentialJwt();
 
@@ -40,6 +42,8 @@ class SdJwtSigner {
             claimsMap.put("rpChallenge", params.rpChallenge());
             claimsMap.put("interactionsDigest", params.interactionsDigest());
             claimsMap.put("interactionTypeUsed", params.interactionTypeUsed());
+            claimsMap.put("rpName", relyingPartyConf.getName());
+            claimsMap.put("schemeName", relyingPartyConf.getSchemeName());
             claimsMap.put("signature", params.sidSignature());
 
             JWTClaimsSet claimsWithRpV3Data = JWTClaimsSet.parse(claimsMap);
@@ -65,7 +69,7 @@ class SdJwtSigner {
         }
     }
 
-    record SdJwtSignatureParams(
+    record SidSignatureParams(
         GetSidSession.Signature sidSignature,
         String rpChallenge,
         String interactionsDigest,

@@ -10,4 +10,6 @@ public interface RelyingPartyConf {
     UUID getUuid();
 
     CertificateLevel getCertificateLevel();
+
+    String getSchemeName();
 }
