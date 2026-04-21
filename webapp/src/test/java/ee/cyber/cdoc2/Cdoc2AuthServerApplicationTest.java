@@ -46,6 +46,8 @@ class Cdoc2AuthServerApplicationTest {
     private static final int WIREMOCK_PORT = 8080;
     private static final String IDENTIFIER_OK = "PNOEE-40504040001";
     private static final String IDENTIFIER_USER_REFUSED = "PNOEE-30403039917";
+    private static final String SESSION_NONCE_1_VALUE = "WTq9gAkv5_UJioELXDqOAA";
+    private static final String SESSION_NONCE_2_VALUE = "nrVcSEcHuWt2SKfjkMm6RQ";
 
     @RegisterExtension
     static WireMockExtension wiremock = WireMockExtension.newInstance()
@@ -68,7 +70,7 @@ class Cdoc2AuthServerApplicationTest {
             ).willReturn(aResponse()
                 .withStatus(HttpStatus.OK.value())
                 .withHeader("Content-Type", "application/json")
-                .withBody("{\"nonce\":\"1234567890987654321\"}"))
+                .withBody("{\"nonce\":\"" + SESSION_NONCE_1_VALUE + "\"}"))
         );
 
         wiremock.stubFor(
@@ -77,7 +79,7 @@ class Cdoc2AuthServerApplicationTest {
             ).willReturn(aResponse()
                 .withStatus(HttpStatus.OK.value())
                 .withHeader("Content-Type", "application/json")
-                .withBody("{\"nonce\":\"98765432123456789\"}"))
+                .withBody("{\"nonce\":\"" + SESSION_NONCE_2_VALUE + "\"}"))
         );
 
         StartAuthRequest startAuthRequest = new StartAuthRequest(
