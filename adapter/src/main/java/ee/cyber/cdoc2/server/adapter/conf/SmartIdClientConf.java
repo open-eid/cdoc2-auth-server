@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 public class SmartIdClientConf {
-    private static final String SSL_BUNDLE_NAME = "sid-trusted-issuers";
+    private static final String SSL_BUNDLE_NAME = "sid-server";
     private final SslBundles sslBundles;
 
     @ConfigurationProperties(prefix = "app.smartid.client")
