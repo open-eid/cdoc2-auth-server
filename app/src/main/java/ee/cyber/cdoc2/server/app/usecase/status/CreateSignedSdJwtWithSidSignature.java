@@ -79,9 +79,7 @@ class CreateSignedSdJwtWithSidSignature {
 
             return signedSdJwt.toString();
 
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        } catch (JOSEException e) {
+        } catch (ParseException | JOSEException e) {
             throw new RuntimeException(e);
         }
     }

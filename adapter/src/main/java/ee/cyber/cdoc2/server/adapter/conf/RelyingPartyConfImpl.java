@@ -20,7 +20,7 @@ public class RelyingPartyConfImpl implements RelyingPartyConf {
     public record AppProperties(
         String name,
         String uuid,
-        @DefaultValue("ADVANCED") String certificateLevel,
+        @DefaultValue("QUALIFIED") String certificateLevel,
         @DefaultValue("smart-id-demo") String schemeName
     ) {
     }

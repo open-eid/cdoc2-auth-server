@@ -94,14 +94,6 @@ class SessionNonceRestApiTest {
         stubOkNonce1();
         stubTimeoutNonce2();
 
-//        URI sessionNonce1RequestUri = URI.create(baseUrl + SESSION_NONCE_1_URI);
-//        URI sessionNonce2RequestUri = URI.create(baseUrl + SESSION_NONCE_2_URI);
-//
-//        List<URI> uris = List.of(
-//            sessionNonce1RequestUri,
-//            sessionNonce2RequestUri
-//        );
-
         Exception exception = assertThrows(
             Exception.class,
             () -> sessionNonceRestApi.collectSessionNonces()
