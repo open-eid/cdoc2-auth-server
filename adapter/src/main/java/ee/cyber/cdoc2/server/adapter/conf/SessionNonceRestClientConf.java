@@ -13,6 +13,12 @@ public class SessionNonceRestClientConf {
     private static final String CONF_DEFAULT_CONNECTION_REQUEST_TIMEOUT = "5000";
     private static final String CONF_DEFAULT_SESSION_NONCE_RETRIES = "3";
 
+    private final int retries;
+
+    public SessionNonceRestClientConf(AppProperties props) {
+        retries = props.retries;
+    }
+
     @ConfigurationProperties(prefix = "app.restclient.session-nonce")
     public record AppProperties(
         @DefaultValue(CONF_DEFAULT_READ_TIMEOUT) int readTimeout,
@@ -31,5 +37,9 @@ public class SessionNonceRestClientConf {
         return RestClient.builder()
             .requestFactory(factory)
             .build();
+    }
+
+    public int getRetries() {
+        return retries;
     }
 }

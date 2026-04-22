@@ -7,7 +7,6 @@ import ee.sk.smartid.common.notification.interactions.NotificationInteraction;
 import ee.sk.smartid.util.InteractionUtil;
 import lombok.RequiredArgsConstructor;
 
-import java.net.URI;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.List;
@@ -40,8 +39,7 @@ public class StartAuthImpl implements StartAuth {
         UUID authUuid = UUID.randomUUID();
         EtsiIdentifier etsiIdentifier = new EtsiIdentifier(request.nationalId());
 
-        List<URI> sessionNonceUris = sessionNonceUriConf.getUris();
-        List<UriSessionNonce> sessionNonces = sessionNonce.collectSessionNonces(sessionNonceUris);
+        List<UriSessionNonce> sessionNonces = sessionNonce.collectSessionNonces();
 
         SessionTokenCreationParams tokenCreationParams = new SessionTokenCreationParams(
             sessionNonces,

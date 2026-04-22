@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 public interface SessionNonce {
-    List<UriSessionNonce> collectSessionNonces(List<URI> uris);
+    List<UriSessionNonce> collectSessionNonces();
 
     record UriSessionNonce(URI uri, String nonce) {
     }
