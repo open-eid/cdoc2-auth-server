@@ -1,4 +1,4 @@
-package ee.cyber.cdoc2.server.adapter.rest.configuration;
+package ee.cyber.cdoc2.server.adapter.conf;
 
 import ee.sk.smartid.SmartIdClient;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
-public class SmartIdClientConfiguration {
+public class SmartIdClientConf {
     private static final String SSL_BUNDLE_NAME = "sid-trusted-issuers";
     private final SslBundles sslBundles;
 

@@ -17,7 +17,7 @@ import org.springframework.web.client.RestClient;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 
-import ee.cyber.cdoc2.server.adapter.rest.configuration.SessionNonceRestClientConfiguration;
+import ee.cyber.cdoc2.server.adapter.conf.SessionNonceRestClientConf;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -49,7 +49,7 @@ class SessionNonceRestApiTest {
 
         sessionNonceRestApi = new SessionNonceRestApi(
             restClient,
-            new SessionNonceRestClientConfiguration.AppProperties(
+            new SessionNonceRestClientConf.AppProperties(
                 DEFAULT_TIMEOUT,
                 DEFAULT_TIMEOUT,
                 DEFAULT_RETRIES

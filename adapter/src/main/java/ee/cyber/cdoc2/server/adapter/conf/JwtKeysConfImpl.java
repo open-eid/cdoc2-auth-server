@@ -20,6 +20,13 @@ public class JwtKeysConfImpl implements JwtKeysConf {
     private final ECPrivateKey ecPrivateKey;
     private final String ecKeyKid;
 
+    @ConfigurationProperties(prefix = "app.well-known")
+    public record AppProperties(
+        String ecPrivateKeyName,
+        String ecKeyKid
+    ) {
+    }
+
     public JwtKeysConfImpl(
         AppProperties props,
         ResourceLoaderWrapper resourceLoader
@@ -29,13 +36,6 @@ public class JwtKeysConfImpl implements JwtKeysConf {
         String ecPrivatePem = readFile(props.ecPrivateKeyName());
         this.ecPrivateKey = JWK.parseFromPEMEncodedObjects(ecPrivatePem).toECKey().toECPrivateKey();
         this.ecKeyKid = props.ecKeyKid();
-    }
-
-    @ConfigurationProperties(prefix = "app.well-known")
-    public record AppProperties(
-        String ecPrivateKeyName,
-        String ecKeyKid
-    ) {
     }
 
     @Override
