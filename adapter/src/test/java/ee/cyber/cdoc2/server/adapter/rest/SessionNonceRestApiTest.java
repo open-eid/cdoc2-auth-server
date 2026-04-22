@@ -17,7 +17,8 @@ import org.springframework.web.client.RestClient;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 
-import ee.cyber.cdoc2.server.adapter.rest.configuration.SessionNonceRestClientConfiguration;
+import ee.cyber.cdoc2.server.adapter.conf.SessionNonceRestClientConf;
+import ee.cyber.cdoc2.server.adapter.conf.SessionNonceUriConfImpl;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -49,11 +50,14 @@ class SessionNonceRestApiTest {
 
         sessionNonceRestApi = new SessionNonceRestApi(
             restClient,
-            new SessionNonceRestClientConfiguration.AppProperties(
-                DEFAULT_TIMEOUT,
-                DEFAULT_TIMEOUT,
-                DEFAULT_RETRIES
-            )
+            new SessionNonceRestClientConf(
+                new SessionNonceRestClientConf.AppProperties(DEFAULT_TIMEOUT,
+                    DEFAULT_TIMEOUT,
+                    DEFAULT_RETRIES
+                )),
+            new SessionNonceUriConfImpl(new SessionNonceUriConfImpl.AppProperties(
+                List.of(baseUrl + SESSION_NONCE_1_URI, baseUrl + SESSION_NONCE_2_URI)
+            ))
         );
     }
 
@@ -70,7 +74,7 @@ class SessionNonceRestApiTest {
             sessionNonce2RequestUri
         );
 
-        List<SessionNonce.UriSessionNonce> result = sessionNonceRestApi.collectSessionNonces(uris);
+        List<SessionNonce.UriSessionNonce> result = sessionNonceRestApi.collectSessionNonces();
 
         assertEquals(2, result.size());
 
@@ -90,17 +94,9 @@ class SessionNonceRestApiTest {
         stubOkNonce1();
         stubTimeoutNonce2();
 
-        URI sessionNonce1RequestUri = URI.create(baseUrl + SESSION_NONCE_1_URI);
-        URI sessionNonce2RequestUri = URI.create(baseUrl + SESSION_NONCE_2_URI);
-
-        List<URI> uris = List.of(
-            sessionNonce1RequestUri,
-            sessionNonce2RequestUri
-        );
-
         Exception exception = assertThrows(
             Exception.class,
-            () -> sessionNonceRestApi.collectSessionNonces(uris)
+            () -> sessionNonceRestApi.collectSessionNonces()
         );
 
         assertInstanceOf(CompletionException.class, exception);

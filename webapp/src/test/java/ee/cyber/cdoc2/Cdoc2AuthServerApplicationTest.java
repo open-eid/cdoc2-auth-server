@@ -31,8 +31,6 @@ import ee.cyber.cdoc2.server.adapter.generated.model.AuthProcessStatusResponse;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static ee.cyber.cdoc2.SessionNonceUriHelper.SESSION_NONCE_URI_1;
-import static ee.cyber.cdoc2.SessionNonceUriHelper.SESSION_NONCE_URI_2;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -44,8 +42,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class Cdoc2AuthServerApplicationTest {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final int WIREMOCK_PORT = 8080;
-    private static final String IDENTIFIER_OK = "PNOEE-40504040001-DEM0-Q";
-    private static final String IDENTIFIER_USER_REFUSED = "PNOEE-30403039917-MOCK-Q";
+    private static final String IDENTIFIER_OK = "PNOEE-40504040001";
+    private static final String IDENTIFIER_USER_REFUSED = "PNOEE-30403039917";
+    private static final String SESSION_NONCE_1_VALUE = "WTq9gAkv5_UJioELXDqOAA";
+    private static final String SESSION_NONCE_2_VALUE = "nrVcSEcHuWt2SKfjkMm6RQ";
+    public static final String SESSION_NONCE_URI_1 = "/session_nonce_1";
+    public static final String SESSION_NONCE_URI_2 = "/session_nonce_2";
 
     @RegisterExtension
     static WireMockExtension wiremock = WireMockExtension.newInstance()
@@ -55,20 +57,15 @@ class Cdoc2AuthServerApplicationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private SessionNonceUriHelper sessionNonceUriHelper;
-
     @Test
     void shouldGetAuthStatus() throws Exception {
-        sessionNonceUriHelper.createSessionNonceUriTestData();
-
         wiremock.stubFor(
             WireMock.post(
                 urlEqualTo(SESSION_NONCE_URI_1)
             ).willReturn(aResponse()
                 .withStatus(HttpStatus.OK.value())
                 .withHeader("Content-Type", "application/json")
-                .withBody("{\"nonce\":\"1234567890987654321\"}"))
+                .withBody("{\"nonce\":\"" + SESSION_NONCE_1_VALUE + "\"}"))
         );
 
         wiremock.stubFor(
@@ -77,7 +74,7 @@ class Cdoc2AuthServerApplicationTest {
             ).willReturn(aResponse()
                 .withStatus(HttpStatus.OK.value())
                 .withHeader("Content-Type", "application/json")
-                .withBody("{\"nonce\":\"98765432123456789\"}"))
+                .withBody("{\"nonce\":\"" + SESSION_NONCE_2_VALUE + "\"}"))
         );
 
         StartAuthRequest startAuthRequest = new StartAuthRequest(

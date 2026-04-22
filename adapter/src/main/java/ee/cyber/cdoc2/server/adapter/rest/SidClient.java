@@ -5,6 +5,7 @@ import ee.sk.smartid.HashAlgorithm;
 import ee.sk.smartid.RpChallenge;
 import ee.sk.smartid.SmartIdClient;
 import ee.sk.smartid.rest.SessionStatusPoller;
+import ee.sk.smartid.rest.dao.SemanticsIdentifier;
 import ee.sk.smartid.rest.dao.SessionSignature;
 import ee.sk.smartid.rest.dao.SessionSignatureAlgorithmParameters;
 import ee.sk.smartid.rest.dao.SessionStatus;
@@ -16,6 +17,7 @@ import java.util.UUID;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Component;
 
+import ee.cyber.cdoc2.server.app.CertificateLevel;
 import ee.cyber.cdoc2.server.app.conf.RelyingPartyConf;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SidAuthenticate;
 import ee.cyber.cdoc2.server.app.usecase.status.sid.GetSidSession;
@@ -37,9 +39,8 @@ public class SidClient implements SidAuthenticate, GetSidSession {
             .withInteractions(request.interactions())
             .withHashAlgorithm(HashAlgorithm.SHA_256)
             .withSignatureAlgorithm(AuthenticationSignatureAlgorithm.RSASSA_PSS)
-            .withCertificateLevel(AuthenticationCertificateLevel.QUALIFIED)
-//            .withSemanticsIdentifier(new SemanticsIdentifier(request.semanticsIdentifier()))
-            .withDocumentNumber(request.semanticsIdentifier())
+            .withCertificateLevel(convertCertificateLevel(relyingPartyConf.getCertificateLevel()))
+            .withSemanticsIdentifier(new SemanticsIdentifier(request.semanticsIdentifier()))
             .initAuthenticationSession();
 
         return UUID.fromString(authenticationSessionResponse.sessionID());
@@ -88,5 +89,18 @@ public class SidClient implements SidAuthenticate, GetSidSession {
                 : null,
             sessionStatus.getInteractionTypeUsed()
         );
+    }
+
+    private AuthenticationCertificateLevel convertCertificateLevel(
+        CertificateLevel certificateLevel
+    ) {
+        if (certificateLevel == CertificateLevel.QUALIFIED) {
+            return AuthenticationCertificateLevel.QUALIFIED;
+        }
+        if (certificateLevel == CertificateLevel.ADVANCED) {
+            return AuthenticationCertificateLevel.ADVANCED;
+        }
+
+        throw new RuntimeException("Unknown certificate level");
     }
 }

@@ -12,8 +12,8 @@ public final class PerformTaskWithRetriesHelper {
 
     public static <T> List<T> allOfWithRetries(
         List<Supplier<CompletableFuture<T>>> tasks,
-        int maxRetries) {
-
+        int maxRetries
+    ) {
         List<CompletableFuture<T>> retryingFutures =
             tasks.stream()
                 .map(task -> withRetries(task, maxRetries))
@@ -27,10 +27,10 @@ public final class PerformTaskWithRetriesHelper {
             ).join();
     }
 
-    public static <T> CompletableFuture<T> withRetries(
+    private static <T> CompletableFuture<T> withRetries(
         Supplier<CompletableFuture<T>> future,
-        int maxRetries) {
-
+        int maxRetries
+    ) {
         CompletableFuture<T> promise = new CompletableFuture<>();
 
         BiConsumer<Integer, Throwable> attempt = new BiConsumer<>() {

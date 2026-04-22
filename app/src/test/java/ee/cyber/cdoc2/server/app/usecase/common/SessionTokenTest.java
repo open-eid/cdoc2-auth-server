@@ -32,7 +32,7 @@ class SessionTokenTest {
     private static final URI URI_2 = URI.create("http://localhost/2");
     private static final String ISS = "test.example.com";
     private static final int EXPECTED_DISCLOSURES_COUNT = 3;
-    private static final int EXPECTED_PAYLOAD_SIZE = 6;
+    private static final int EXPECTED_PAYLOAD_SIZE = 4;
     private static final String MOCK_HEADER = "eyJraWQiOiJlYy1rZXktMjAyNiIsInR5cCI6InZuZC5jZG9jMi"
         + "5zZXNzaW9uLXRva2VuLnYyK3NkLWp3dCIsImFsZyI6IkVTMjU2In0";
 
@@ -67,12 +67,11 @@ class SessionTokenTest {
 
         Map<String, Object> payload = JSONObjectUtils.parse(sdjwt.getCredentialJwt());
 
+        assertNull(payload.get("aud"));
         assertEquals(EXPECTED_PAYLOAD_SIZE, payload.size());
         assertEquals(ETSI_IDENTIFIER, payload.get("sub"));
         assertEquals(ISS, payload.get("iss"));
         assertEquals("sha-256", payload.get("_sd_alg"));
-        assertNotNull(payload.get("iat"));
-        assertNotNull(payload.get("exp"));
         assertNotNull(payload.get("_sd"));
     }
 

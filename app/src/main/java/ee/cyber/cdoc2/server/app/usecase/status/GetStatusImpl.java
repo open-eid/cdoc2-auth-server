@@ -21,7 +21,7 @@ public class GetStatusImpl implements GetStatus {
     private final CompleteAuthProcess completeAuthProcess;
     private final GetSidSession getSidSession;
     private final GetSessionTokenMaterial getSessionTokenMaterial;
-    private final SdJwtSigner sdJwtSigner;
+    private final CreateSignedSdJwtWithSidSignature createSignedSdJwtWithSidSignature;
 
     @Override
     public Response execute(String uuidStr) {
@@ -67,17 +67,20 @@ public class GetStatusImpl implements GetStatus {
                         new GetSessionTokenMaterial.Request(authProcessUuid)
                     );
 
-                GetSidSession.Signature signature = sidSession.response().signature();
-                if (signature == null) {
-                    throw new RuntimeException("Signature missing after authentication session "
-                        + "completed successfully");
-                }
+                GetSidSession.Signature signature = getSidSignature(
+                    sidSession.response()
+                );
+                GetSidSession.Certificate signingCertificate = getSigningCertificate(
+                    sidSession.response()
+                );
 
-                String signedSdJwt = sdJwtSigner.execute(sessionTokenMaterial.unsignedJwt(),
-                    new SdJwtSigner.SdJwtSignatureParams(
+                String signedSdJwt = createSignedSdJwtWithSidSignature.execute(
+                    sessionTokenMaterial.unsignedJwt(),
+                    new CreateSignedSdJwtWithSidSignature.SidSignatureParams(
                         signature,
                         sessionTokenMaterial.rpChallenge(),
-                        sessionTokenMaterial.interactionsDigest()
+                        sessionTokenMaterial.interactionsDigest(),
+                        sidSession.response().interactionTypeUsed()
                     ));
 
                 completeAuthProcess.execute(new CompleteAuthProcess.Request(
@@ -89,12 +92,28 @@ public class GetStatusImpl implements GetStatus {
                     COMPLETE.name(),
                     sidSession.response().endResult(),
                     signedSdJwt,
-                    sidSession.response().cert().value()
+                    signingCertificate.value()
                 );
             }
         }
 
         throw new RuntimeException("SID session in unknown state");
+    }
+
+    private GetSidSession.Certificate getSigningCertificate(GetSidSession.Response response) {
+        if (response.cert() == null) {
+            throw new RuntimeException("Certificate missing in SID session response");
+        }
+
+        return response.cert();
+    }
+
+    private GetSidSession.Signature getSidSignature(GetSidSession.Response response) {
+        if (response.signature() == null) {
+            throw new RuntimeException("Signature missing in SID session response");
+        }
+
+        return response.signature();
     }
 }
 

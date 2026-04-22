@@ -1,4 +1,4 @@
-package ee.cyber.cdoc2.server.adapter.rest.configuration;
+package ee.cyber.cdoc2.server.adapter.conf;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
@@ -8,10 +8,16 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 @Configuration
-public class SessionNonceRestClientConfiguration {
+public class SessionNonceRestClientConf {
     private static final String CONF_DEFAULT_READ_TIMEOUT = "5000";
     private static final String CONF_DEFAULT_CONNECTION_REQUEST_TIMEOUT = "5000";
     private static final String CONF_DEFAULT_SESSION_NONCE_RETRIES = "3";
+
+    private final int retries;
+
+    public SessionNonceRestClientConf(AppProperties props) {
+        retries = props.retries;
+    }
 
     @ConfigurationProperties(prefix = "app.restclient.session-nonce")
     public record AppProperties(
@@ -31,5 +37,9 @@ public class SessionNonceRestClientConfiguration {
         return RestClient.builder()
             .requestFactory(factory)
             .build();
+    }
+
+    public int getRetries() {
+        return retries;
     }
 }
