@@ -1,10 +1,7 @@
 package ee.cyber.cdoc2.server.app.usecase.common;
 
 import java.text.ParseException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -71,14 +68,9 @@ public final class SessionToken {
         // The size of the array is 1.
         Map<String, Object> claims = builder.build(true);
 
-        Date issueDate = new Date();
-        Instant instant = issueDate.toInstant().plus(1, ChronoUnit.DAYS);
-
         JWTClaimsSet regularClaims = new JWTClaimsSet.Builder()
             .issuer(creationParams.issuer)
             .subject(creationParams.etsiIdentifier.toString())
-            .issueTime(issueDate)
-            .expirationTime(Date.from(instant))
             .build();
 
         claims.putAll(regularClaims.toJSONObject());
