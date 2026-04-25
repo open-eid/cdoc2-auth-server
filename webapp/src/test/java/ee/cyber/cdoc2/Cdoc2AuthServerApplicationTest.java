@@ -127,8 +127,8 @@ class Cdoc2AuthServerApplicationTest {
 
         assertTrue(signedJWT.verify(verifier));
 
-        verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_1)));
-        verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_2)));
+        wiremock.verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_1)));
+        wiremock.verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_2)));
     }
 
     private AuthProcessStatusResponse performAuthStatusRequest(

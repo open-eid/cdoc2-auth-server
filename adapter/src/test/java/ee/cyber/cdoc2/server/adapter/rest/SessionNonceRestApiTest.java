@@ -36,7 +36,7 @@ class SessionNonceRestApiTest {
     private SessionNonceRestApi sessionNonceRestApi;
     private static String baseUrl;
 
-    private static final int WIREMOCK_PORT = 8080;
+    private static final int WIREMOCK_PORT = 8090;
 
     @RegisterExtension
     static WireMockExtension wiremock = WireMockExtension.newInstance()
@@ -101,8 +101,9 @@ class SessionNonceRestApiTest {
 
         assertInstanceOf(CompletionException.class, exception);
         assertInstanceOf(ResourceAccessException.class, exception.getCause());
-        verify(1, postRequestedFor(urlEqualTo(SESSION_NONCE_1_URI)));
-        verify(DEFAULT_RETRIES + 1, postRequestedFor(urlEqualTo(SESSION_NONCE_2_URI)));
+        wiremock.verify(1, postRequestedFor(urlEqualTo(SESSION_NONCE_1_URI)));
+        wiremock.verify(DEFAULT_RETRIES + 1,
+            postRequestedFor(urlEqualTo(SESSION_NONCE_2_URI)));
     }
 
     private void stubTimeoutNonce2() {
