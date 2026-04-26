@@ -2,6 +2,8 @@ package ee.cyber.cdoc2.server.app.usecase.status;
 
 import java.util.UUID;
 
+import org.jspecify.annotations.Nullable;
+
 import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessStatus;
 
 public interface GetAuthProcess {
@@ -9,8 +11,8 @@ public interface GetAuthProcess {
 
     record Response(
         AuthProcessStatus status,
-        String endResult,
-        String midSidSessionUuid
+        @Nullable String endResult,
+        @Nullable String midSidSessionUuid
     ) {
     }
 }

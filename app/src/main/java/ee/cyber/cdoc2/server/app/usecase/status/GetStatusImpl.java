@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
-import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Component;
 
 import ee.cyber.cdoc2.server.app.usecase.status.sid.GetSidSession;
@@ -12,7 +11,6 @@ import ee.cyber.cdoc2.server.app.usecase.status.sid.SidSession;
 
 import static ee.cyber.cdoc2.server.app.usecase.common.AuthProcessStatus.*;
 
-@NullMarked
 @Component
 @RequiredArgsConstructor
 public class GetStatusImpl implements GetStatus {
