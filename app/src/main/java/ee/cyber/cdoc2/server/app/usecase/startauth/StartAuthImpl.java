@@ -12,26 +12,22 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
-import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Component;
 
 import com.authlete.sd.SDJWT;
 
 import ee.cyber.cdoc2.auth.EtsiIdentifier;
-import ee.cyber.cdoc2.server.app.conf.SessionNonceUriConf;
 import ee.cyber.cdoc2.server.app.usecase.common.SessionToken;
 import ee.cyber.cdoc2.server.app.usecase.common.SessionToken.SessionTokenCreationParams;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce.UriSessionNonce;
 
-@NullMarked
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class StartAuthImpl implements StartAuth {
     private static final int RP_CHALLENGE_BYTES_LENGTH = 64;
 
     private final StoreAuthProcess storeAuthProcess;
     private final SessionNonce sessionNonce;
-    private final SessionNonceUriConf sessionNonceUriConf;
     private final SidAuthenticate sidAuthenticate;
 
     @Override

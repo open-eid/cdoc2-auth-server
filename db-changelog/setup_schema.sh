@@ -4,10 +4,16 @@ set -e
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
     CREATE USER docker;
     CREATE DATABASE cdoc2auth;
+    CREATE DATABASE cdoc2rp;
     GRANT ALL PRIVILEGES ON DATABASE cdoc2auth TO docker;
+    GRANT ALL PRIVILEGES ON DATABASE cdoc2rp TO docker;
     ALTER USER docker WITH PASSWORD 'docker';
 EOSQL
 
 psql -v ON_ERROR_STOP=1 --username docker --dbname cdoc2auth <<-EOSQL
+    CREATE SCHEMA docker AUTHORIZATION docker;
+EOSQL
+
+psql -v ON_ERROR_STOP=1 --username docker --dbname cdoc2rp <<-EOSQL
     CREATE SCHEMA docker AUTHORIZATION docker;
 EOSQL

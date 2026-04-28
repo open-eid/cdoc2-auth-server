@@ -1,8 +1,5 @@
 package ee.cyber.cdoc2.server.app.usecase.status.sid;
 
-import org.jspecify.annotations.NullMarked;
-
-@NullMarked
 public record SidSession(GetSidSession.Response response) {
     private static final String SESSION_COMPLETE = "COMPLETE";
     private static final String SESSION_RUNNING = "RUNNING";

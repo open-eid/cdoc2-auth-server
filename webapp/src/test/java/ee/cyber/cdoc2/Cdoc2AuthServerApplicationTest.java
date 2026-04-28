@@ -41,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class Cdoc2AuthServerApplicationTest {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final int WIREMOCK_PORT = 8080;
+    private static final int WIREMOCK_PORT = 9080;
     private static final String IDENTIFIER_OK = "PNOEE-40504040001";
     private static final String IDENTIFIER_USER_REFUSED = "PNOEE-30403039917";
     private static final String SESSION_NONCE_1_VALUE = "WTq9gAkv5_UJioELXDqOAA";
@@ -127,8 +127,8 @@ class Cdoc2AuthServerApplicationTest {
 
         assertTrue(signedJWT.verify(verifier));
 
-        verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_1)));
-        verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_2)));
+        wiremock.verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_1)));
+        wiremock.verify(postRequestedFor(urlEqualTo(SESSION_NONCE_URI_2)));
     }
 
     private AuthProcessStatusResponse performAuthStatusRequest(

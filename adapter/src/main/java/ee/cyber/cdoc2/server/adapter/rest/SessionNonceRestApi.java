@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -65,6 +66,8 @@ public class SessionNonceRestApi implements SessionNonce {
         );
     }
 
-    private record NonceBody(String nonce) {
+    private record NonceBody(
+        @Nullable String nonce
+    ) {
     }
 }

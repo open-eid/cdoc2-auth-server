@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
-import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Component;
 
 import ee.cyber.cdoc2.server.app.CertificateLevel;
@@ -22,7 +21,6 @@ import ee.cyber.cdoc2.server.app.conf.RelyingPartyConf;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SidAuthenticate;
 import ee.cyber.cdoc2.server.app.usecase.status.sid.GetSidSession;
 
-@NullMarked
 @Component
 @RequiredArgsConstructor
 public class SidClient implements SidAuthenticate, GetSidSession {
