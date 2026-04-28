@@ -12,6 +12,7 @@
     <artifactId>cdoc2-auth-server-openapi</artifactId>
 
     <properties>
+        <cdoc2-auth-server-openapi.version>0.9.0-draft</cdoc2-auth-server-openapi.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,6 +20,13 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>ee.cyber.cdoc2.openapi</groupId>
+            <artifactId>cdoc2-auth-server-openapi</artifactId>
+            <version>${cdoc2-auth-server-openapi.version}</version>
+            <type>yaml</type>
+        </dependency>
+
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations</artifactId>
@@ -49,19 +57,46 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.10.0</version>
+                <executions>
+
+                    <execution>
+                        <id>copy-cdoc2-auth-server-openapi-yaml</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>ee.cyber.cdoc2.openapi</groupId>
+                                    <artifactId>cdoc2-auth-server-openapi</artifactId>
+                                    <version>${cdoc2-auth-server-openapi.version}</version>
+                                    <type>yaml</type>
+                                    <outputDirectory>${project.build.directory}/openapi</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                            <useBaseVersion>true</useBaseVersion>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
                 <version>7.20.0</version>
                 <executions>
                     <execution>
-                        <id>generate-cdoc2-shares</id>
+                        <id>generate-auth-server</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>
-                                ${project.basedir}/src/main/resources/cdoc2-auth-server-openapi.yaml
-                            </inputSpec>
+                                <inputSpec>
+                                    ${project.build.directory}/openapi/cdoc2-auth-server-openapi-${cdoc2-auth-server-openapi.version}.yaml
+                                </inputSpec>
                             <apiPackage>ee.cyber.cdoc2.server.adapter.generated.api</apiPackage>
                             <modelPackage>ee.cyber.cdoc2.server.adapter.generated.model
                             </modelPackage>
