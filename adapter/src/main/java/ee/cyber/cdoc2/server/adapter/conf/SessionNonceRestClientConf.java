@@ -32,7 +32,7 @@ public class SessionNonceRestClientConf {
 
     private final int retries;
 
-    private static final String SSL_BUNDLE_NAME = "session-nonce-server";
+    private static final String SSL_BUNDLE_NAME = "trusted-infra";
     private final SslBundles sslBundles;
 
     public SessionNonceRestClientConf(AppProperties props, SslBundles sslBundles) {
