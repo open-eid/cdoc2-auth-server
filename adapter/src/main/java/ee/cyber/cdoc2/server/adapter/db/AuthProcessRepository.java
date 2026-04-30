@@ -48,7 +48,9 @@ public class AuthProcessRepository implements StoreAuthProcess, GetAuthProcess, 
         return new GetAuthProcess.Response(
             AuthProcessStatus.valueOf(projection.getStatus()),
             projection.getEndResult(),
-            projection.getMidSidSessionId()
+            projection.getMidSidSessionId(),
+            projection.getSessionToken(),
+            projection.getSigningCert()
         );
     }
 
@@ -70,7 +72,9 @@ public class AuthProcessRepository implements StoreAuthProcess, GetAuthProcess, 
         int updated = authProcessJpaRepository.updateStatus(
             request.uuid().toString(),
             AuthProcessStatus.COMPLETE.name(),
-            request.endResult()
+            request.endResult(),
+            request.sessionToken(),
+            request.signingCert()
         );
 
         if (updated != 1) {

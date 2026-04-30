@@ -31,12 +31,13 @@ public class GetStatusImpl implements GetStatus {
             return new Response(FAILED.name(), authProcess.endResult());
         }
 
-        //TODO
-        // if we want repeat calls to /auth/status/{authProcessUuid} for an already COMPLETED auth
-        // process to return signature data, we need to store signature, certificate and
-        // signature params in db.
         if (COMPLETE == authProcess.status()) {
-            return new Response(COMPLETE.name(), authProcess.endResult());
+            return new Response(
+                COMPLETE.name(),
+                authProcess.endResult(),
+                authProcess.sessionToken(),
+                authProcess.signingCert()
+            );
         }
 
         if (STARTED == authProcess.status()) {
@@ -83,7 +84,9 @@ public class GetStatusImpl implements GetStatus {
 
                 completeAuthProcess.execute(new CompleteAuthProcess.Request(
                     authProcessUuid,
-                    sidSession.response().endResult()
+                    sidSession.response().endResult(),
+                    signedSdJwt,
+                    signingCertificate.value()
                 ));
 
                 return new Response(

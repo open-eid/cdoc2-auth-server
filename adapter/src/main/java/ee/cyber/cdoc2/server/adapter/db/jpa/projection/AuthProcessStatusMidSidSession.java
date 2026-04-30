@@ -6,4 +6,8 @@ public interface AuthProcessStatusMidSidSession {
     String getEndResult();
 
     String getMidSidSessionId();
+
+    String getSessionToken();
+
+    String getSigningCert();
 }

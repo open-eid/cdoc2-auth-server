@@ -71,6 +71,14 @@
                 <constraints nullable="false"/>
             </column>
 
+            <column name="SESSION_TOKEN" type="CLOB"
+                    remarks="Final session token">
+            </column>
+
+            <column name="SIGNING_CERT" type="CLOB"
+                    remarks="Certificate used to sign the session token">
+            </column>
+
             <column name="CREATED_AT"
                     remarks="Instant of process creation"
                     type="timestamp with time zone">
