@@ -12,7 +12,9 @@ public interface GetAuthProcess {
     record Response(
         AuthProcessStatus status,
         @Nullable String endResult,
-        @Nullable String midSidSessionUuid
+        @Nullable String midSidSessionUuid,
+        @Nullable String sessionToken,
+        @Nullable String signingCert
     ) {
     }
 }

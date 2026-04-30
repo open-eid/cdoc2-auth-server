@@ -47,6 +47,12 @@ public class AuthProcessEntity {
     @Column(name = "unsigned_sdjwt", nullable = false)
     private String unsignedSdJwt;
 
+    @Column(name = "session_token")
+    private String sessionToken;
+
+    @Column(name = "signing_cert")
+    private String signingCert;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;

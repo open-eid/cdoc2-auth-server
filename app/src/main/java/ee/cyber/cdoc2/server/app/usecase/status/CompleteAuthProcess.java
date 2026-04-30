@@ -5,6 +5,6 @@ import java.util.UUID;
 public interface CompleteAuthProcess {
     void execute(Request request);
 
-    record Request(UUID uuid, String endResult) {
+    record Request(UUID uuid, String endResult, String sessionToken, String signingCert) {
     }
 }
