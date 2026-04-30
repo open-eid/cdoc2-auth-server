@@ -54,7 +54,9 @@ class SessionNonceRestApiTest {
                 new SessionNonceRestClientConf.AppProperties(DEFAULT_TIMEOUT,
                     DEFAULT_TIMEOUT,
                     DEFAULT_RETRIES
-                )),
+                ),
+                null // we use a test RestClient that does not care about SSL
+            ),
             new SessionNonceUriConfImpl(new SessionNonceUriConfImpl.AppProperties(
                 List.of(baseUrl + SESSION_NONCE_1_URI, baseUrl + SESSION_NONCE_2_URI)
             ))
