@@ -86,3 +86,15 @@ Defined bundles:
 | server-bundle | keystore, truststore | keystore and truststore (if any) to use for embedded server SSL connections    |
 | sid-server    | truststore           | provides truststore for SID server connections                                 |
 | trusted-infra | truststore           | provides truststore for REST clients communicating with other CDOC2 components |
+
+### Building the docker image locally
+
+To build Docker images:
+```bash
+./build-images.sh
+```
+
+To run the build container:
+```bash
+docker run --rm --network=host ghcr.io/open-eid/cdoc2-auth-server:0.5.0-SNAPSHOT
+```
