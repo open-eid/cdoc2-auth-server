@@ -14,7 +14,6 @@ mvn install -Dmaven.test.skip=true
 # so installed POMs in ~/.m2 keep the literal ${revision} placeholder. Replace it
 # with the real version so out-of-reactor dependency resolution works.
 M2_CDOC2="${HOME}/.m2/repository/ee/cyber/cdoc2"
-find "${M2_CDOC2}" -name "*.pom" -exec sed -i "s/\${revision}/${AUTH_SERVER_VERSION}/g" {} \;
 find "${M2_CDOC2}" -name "*.lastUpdated" -delete
 
 mvn spring-boot:build-image \
