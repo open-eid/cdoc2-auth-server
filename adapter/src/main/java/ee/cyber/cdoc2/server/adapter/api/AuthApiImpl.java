@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import ee.cyber.cdoc2.server.adapter.exception.AuthProcessNotFoundException;
 import ee.cyber.cdoc2.server.adapter.generated.api.Cdoc2AuthApiDelegate;
 import ee.cyber.cdoc2.server.adapter.generated.model.AuthIdentity;
 import ee.cyber.cdoc2.server.adapter.generated.model.AuthProcessStatusResponse;
@@ -47,16 +48,20 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
 
     @Override
     public ResponseEntity<AuthProcessStatusResponse> getAuthProcessStatus(String authProcessUuid) {
-        GetStatus.Response response = getStatus.execute(authProcessUuid);
+        try {
+            GetStatus.Response response = getStatus.execute(authProcessUuid);
 
-        AuthProcessStatusResponse responseBody = new AuthProcessStatusResponse(response.status())
-            .endResult(response.endResult())
-            .sessionToken(response.sessionToken())
-            .signingCertificate(
-                base64toBase64Url(response.signingCertificate())
-            );
+            AuthProcessStatusResponse responseBody = new AuthProcessStatusResponse(response.status())
+                .endResult(response.endResult())
+                .sessionToken(response.sessionToken())
+                .signingCertificate(
+                    base64toBase64Url(response.signingCertificate())
+                );
 
-        return ResponseEntity.ok(responseBody);
+            return ResponseEntity.ok(responseBody);
+        } catch (AuthProcessNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @Override

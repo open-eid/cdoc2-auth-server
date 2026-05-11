@@ -3,6 +3,7 @@ package ee.cyber.cdoc2.server.adapter.db;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import org.jspecify.annotations.NullMarked;
@@ -12,6 +13,7 @@ import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessEntity;
 import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessJpaRepository;
 import ee.cyber.cdoc2.server.adapter.db.jpa.projection.AuthProcessSessionTokenMaterial;
 import ee.cyber.cdoc2.server.adapter.db.jpa.projection.AuthProcessStatusMidSidSession;
+import ee.cyber.cdoc2.server.adapter.exception.AuthProcessNotFoundException;
 import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessStatus;
 import ee.cyber.cdoc2.server.app.usecase.startauth.StoreAuthProcess;
 import ee.cyber.cdoc2.server.app.usecase.status.CompleteAuthProcess;
@@ -45,6 +47,11 @@ public class AuthProcessRepository implements StoreAuthProcess, GetAuthProcess, 
     public GetAuthProcess.Response execute(UUID uuid) {
         AuthProcessStatusMidSidSession projection =
             authProcessJpaRepository.findStatusMidSidSessionByUuid(uuid.toString());
+
+        if (projection == null) {
+            throw new AuthProcessNotFoundException();
+        }
+
         return new GetAuthProcess.Response(
             AuthProcessStatus.valueOf(projection.getStatus()),
             projection.getEndResult(),
@@ -92,5 +99,9 @@ public class AuthProcessRepository implements StoreAuthProcess, GetAuthProcess, 
             projection.getInteractionsDigest(),
             projection.getRpChallenge()
         );
+    }
+
+    public int authProcessCleanup(Instant createdAtCutoff) {
+        return authProcessJpaRepository.deleteExpiredAuthProcesses(createdAtCutoff);
     }
 }

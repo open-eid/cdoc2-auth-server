@@ -2,6 +2,8 @@ package ee.cyber.cdoc2.server.adapter.db.jpa;
 
 import jakarta.transaction.Transactional;
 
+import java.time.Instant;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -37,4 +39,9 @@ public interface AuthProcessJpaRepository extends JpaRepository<AuthProcessEntit
         @Param("sessionToken") String sessionToken,
         @Param("signingCert") String signingCert
     );
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM AuthProcessEntity ap WHERE ap.createdAt < :createdAtCutoff")
+    int deleteExpiredAuthProcesses(@Param("createdAtCutoff") Instant createdAtCutoff);
 }
