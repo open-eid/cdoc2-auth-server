@@ -52,6 +52,8 @@ class AuthProcessCleanupJobTest {
             authProcessRepository,
             CLOCK_FIXED_NOW
         );
+
+        authProcessJpaRepository.deleteAll();
     }
 
     @Test

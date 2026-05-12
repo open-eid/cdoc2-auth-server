@@ -20,7 +20,7 @@ public class AuthProcessCleanupJob {
     private final AuthProcessRepository authProcessRepository;
     private final Clock clock;
 
-    @Scheduled(fixedRateString = "${app.cleanup.rate}")
+    @Scheduled(fixedRateString = "${app.cleanup.rate:PT30S}")
     public void deleteExpiredAuthProcesses() {
         int maxAge = authProcessCleanupConf.getMaxAge();
         Instant createdAtCutoff = clock.instant().minus(
