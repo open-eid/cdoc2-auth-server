@@ -45,6 +45,9 @@ In configuration files, the following properties must start with the `app.` pref
 | rp.certificate-level                                | QUALIFIED     | The required certificate level when authenticating through SID/MID services                       |
 | rp.scheme-name                                      | smart-id-demo | Name of the SID scheme used (eg. `smart-id`)                                                      |
 | smartid.client.hostUrl                              |               | URL of the SID RP API                                                                             |
+| cleanup.rate                                        | 30000         | milliseconds between auth process cleanup job executions                                          |
+| cleanup.authProcessMaxAgeMinutes                    | 5             | maximum allowable age for an auth process in minutes                                              |
+| cleanup.authProcessDeletionLimit                    | 1000          | limit to the number of records deleted by a single run of the cleanup job                         |
 
 ### Spring properties
 
@@ -90,11 +93,13 @@ Defined bundles:
 ### Building the docker image locally
 
 To build Docker images:
+
 ```bash
 ./build-images.sh
 ```
 
 To run the build container:
+
 ```bash
 docker run --rm --network=host ghcr.io/open-eid/cdoc2-auth-server:0.5.0-SNAPSHOT
 ```
