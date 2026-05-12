@@ -8,7 +8,6 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 @ConfigurationPropertiesScan
 public final class Cdoc2AuthServerApplication {
     private Cdoc2AuthServerApplication() {
-
     }
 
     public static void main(String[] args) {
