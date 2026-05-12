@@ -28,7 +28,10 @@ public class AuthProcessCleanupJob {
             ChronoUnit.MINUTES
         );
 
-        int deletedRecords = authProcessRepository.authProcessCleanup(createdAtCutoff);
+        int deletedRecords = authProcessRepository.authProcessCleanup(
+            createdAtCutoff,
+            authProcessCleanupConf.getDeletionLimit()
+        );
 
         log.info("Auth process cleanup deleted {} records", deletedRecords);
     }

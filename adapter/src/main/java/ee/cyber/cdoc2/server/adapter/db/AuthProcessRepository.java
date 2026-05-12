@@ -101,7 +101,7 @@ public class AuthProcessRepository implements StoreAuthProcess, GetAuthProcess, 
         );
     }
 
-    public int authProcessCleanup(Instant createdAtCutoff) {
-        return authProcessJpaRepository.deleteExpiredAuthProcesses(createdAtCutoff);
+    public int authProcessCleanup(Instant createdAtCutoff, int deletionLimit) {
+        return authProcessJpaRepository.deleteExpiredAuthProcesses(createdAtCutoff, deletionLimit);
     }
 }

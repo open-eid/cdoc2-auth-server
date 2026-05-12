@@ -42,6 +42,12 @@ public interface AuthProcessJpaRepository extends JpaRepository<AuthProcessEntit
 
     @Modifying
     @Transactional
-    @Query("DELETE FROM AuthProcessEntity ap WHERE ap.createdAt < :createdAtCutoff")
-    int deleteExpiredAuthProcesses(@Param("createdAtCutoff") Instant createdAtCutoff);
+    @Query(value = "DELETE FROM auth_process WHERE id IN "
+        + "(SELECT id FROM auth_process "
+        + "WHERE created_at < :createdAtCutoff LIMIT :deletionLimit)",
+        nativeQuery = true)
+    int deleteExpiredAuthProcesses(
+        @Param("createdAtCutoff") Instant createdAtCutoff,
+        @Param("deletionLimit") int deletionLimit
+    );
 }
