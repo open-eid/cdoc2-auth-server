@@ -1,77 +1,35 @@
 package ee.cyber.cdoc2.server.app.usecase.startauth;
 
 
-import ee.sk.smartid.VerificationCodeCalculator;
-import ee.sk.smartid.common.InteractionsMapper;
-import ee.sk.smartid.common.notification.interactions.NotificationInteraction;
-import ee.sk.smartid.util.InteractionUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.security.SecureRandom;
-import java.util.Base64;
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
-import com.authlete.sd.SDJWT;
-
-import ee.cyber.cdoc2.auth.EtsiIdentifier;
-import ee.cyber.cdoc2.server.app.usecase.common.SessionToken;
-import ee.cyber.cdoc2.server.app.usecase.common.SessionToken.SessionTokenCreationParams;
-import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce.UriSessionNonce;
-
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class StartAuthImpl implements StartAuth {
     private static final int RP_CHALLENGE_BYTES_LENGTH = 64;
 
-    private final StoreAuthProcess storeAuthProcess;
     private final SessionNonce sessionNonce;
-    private final SidAuthenticate sidAuthenticate;
+    private final StartSidAuth startSidAuth;
+    private final StartMidAuth startMidAuth;
 
     @Override
     public Response execute(Request request) {
         UUID authUuid = UUID.randomUUID();
-        EtsiIdentifier etsiIdentifier = new EtsiIdentifier(request.nationalId());
-
-        List<UriSessionNonce> sessionNonces = sessionNonce.collectSessionNonces();
-
-        SessionTokenCreationParams tokenCreationParams = new SessionTokenCreationParams(
-            sessionNonces,
-            etsiIdentifier,
-            "https://cdoc2-auth-server.ee"
-        );
-
-        SDJWT unsignedSdJWT = SessionToken.unsignedSdJwtWithAllDisclosures(tokenCreationParams);
-
         byte[] rpChallenge = createRpChallengeBytes();
+        String verificationCode;
 
-        String verificationCode = VerificationCodeCalculator.calculate(rpChallenge);
-
-        List<NotificationInteraction> interactions = List.of(
-            NotificationInteraction
-                .confirmationMessageAndVerificationCodeChoice("Creating CDOC2 session:"
-                    + " " + etsiIdentifier.getSemanticsIdentifier())
-        );
-
-        String interactionsBase64 =
-            InteractionUtil.encodeToBase64(InteractionsMapper.from(interactions));
-        String interactionsDigest = InteractionUtil.calculateDigest(interactionsBase64);
-
-        UUID sidAuthSessionUuid = sidAuthenticate.execute(new SidAuthenticate.Request(
-            interactions,
-            rpChallenge,
-            etsiIdentifier.getSemanticsIdentifier()
-        ));
-
-        storeAuthProcess.execute(new StoreAuthProcess.Request(
-            authUuid,
-            sidAuthSessionUuid,
-            unsignedSdJWT.toString(),
-            interactionsDigest,
-            Base64.getEncoder().encodeToString(rpChallenge)
-        ));
+        if (request.mobileNr() != null) {
+            verificationCode = startMidAuth.doIt(authUuid, rpChallenge, request);
+        } else {
+            verificationCode = startSidAuth.doIt(authUuid, rpChallenge, request);
+        }
 
         return new Response(
             authUuid,
@@ -79,9 +37,65 @@ public class StartAuthImpl implements StartAuth {
         );
     }
 
+//    private String getAndValidatePhoneNumber(Request request) {
+//        try {
+//            Objects.requireNonNull(request.mobileNr());
+//            return MidInputUtil.getValidatedPhoneNumber(request.mobileNr());
+//        } catch (MidInvalidPhoneNumberException e) {
+//            throw new InputValidationException(e.getMessage(), e);
+//        }
+//    }
+//
+//    private String getAndValidateNationalIdentityNumber(Request request) {
+//        try {
+//            return MidInputUtil.getValidatedNationalIdentityNumber(request.nationalId());
+//        } catch (MidInvalidNationalIdentityNumberException e) {
+//            throw new InputValidationException(e.getMessage(), e);
+//        }
+//    }
+
     private static byte[] createRpChallengeBytes() {
         byte[] rpChallengeBytes = new byte[RP_CHALLENGE_BYTES_LENGTH];
         new SecureRandom().nextBytes(rpChallengeBytes);
         return rpChallengeBytes;
     }
+
+//    private Response performMidAuth(Request request) {
+//        String validPhoneNumber = getAndValidatePhoneNumber(request);
+//        String validNationalIdentityNumber = getAndValidateNationalIdentityNumber(request);
+//
+//        List<UriSessionNonce> sessionNonces = sessionNonce.collectSessionNonces();
+//
+//        SessionTokenCreationParams tokenCreationParams = new SessionTokenCreationParams(
+//            sessionNonces,
+//            validNationalIdentityNumber,
+//            "https://cdoc2-auth-server.ee"
+//        );
+//
+//        SDJWT unsignedSdJWT = SessionToken.unsignedSdJwtWithAllDisclosures(tokenCreationParams);
+//
+//        byte[] rpChallenge = createRpChallengeBytes();
+//
+//        MidHashToSign hashToSign = MidHashToSign.newBuilder()
+//            .withDataToHash(rpChallenge)
+//            .withHashType(MidHashType.SHA256)
+//            .build();
+//
+//        byte[] hashBytes = hashToSign.getHash();
+//
+//        MidAuthenticationHashToSign authenticationHash = MidAuthenticationHashToSign.newBuilder()
+//            .withHash(hashBytes)
+//            .withHashType(MidHashType.SHA256)
+//            .build();
+//
+//        UUID sessionId = midAuthenticate.execute(new MidAuthenticate.Request(
+//                validPhoneNumber,
+//                validNationalIdentityNumber,
+//                authenticationHash
+//            )
+//        );
+//        String verificationCode = authenticationHash.calculateVerificationCode();
+//
+//        return new Response(sessionId, verificationCode);
+//    }
 }

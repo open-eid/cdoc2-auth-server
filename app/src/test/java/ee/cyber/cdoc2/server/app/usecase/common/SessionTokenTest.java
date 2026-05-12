@@ -18,7 +18,6 @@ import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
-import ee.cyber.cdoc2.auth.EtsiIdentifier;
 import ee.cyber.cdoc2.server.app.usecase.common.SessionToken.SessionTokenCreationParams;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce;
 
@@ -107,7 +106,7 @@ class SessionTokenTest {
                 new SessionNonce.UriSessionNonce(URI_1, URI_1_NONCE),
                 new SessionNonce.UriSessionNonce(URI_2, URI_2_NONCE)
             ),
-            new EtsiIdentifier(ETSI_IDENTIFIER),
+            ETSI_IDENTIFIER,
             ISS
         );
         return SessionToken.unsignedSdJwtWithAllDisclosures(params);

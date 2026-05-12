@@ -5,9 +5,13 @@ import java.util.UUID;
 import ee.cyber.cdoc2.server.app.CertificateLevel;
 
 public interface RelyingPartyConf {
-    String getName();
+    String getSidName();
 
-    UUID getUuid();
+    UUID getSidUuid();
+
+    String getMidName();
+
+    UUID getMidUuid();
 
     CertificateLevel getCertificateLevel();
 

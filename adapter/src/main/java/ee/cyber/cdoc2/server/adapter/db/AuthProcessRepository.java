@@ -34,6 +34,7 @@ public class AuthProcessRepository implements StoreAuthProcess, GetAuthProcess, 
         AuthProcessEntity authProcessEntity = new AuthProcessEntity();
 
         authProcessEntity.setUuid(request.authUuid().toString());
+        authProcessEntity.setType(request.type().name());
         authProcessEntity.setMidSidSessionId(request.midSidSessionId().toString());
         authProcessEntity.setInteractionsDigest(request.interactionsDigest());
         authProcessEntity.setRpChallenge(request.rpChallenge());

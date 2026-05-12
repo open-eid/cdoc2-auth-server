@@ -11,35 +11,55 @@ import ee.cyber.cdoc2.server.app.conf.RelyingPartyConf;
 
 @Configuration
 public class RelyingPartyConfImpl implements RelyingPartyConf {
-    private final String name;
-    private final UUID uuid;
+    private final String sidName;
+    private final UUID sidUuid;
+    private final String midName;
+    private final UUID midUuid;
     private final CertificateLevel certificateLevel;
     private final String schemeName;
 
     @ConfigurationProperties(prefix = "app.rp")
     public record AppProperties(
-        String name,
-        String uuid,
+        Sid sid,
+        Mid mid,
         @DefaultValue("QUALIFIED") String certificateLevel,
         @DefaultValue("smart-id-demo") String schemeName
     ) {
+
+        record Sid(String name, String uuid) {
+        }
+
+        record Mid(String name, String uuid) {
+        }
     }
 
     public RelyingPartyConfImpl(AppProperties props) {
-        this.name = props.name;
-        this.uuid = UUID.fromString(props.uuid);
+        this.sidName = props.sid.name;
+        this.sidUuid = UUID.fromString(props.sid.uuid);
+        this.midName = props.mid.name;
+        this.midUuid = UUID.fromString(props.mid.uuid);
         this.certificateLevel = CertificateLevel.valueOf(props.certificateLevel);
         this.schemeName = props.schemeName;
     }
 
     @Override
-    public String getName() {
-        return this.name;
+    public String getSidName() {
+        return this.sidName;
     }
 
     @Override
-    public UUID getUuid() {
-        return this.uuid;
+    public UUID getSidUuid() {
+        return this.sidUuid;
+    }
+
+    @Override
+    public String getMidName() {
+        return midName;
+    }
+
+    @Override
+    public UUID getMidUuid() {
+        return midUuid;
     }
 
     @Override
