@@ -6,8 +6,11 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
+import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessType;
+import ee.cyber.cdoc2.server.app.usecase.status.mid.CreateMidSessionToken;
+import ee.cyber.cdoc2.server.app.usecase.status.mid.GetMidSession;
+import ee.cyber.cdoc2.server.app.usecase.status.sid.CreateSidSessionToken;
 import ee.cyber.cdoc2.server.app.usecase.status.sid.GetSidSession;
-import ee.cyber.cdoc2.server.app.usecase.status.sid.SidSession;
 
 import static ee.cyber.cdoc2.server.app.usecase.common.AuthProcessStatus.*;
 
@@ -18,8 +21,9 @@ public class GetStatusImpl implements GetStatus {
     private final FailAuthProcess failAuthProcess;
     private final CompleteAuthProcess completeAuthProcess;
     private final GetSidSession getSidSession;
-    private final GetSessionTokenMaterial getSessionTokenMaterial;
-    private final CreateSignedSdJwtWithSidSignature createSignedSdJwtWithSidSignature;
+    private final GetMidSession getMidSession;
+    private final CreateMidSessionToken createMidSessionToken;
+    private final CreateSidSessionToken createSidSessionToken;
 
     @Override
     public Response execute(String uuidStr) {
@@ -40,81 +44,58 @@ public class GetStatusImpl implements GetStatus {
             );
         }
 
+        AuthProcessType authProcessType = authProcess.type();
+
         if (STARTED == authProcess.status()) {
             if (authProcess.midSidSessionUuid() == null) {
                 throw new RuntimeException("midSidSessionUuId missing on STARTED auth process");
             }
-            SidSession sidSession = new SidSession(this.getSidSession.execute(
-                UUID.fromString(authProcess.midSidSessionUuid())
-            ));
 
-            if (sidSession.isRunning()) {
+            SessionStatusHolder sidMidSessionStatus = switch (authProcessType) {
+                case AuthProcessType.SID -> new SessionStatusHolder(this.getSidSession.execute(
+                    UUID.fromString(authProcess.midSidSessionUuid())
+                ));
+                case AuthProcessType.MID -> new SessionStatusHolder(this.getMidSession.execute(
+                    UUID.fromString(authProcess.midSidSessionUuid())
+                ));
+            };
+
+            if (sidMidSessionStatus.isRunning()) {
                 return new Response(STARTED.name());
             }
 
-            if (sidSession.isCompletedNotOk()) {
+            if (sidMidSessionStatus.isCompletedNotOk()) {
                 failAuthProcess.execute(new FailAuthProcess.Request(
                     authProcessUuid,
-                    sidSession.response().endResult()
+                    sidMidSessionStatus.getEndResult()
                 ));
-                return new Response(FAILED.name(), sidSession.response().endResult());
+                return new Response(FAILED.name(), sidMidSessionStatus.getEndResult());
             }
 
-            if (sidSession.isCompletedOk()) {
-                GetSessionTokenMaterial.Response sessionTokenMaterial =
-                    getSessionTokenMaterial.execute(
-                        new GetSessionTokenMaterial.Request(authProcessUuid)
-                    );
-
-                GetSidSession.Signature signature = getSidSignature(
-                    sidSession.response()
-                );
-                GetSidSession.Certificate signingCertificate = getSigningCertificate(
-                    sidSession.response()
-                );
-
-                String signedSdJwt = createSignedSdJwtWithSidSignature.execute(
-                    sessionTokenMaterial.unsignedJwt(),
-                    new CreateSignedSdJwtWithSidSignature.SidSignatureParams(
-                        signature,
-                        sessionTokenMaterial.rpChallenge(),
-                        sessionTokenMaterial.interactionsDigest(),
-                        sidSession.response().interactionTypeUsed()
-                    ));
+            if (sidMidSessionStatus.isCompletedOk()) {
+                String signedSdJwt = switch (authProcessType) {
+                    case AuthProcessType.SID -> createSidSessionToken
+                        .execute(authProcessUuid, sidMidSessionStatus);
+                    case AuthProcessType.MID -> createMidSessionToken.execute(authProcessUuid);
+                };
 
                 completeAuthProcess.execute(new CompleteAuthProcess.Request(
                     authProcessUuid,
-                    sidSession.response().endResult(),
+                    sidMidSessionStatus.getEndResult(),
                     signedSdJwt,
-                    signingCertificate.value()
+                    sidMidSessionStatus.getCert()
                 ));
 
                 return new Response(
                     COMPLETE.name(),
-                    sidSession.response().endResult(),
+                    sidMidSessionStatus.getEndResult(),
                     signedSdJwt,
-                    signingCertificate.value()
+                    sidMidSessionStatus.getCert()
                 );
             }
         }
 
-        throw new RuntimeException("SID session in unknown state");
-    }
-
-    private GetSidSession.Certificate getSigningCertificate(GetSidSession.Response response) {
-        if (response.cert() == null) {
-            throw new RuntimeException("Certificate missing in SID session response");
-        }
-
-        return response.cert();
-    }
-
-    private GetSidSession.Signature getSidSignature(GetSidSession.Response response) {
-        if (response.signature() == null) {
-            throw new RuntimeException("Signature missing in SID session response");
-        }
-
-        return response.signature();
+        throw new RuntimeException(authProcessType + " session in unknown state");
     }
 }
 

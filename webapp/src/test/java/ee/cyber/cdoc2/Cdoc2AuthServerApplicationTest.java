@@ -67,7 +67,46 @@ class Cdoc2AuthServerApplicationTest {
     private MockMvc mockMvc;
 
     @Test
-    void shouldGetAuthStatus() throws Exception {
+    void shouldPerformFullAuthProcessForSid() throws Exception {
+        performAuthProcess(
+            new StartAuthRequest(
+                "etsi/" + IDENTIFIER_OK,
+                null
+            )
+        );
+    }
+
+    @Test
+    void shouldPerformFullAuthProcessForMid() throws Exception {
+        performAuthProcess(
+            new StartAuthRequest(
+                OK_1_IDENTITY_CODE,
+                OK_1_PHONE_NUMBER
+            )
+        );
+    }
+
+    @Test
+    void shouldGetWellKnown() throws Exception {
+        MockHttpServletResponse getWellKnownResponse = mockMvc.perform(
+                get(URI.create("/.well-known/jwks.jws"))
+            ).andExpect(status().isOk())
+            .andReturn().getResponse();
+
+        GetWellKnownResponseBody getWellKnownResponseBody = OBJECT_MAPPER.readValue(
+            getWellKnownResponse.getContentAsString(),
+            GetWellKnownResponseBody.class
+        );
+
+        assertEquals(2, getWellKnownResponseBody.keys.size());
+
+        assertTrue(
+            getWellKnownResponseBody.keys.stream()
+                .allMatch(key -> key.kid != null && key.kty != null)
+        );
+    }
+
+    private void performAuthProcess(StartAuthRequest startAuthRequest) throws Exception {
         wiremock.stubFor(
             WireMock.post(
                 urlEqualTo(SESSION_NONCE_URI_1)
@@ -85,16 +124,6 @@ class Cdoc2AuthServerApplicationTest {
                 .withHeader("Content-Type", "application/json")
                 .withBody("{\"nonce\":\"" + SESSION_NONCE_2_VALUE + "\"}"))
         );
-
-        StartAuthRequest startAuthRequest = new StartAuthRequest(
-            "etsi/" + IDENTIFIER_OK,
-            null
-        );
-
-//        StartAuthRequest startAuthRequest = new StartAuthRequest(
-//            OK_1_IDENTITY_CODE,
-//            OK_1_PHONE_NUMBER
-//        );
 
         MockHttpServletResponse startAuthResponse = mockMvc.perform(
                 post(URI.create("/auth/start"))
@@ -171,26 +200,6 @@ class Cdoc2AuthServerApplicationTest {
         }
 
         return authStatusResponseBody;
-    }
-
-    @Test
-    void shouldGetWellKnown() throws Exception {
-        MockHttpServletResponse getWellKnownResponse = mockMvc.perform(
-                get(URI.create("/.well-known/jwks.jws"))
-            ).andExpect(status().isOk())
-            .andReturn().getResponse();
-
-        GetWellKnownResponseBody getWellKnownResponseBody = OBJECT_MAPPER.readValue(
-            getWellKnownResponse.getContentAsString(),
-            GetWellKnownResponseBody.class
-        );
-
-        assertEquals(2, getWellKnownResponseBody.keys.size());
-
-        assertTrue(
-            getWellKnownResponseBody.keys.stream()
-                .allMatch(key -> key.kid != null && key.kty != null)
-        );
     }
 
     private record StartAuthRequest(String identifier, String mobileNr) {

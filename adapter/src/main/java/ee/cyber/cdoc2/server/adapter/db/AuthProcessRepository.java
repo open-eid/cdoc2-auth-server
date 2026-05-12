@@ -15,6 +15,7 @@ import ee.cyber.cdoc2.server.adapter.db.jpa.projection.AuthProcessSessionTokenMa
 import ee.cyber.cdoc2.server.adapter.db.jpa.projection.AuthProcessStatusMidSidSession;
 import ee.cyber.cdoc2.server.adapter.exception.AuthProcessNotFoundException;
 import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessStatus;
+import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessType;
 import ee.cyber.cdoc2.server.app.usecase.startauth.StoreAuthProcess;
 import ee.cyber.cdoc2.server.app.usecase.status.CompleteAuthProcess;
 import ee.cyber.cdoc2.server.app.usecase.status.FailAuthProcess;
@@ -55,6 +56,7 @@ public class AuthProcessRepository implements StoreAuthProcess, GetAuthProcess, 
 
         return new GetAuthProcess.Response(
             AuthProcessStatus.valueOf(projection.getStatus()),
+            AuthProcessType.valueOf(projection.getType()),
             projection.getEndResult(),
             projection.getMidSidSessionId(),
             projection.getSessionToken(),
