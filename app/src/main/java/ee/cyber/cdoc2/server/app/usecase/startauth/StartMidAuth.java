@@ -29,7 +29,7 @@ public class StartMidAuth {
     private final SessionNonce sessionNonce;
     private final MidAuthenticate midAuthenticate;
 
-    String doIt(UUID authProcessUuid, byte[] rpChallenge, StartAuth.Request request) {
+    String execute(UUID authProcessUuid, byte[] rpChallenge, StartAuth.Request request) {
         String validPhoneNumber = getAndValidatePhoneNumber(request);
         String validNationalIdentityNumber = getAndValidateNationalIdentityNumber(request);
 

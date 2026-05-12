@@ -29,7 +29,7 @@ public class StartSidAuth {
     private final SessionNonce sessionNonce;
     private final SidAuthenticate sidAuthenticate;
 
-    String doIt(UUID authProcessUuid, byte[] rpChallenge, StartAuth.Request request) {
+    String execute(UUID authProcessUuid, byte[] rpChallenge, StartAuth.Request request) {
         EtsiIdentifier etsiIdentifier = getAndValidateEtsiIdentifier(request);
 
         List<SessionNonce.UriSessionNonce> sessionNonces = sessionNonce.collectSessionNonces();

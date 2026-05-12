@@ -25,9 +25,9 @@ public class StartAuthImpl implements StartAuth {
         String verificationCode;
 
         if (request.mobileNr() != null) {
-            verificationCode = startMidAuth.doIt(authUuid, rpChallenge, request);
+            verificationCode = startMidAuth.execute(authUuid, rpChallenge, request);
         } else {
-            verificationCode = startSidAuth.doIt(authUuid, rpChallenge, request);
+            verificationCode = startSidAuth.execute(authUuid, rpChallenge, request);
         }
 
         return new Response(
