@@ -35,7 +35,7 @@ public class AuthProcessEntity {
     @Column(name = "interactions_digest")
     private String interactionsDigest;
 
-    @Column(name = "rp_challenge")
+    @Column(name = "rp_challenge", nullable = false)
     private String rpChallenge;
 
     @Column(name = "end_result")

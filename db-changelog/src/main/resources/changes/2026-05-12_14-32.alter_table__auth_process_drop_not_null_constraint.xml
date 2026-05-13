@@ -5,13 +5,11 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet author="auth" id="alter_table__auth_process_drop_not_null_constraints.0000">
+    <changeSet author="auth" id="alter_table__auth_process_drop_not_null_constraint.0000">
         <dropNotNullConstraint tableName="AUTH_PROCESS" columnName="INTERACTIONS_DIGEST"/>
-        <dropNotNullConstraint tableName="AUTH_PROCESS" columnName="RP_CHALLENGE"/>
 
         <rollback>
             <addNotNullConstraint tableName="AUTH_PROCESS" columnName="INTERACTIONS_DIGEST"/>
-            <addNotNullConstraint tableName="AUTH_PROCESS" columnName="RP_CHALLENGE"/>
         </rollback>
     </changeSet>
 </databaseChangeLog>
