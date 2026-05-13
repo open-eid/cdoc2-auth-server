@@ -11,7 +11,8 @@ public interface MidAuthenticate {
     record Request(
         String phoneNumber,
         String nationalIdentityNumber,
-        MidAuthenticationHashToSign authenticationHash
+        MidAuthenticationHashToSign authenticationHash,
+        String displayText
     ) {
     }
 }
