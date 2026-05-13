@@ -49,7 +49,7 @@ class Cdoc2AuthServerApplicationTest {
     public static final String SESSION_NONCE_URI_1 = "/session_nonce_1";
     public static final String SESSION_NONCE_URI_2 = "/session_nonce_2";
 
-    public static final String OK_1_IDENTITY_CODE = "51307149560";
+    public static final String OK_1_IDENTITY_CODE = "PNOEE-51307149560";
     public static final String OK_1_PHONE_NUMBER = "+37269930366";
 
     @RegisterExtension
@@ -92,7 +92,7 @@ class Cdoc2AuthServerApplicationTest {
         );
 
 //        StartAuthRequest startAuthRequest = new StartAuthRequest(
-//            OK_1_IDENTITY_CODE,
+//            "etsi/" + OK_1_IDENTITY_CODE,
 //            OK_1_PHONE_NUMBER
 //        );
 
