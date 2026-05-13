@@ -45,7 +45,7 @@ public class StartMidAuth {
 
         SessionToken.SessionTokenCreationParams tokenCreationParams = new SessionToken.SessionTokenCreationParams(
             sessionNonces,
-            validNationalIdentityNumber,
+            etsiIdentifier.toString(),
             "https://cdoc2-auth-server.ee"
         );
 
