@@ -5,7 +5,6 @@ import ee.sk.mid.MidAuthenticationHashToSign;
 import ee.sk.mid.MidAuthenticationResponseValidator;
 import ee.sk.mid.MidAuthenticationResult;
 import ee.sk.mid.MidCertificateParser;
-import ee.sk.mid.exception.MidInternalErrorException;
 import ee.sk.mid.rest.dao.MidSessionSignature;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,7 +89,7 @@ public class CreateMidSessionToken {
     private void validateSessionSignatureNotBlank(@Nullable MidSessionSignature signature) {
         if (signature == null || isBlank(signature.getValue())) {
             log.error("Signature was not present in the response");
-            throw new MidInternalErrorException("Signature was not present in the response");
+            throw new IllegalStateException("Signature was not present in the response");
         }
     }
 }
