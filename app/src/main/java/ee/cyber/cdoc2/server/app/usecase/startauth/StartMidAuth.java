@@ -1,14 +1,13 @@
 package ee.cyber.cdoc2.server.app.usecase.startauth;
 
 import ee.sk.mid.MidAuthenticationHashToSign;
-import ee.sk.mid.MidHashToSign;
-import ee.sk.mid.MidHashType;
 import ee.sk.mid.MidInputUtil;
 import ee.sk.mid.exception.MidInvalidNationalIdentityNumberException;
 import ee.sk.mid.exception.MidInvalidPhoneNumberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -19,6 +18,7 @@ import com.authlete.sd.SDJWT;
 
 import ee.cyber.cdoc2.server.app.exception.InputValidationException;
 import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessType;
+import ee.cyber.cdoc2.server.app.usecase.common.MidUtil;
 import ee.cyber.cdoc2.server.app.usecase.common.SessionToken;
 
 @Slf4j
@@ -43,17 +43,9 @@ public class StartMidAuth {
 
         SDJWT unsignedSdJWT = SessionToken.unsignedSdJwtWithAllDisclosures(tokenCreationParams);
 
-        MidHashToSign hashToSign = MidHashToSign.newBuilder()
-            .withDataToHash(rpChallenge)
-            .withHashType(MidHashType.SHA256)
-            .build();
-
-        byte[] hashBytes = hashToSign.getHash();
-
-        MidAuthenticationHashToSign authenticationHash = MidAuthenticationHashToSign.newBuilder()
-            .withHash(hashBytes)
-            .withHashType(MidHashType.SHA256)
-            .build();
+        MidAuthenticationHashToSign authenticationHash = MidUtil.createAuthenticationHash(
+            rpChallenge
+        );
 
         UUID sessionId = midAuthenticate.execute(new MidAuthenticate.Request(
                 validPhoneNumber,
@@ -70,7 +62,7 @@ public class StartMidAuth {
             sessionId,
             unsignedSdJWT.toString(),
             null,
-            null
+            Base64.getEncoder().encodeToString(rpChallenge)
         ));
 
         return verificationCode;
