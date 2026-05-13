@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.authlete.sd.SDJWT;
 
+import ee.cyber.cdoc2.auth.EtsiIdentifier;
 import ee.cyber.cdoc2.server.app.exception.InputValidationException;
 import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessType;
 import ee.cyber.cdoc2.server.app.usecase.common.MidUtil;
@@ -29,9 +30,16 @@ public class StartMidAuth {
     private final SessionNonce sessionNonce;
     private final MidAuthenticate midAuthenticate;
 
-    String execute(UUID authProcessUuid, byte[] rpChallenge, StartAuth.Request request) {
-        String validPhoneNumber = getAndValidatePhoneNumber(request);
-        String validNationalIdentityNumber = getAndValidateNationalIdentityNumber(request);
+    String execute(
+        UUID authProcessUuid,
+        byte[] rpChallenge,
+        EtsiIdentifier etsiIdentifier,
+        String phoneNr
+    ) {
+        String validPhoneNumber = getAndValidatePhoneNumber(phoneNr);
+        String validNationalIdentityNumber = getAndValidateNationalIdentityNumber(
+            etsiIdentifier.getIdentifier()
+        );
 
         List<SessionNonce.UriSessionNonce> sessionNonces = sessionNonce.collectSessionNonces();
 
@@ -68,18 +76,18 @@ public class StartMidAuth {
         return verificationCode;
     }
 
-    private String getAndValidatePhoneNumber(StartAuth.Request request) {
+    private String getAndValidatePhoneNumber(String phoneNr) {
         try {
-            Objects.requireNonNull(request.mobileNr());
-            return MidInputUtil.getValidatedPhoneNumber(request.mobileNr());
+            Objects.requireNonNull(phoneNr);
+            return MidInputUtil.getValidatedPhoneNumber(phoneNr);
         } catch (MidInvalidPhoneNumberException e) {
             throw new InputValidationException(e.getMessage(), e);
         }
     }
 
-    private String getAndValidateNationalIdentityNumber(StartAuth.Request request) {
+    private String getAndValidateNationalIdentityNumber(String nationalIdNumber) {
         try {
-            return MidInputUtil.getValidatedNationalIdentityNumber(request.nationalId());
+            return MidInputUtil.getValidatedNationalIdentityNumber(nationalIdNumber);
         } catch (MidInvalidNationalIdentityNumberException e) {
             throw new InputValidationException(e.getMessage(), e);
         }

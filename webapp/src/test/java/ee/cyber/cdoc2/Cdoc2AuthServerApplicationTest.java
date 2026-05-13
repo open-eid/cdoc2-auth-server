@@ -44,7 +44,7 @@ class Cdoc2AuthServerApplicationTest {
     private static final int WIREMOCK_PORT = 9080;
     private static final String SID_IDENTIFIER_OK = "PNOEE-40504040001";
     private static final String SID_IDENTIFIER_USER_REFUSED = "PNOEE-30403039917";
-    public static final String MID_OK_IDENTITY_CODE = "51307149560";
+    public static final String MID_OK_IDENTITY_CODE = "PNOEE-51307149560";
     public static final String MID_OK_PHONE_NUMBER = "+37269930366";
 
     private static final String SESSION_NONCE_1_VALUE = "WTq9gAkv5_UJioELXDqOAA";

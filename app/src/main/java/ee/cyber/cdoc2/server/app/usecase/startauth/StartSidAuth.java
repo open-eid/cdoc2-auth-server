@@ -16,8 +16,6 @@ import org.springframework.stereotype.Component;
 import com.authlete.sd.SDJWT;
 
 import ee.cyber.cdoc2.auth.EtsiIdentifier;
-import ee.cyber.cdoc2.auth.exception.InvalidEtsiSemanticsIdenfierException;
-import ee.cyber.cdoc2.server.app.exception.InputValidationException;
 import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessType;
 import ee.cyber.cdoc2.server.app.usecase.common.SessionToken;
 
@@ -29,9 +27,7 @@ public class StartSidAuth {
     private final SessionNonce sessionNonce;
     private final SidAuthenticate sidAuthenticate;
 
-    String execute(UUID authProcessUuid, byte[] rpChallenge, StartAuth.Request request) {
-        EtsiIdentifier etsiIdentifier = getAndValidateEtsiIdentifier(request);
-
+    String execute(UUID authProcessUuid, byte[] rpChallenge, EtsiIdentifier etsiIdentifier) {
         List<SessionNonce.UriSessionNonce> sessionNonces = sessionNonce.collectSessionNonces();
 
         SessionToken.SessionTokenCreationParams tokenCreationParams = new SessionToken.SessionTokenCreationParams(
@@ -70,14 +66,5 @@ public class StartSidAuth {
         ));
 
         return verificationCode;
-    }
-
-    private EtsiIdentifier getAndValidateEtsiIdentifier(StartAuth.Request request) {
-        try {
-            return new EtsiIdentifier(request.nationalId());
-        } catch (InvalidEtsiSemanticsIdenfierException e) {
-            log.warn("Error parsing ETSI identifier: {}", e.getMessage());
-            throw new InputValidationException(e.getMessage(), e);
-        }
     }
 }
