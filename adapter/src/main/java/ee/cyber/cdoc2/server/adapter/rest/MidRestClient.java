@@ -30,7 +30,7 @@ public class MidRestClient implements MidAuthenticate, GetMidSession {
             .withNationalIdentityNumber(request.nationalIdentityNumber())
             .withHashToSign(request.authenticationHash())
             .withLanguage(MidLanguage.valueOf(properties.displayTextDefaultLang()))
-            .withDisplayText(properties.displayTextDefault())
+            .withDisplayText(request.displayText())
             .withDisplayTextFormat(
                 MidDisplayTextFormat.valueOf(properties.displayTextDefaultFormat())
             )

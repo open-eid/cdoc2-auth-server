@@ -58,7 +58,8 @@ public class StartMidAuth {
         UUID sessionId = midAuthenticate.execute(new MidAuthenticate.Request(
                 validPhoneNumber,
                 validNationalIdentityNumber,
-                authenticationHash
+                authenticationHash,
+            "Creating CDOC2 session: " + " " + etsiIdentifier.getSemanticsIdentifier()
             )
         );
 
