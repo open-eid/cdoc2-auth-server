@@ -18,14 +18,12 @@ public class SessionStatusHolder {
     private final String endResult;
     private final GetSidSession.@Nullable Response sidSessionResponse;
     private final GetMidSession.@Nullable Response midSessionResponse;
-    private final String cert;
 
     public SessionStatusHolder(GetSidSession.Response response) {
         this.state = response.state();
         this.endResult = response.endResult();
         this.sidSessionResponse = response;
         this.midSessionResponse = null;
-        this.cert = getSigningCertificate(response).value();
     }
 
     public SessionStatusHolder(GetMidSession.Response response) {
@@ -33,7 +31,6 @@ public class SessionStatusHolder {
         this.endResult = response.endResult();
         this.sidSessionResponse = null;
         this.midSessionResponse = response;
-        this.cert = response.cert();
     }
 
     public boolean isRunning() {
@@ -50,11 +47,33 @@ public class SessionStatusHolder {
             && !SESSION_END_RESULT_OK.equals(endResult);
     }
 
-    private GetSidSession.Certificate getSigningCertificate(GetSidSession.Response response) {
-        if (response.cert() == null) {
-            throw new RuntimeException("Certificate missing in SID session response");
+    public String getCert() {
+        if (sidSessionResponse != null && midSessionResponse != null) {
+            throw new IllegalStateException("SessionSatusHolder in illegal state");
         }
 
-        return response.cert();
+        String certValue = null;
+
+        if (sidSessionResponse != null) {
+            certValue = getSidSigningCertificate(sidSessionResponse);
+        }
+
+        if (midSessionResponse != null) {
+            certValue = midSessionResponse.cert();
+        }
+
+        if (certValue == null) {
+            throw new IllegalStateException("Certificate value is null");
+        }
+
+        return certValue;
+    }
+
+    private String getSidSigningCertificate(GetSidSession.Response response) {
+        if (response.cert() == null) {
+            throw new IllegalStateException("Certificate missing in SID session response");
+        }
+
+        return response.cert().value();
     }
 }
