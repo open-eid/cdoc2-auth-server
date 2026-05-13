@@ -80,18 +80,20 @@ public class GetStatusImpl implements GetStatus {
                         .execute(authProcessUuid, sidMidSessionStatus.getMidSessionResponse());
                 };
 
+                String cert = sidMidSessionStatus.getCert();
+
                 completeAuthProcess.execute(new CompleteAuthProcess.Request(
                     authProcessUuid,
                     sidMidSessionStatus.getEndResult(),
                     signedSdJwt,
-                    sidMidSessionStatus.getCert()
+                    cert
                 ));
 
                 return new Response(
                     COMPLETE.name(),
                     sidMidSessionStatus.getEndResult(),
                     signedSdJwt,
-                    sidMidSessionStatus.getCert()
+                    cert
                 );
             }
         }
