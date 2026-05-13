@@ -15,7 +15,6 @@ import ee.cyber.cdoc2.server.app.usecase.status.SdJwtSigner;
 @Component
 @RequiredArgsConstructor
 public class CreateSignedSdJwtForMid {
-    //    private final Clock clock;
     private final JwtIssuanceClaimsCreator jwtIssuanceClaimsCreator;
     private final SdJwtSigner sdJwtSigner;
 
@@ -26,20 +25,6 @@ public class CreateSignedSdJwtForMid {
         try {
             JWTClaimsSet claims = JWTClaimsSet.parse(credentialJwt);
 
-//            Instant now = clock.instant();
-//
-//            JWTClaimsSet issuanceClaims = new JWTClaimsSet.Builder()
-//                .issueTime(Date.from(now))
-//                .expirationTime(
-//                    Date.from(now.plus(1, ChronoUnit.DAYS))
-//                )
-//                .build();
-//            Map<String, Object> issuanceClaimsMap = issuanceClaims.toJSONObject();
-//
-//            Map<String, Object> claimsMap = claims.toJSONObject();
-//            claimsMap.putAll(issuanceClaimsMap);
-//
-//            JWTClaimsSet claimsWithIssuance = JWTClaimsSet.parse(claimsMap);
             JWTClaimsSet claimsWithIssuance = jwtIssuanceClaimsCreator.execute(
                 claims.toJSONObject()
             );
