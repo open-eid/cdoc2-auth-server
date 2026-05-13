@@ -17,12 +17,14 @@ public class SessionStatusHolder {
     @Nullable
     private final String endResult;
     private final GetSidSession.@Nullable Response sidSessionResponse;
+    private final GetMidSession.@Nullable Response midSessionResponse;
     private final String cert;
 
     public SessionStatusHolder(GetSidSession.Response response) {
         this.state = response.state();
         this.endResult = response.endResult();
         this.sidSessionResponse = response;
+        this.midSessionResponse = null;
         this.cert = getSigningCertificate(response).value();
     }
 
@@ -30,6 +32,7 @@ public class SessionStatusHolder {
         this.state = response.state();
         this.endResult = response.endResult();
         this.sidSessionResponse = null;
+        this.midSessionResponse = response;
         this.cert = response.cert();
     }
 

@@ -42,15 +42,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class Cdoc2AuthServerApplicationTest {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final int WIREMOCK_PORT = 9080;
-    private static final String IDENTIFIER_OK = "PNOEE-40504040001";
-    private static final String IDENTIFIER_USER_REFUSED = "PNOEE-30403039917";
+    private static final String SID_IDENTIFIER_OK = "PNOEE-40504040001";
+    private static final String SID_IDENTIFIER_USER_REFUSED = "PNOEE-30403039917";
+    public static final String MID_OK_IDENTITY_CODE = "51307149560";
+    public static final String MID_OK_PHONE_NUMBER = "+37269930366";
+
     private static final String SESSION_NONCE_1_VALUE = "WTq9gAkv5_UJioELXDqOAA";
     private static final String SESSION_NONCE_2_VALUE = "nrVcSEcHuWt2SKfjkMm6RQ";
     public static final String SESSION_NONCE_URI_1 = "/session_nonce_1";
     public static final String SESSION_NONCE_URI_2 = "/session_nonce_2";
 
-    public static final String OK_1_IDENTITY_CODE = "51307149560";
-    public static final String OK_1_PHONE_NUMBER = "+37269930366";
+
 
     @RegisterExtension
     static WireMockExtension wiremock = WireMockExtension.newInstance()
@@ -70,7 +72,7 @@ class Cdoc2AuthServerApplicationTest {
     void shouldPerformFullAuthProcessForSid() throws Exception {
         performAuthProcess(
             new StartAuthRequest(
-                "etsi/" + IDENTIFIER_OK,
+                "etsi/" + SID_IDENTIFIER_OK,
                 null
             )
         );
@@ -80,8 +82,8 @@ class Cdoc2AuthServerApplicationTest {
     void shouldPerformFullAuthProcessForMid() throws Exception {
         performAuthProcess(
             new StartAuthRequest(
-                OK_1_IDENTITY_CODE,
-                OK_1_PHONE_NUMBER
+                MID_OK_IDENTITY_CODE,
+                MID_OK_PHONE_NUMBER
             )
         );
     }

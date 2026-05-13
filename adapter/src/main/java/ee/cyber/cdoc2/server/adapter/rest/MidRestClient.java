@@ -52,7 +52,8 @@ public class MidRestClient implements MidAuthenticate, GetMidSession {
         return new Response(
             midSessionStatus.getState(),
             midSessionStatus.getResult(),
-            midSessionStatus.getCert()
+            midSessionStatus.getCert(),
+            midSessionStatus.getSignature()
         );
     }
 }

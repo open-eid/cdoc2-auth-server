@@ -75,8 +75,9 @@ public class GetStatusImpl implements GetStatus {
             if (sidMidSessionStatus.isCompletedOk()) {
                 String signedSdJwt = switch (authProcessType) {
                     case AuthProcessType.SID -> createSidSessionToken
-                        .execute(authProcessUuid, sidMidSessionStatus);
-                    case AuthProcessType.MID -> createMidSessionToken.execute(authProcessUuid);
+                        .execute(authProcessUuid, sidMidSessionStatus.getSidSessionResponse());
+                    case AuthProcessType.MID -> createMidSessionToken
+                        .execute(authProcessUuid, sidMidSessionStatus.getMidSessionResponse());
                 };
 
                 completeAuthProcess.execute(new CompleteAuthProcess.Request(

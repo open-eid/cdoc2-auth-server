@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import ee.cyber.cdoc2.server.app.usecase.status.GetSessionTokenMaterial;
-import ee.cyber.cdoc2.server.app.usecase.status.SessionStatusHolder;
 
 @Component
 @RequiredArgsConstructor
@@ -15,17 +15,17 @@ public class CreateSidSessionToken {
     private final CreateSignedSdJwtForSid createSignedSdJwtForSid;
     private final GetSessionTokenMaterial getSessionTokenMaterial;
 
-    public String execute(UUID authProcessUuid, SessionStatusHolder sessionStatusHolder) {
-        GetSessionTokenMaterial.Response sessionTokenMaterial =
-            getSessionTokenMaterial.execute(
-                new GetSessionTokenMaterial.Request(authProcessUuid)
-            );
-
-        GetSidSession.Response sidSessionResponse = getSidSessionResponse(sessionStatusHolder);
+    public String execute(UUID authProcessUuid, GetSidSession.@Nullable Response sessionResponse) {
+        GetSidSession.Response sidSessionResponse = validateSessionResponse(sessionResponse);
 
         GetSidSession.Signature signature = getSidSignature(
             sidSessionResponse
         );
+
+        GetSessionTokenMaterial.Response sessionTokenMaterial =
+            getSessionTokenMaterial.execute(
+                new GetSessionTokenMaterial.Request(authProcessUuid)
+            );
 
         return createSignedSdJwtForSid.execute(
             sessionTokenMaterial.unsignedJwt(),
@@ -39,17 +39,19 @@ public class CreateSidSessionToken {
 
     private GetSidSession.Signature getSidSignature(GetSidSession.Response response) {
         if (response.signature() == null) {
-            throw new RuntimeException("Signature missing in SID session response");
+            throw new IllegalStateException("Signature missing in SID session response");
         }
 
         return response.signature();
     }
 
-    private GetSidSession.Response getSidSessionResponse(SessionStatusHolder sessionStatusHolder) {
-        if (sessionStatusHolder.getSidSessionResponse() == null) {
-            throw new RuntimeException("Sid session response missing");
+    private GetSidSession.Response validateSessionResponse(
+        GetSidSession.@Nullable Response sessionResponse
+    ) {
+        if (sessionResponse == null) {
+            throw new IllegalStateException("SID session response missing");
         }
 
-        return sessionStatusHolder.getSidSessionResponse();
+        return sessionResponse;
     }
 }
