@@ -52,10 +52,10 @@ class Cdoc2AuthServerApplicationTest {
     public static final String SESSION_NONCE_URI_1 = "/session_nonce_1";
     public static final String SESSION_NONCE_URI_2 = "/session_nonce_2";
 
-
     @RegisterExtension
     static WireMockExtension wiremock = WireMockExtension.newInstance()
         .options(wireMockConfig()
+            .httpDisabled(true)
             .httpsPort(WIREMOCK_PORT)
             .keystorePath("wiremock_keystore.p12")
             .keystorePassword("changeit")
