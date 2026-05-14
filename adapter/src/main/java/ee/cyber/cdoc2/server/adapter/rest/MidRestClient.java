@@ -46,7 +46,10 @@ public class MidRestClient implements MidAuthenticate, GetMidSession {
     public Response execute(UUID sessionId) {
         MidSessionStatus midSessionStatus = midClient.getMobileIdConnector()
             .getAuthenticationSessionStatus(
-                new MidSessionStatusRequest(sessionId.toString())
+                new MidSessionStatusRequest(
+                    sessionId.toString(),
+                    properties.timeoutSeconds()
+                )
             );
 
         return new Response(

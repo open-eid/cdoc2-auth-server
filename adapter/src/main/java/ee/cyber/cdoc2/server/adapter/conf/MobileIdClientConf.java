@@ -19,6 +19,7 @@ public class MobileIdClientConf {
     private static final String DEFAULT_DISPLAY_TEXT = "Please confirm authentication";
     private static final String DEFAULT_DISPLAY_TEXT_FORMAT = "GSM7";
     private static final String DEFAULT_DISPLAY_TEXT_LANG = "ENG";
+    private static final String DEFAULT_TIMEOUT_SECONDS = "5";
 
     private static final String SSL_BUNDLE_NAME = "mid-server";
     private final SslBundles sslBundles;
@@ -26,6 +27,7 @@ public class MobileIdClientConf {
     @ConfigurationProperties(prefix = "app.mobileid.client")
     public record AppProperties(
         String hostUrl,
+        @DefaultValue(DEFAULT_TIMEOUT_SECONDS) int timeoutSeconds,
         @DefaultValue(DEFAULT_DISPLAY_TEXT) String displayTextDefault,
         @DefaultValue(DEFAULT_DISPLAY_TEXT_FORMAT) String displayTextDefaultFormat,
         @DefaultValue(DEFAULT_DISPLAY_TEXT_LANG) String displayTextDefaultLang
