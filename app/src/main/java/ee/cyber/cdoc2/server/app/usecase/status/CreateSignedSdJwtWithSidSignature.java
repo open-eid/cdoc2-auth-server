@@ -59,7 +59,7 @@ class CreateSignedSdJwtWithSidSignature {
             claimsMap.put("rpChallenge", params.rpChallenge());
             claimsMap.put("interactionsDigest", params.interactionsDigest());
             claimsMap.put("interactionTypeUsed", params.interactionTypeUsed());
-            claimsMap.put("rpName", relyingPartyConf.getName());
+            claimsMap.put("rpName", relyingPartyConf.getSidName());
             claimsMap.put("schemeName", relyingPartyConf.getSchemeName());
             claimsMap.put("signature", params.sidSignature());
 

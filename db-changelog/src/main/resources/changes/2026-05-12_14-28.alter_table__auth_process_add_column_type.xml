@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="auth" id="alter_table__auth_process_add_column_type.0000">
+        <addColumn tableName="AUTH_PROCESS">
+            <column name="TYPE"
+                    type="VARCHAR(16)"
+                    defaultValue="SID"
+                    remarks="Type of the authentication process. SID - Smart-ID, MID - Mobile-ID">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="AUTH_PROCESS" columnName="TYPE"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

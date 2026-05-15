@@ -15,5 +15,7 @@
 
 * HTTP 404 Not Found returned by `/auth/status/{authProcessUuid}` when no auth process matching
   authProcessUuid found in database
+* Upgraded to Spring Boot 4.0.6
+* SID and MID processes can be configured to use different RP name and UUID values
 
 ## [0.5.0] First public release 

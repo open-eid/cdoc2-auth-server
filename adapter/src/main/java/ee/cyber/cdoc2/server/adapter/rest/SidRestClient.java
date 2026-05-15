@@ -23,7 +23,7 @@ import ee.cyber.cdoc2.server.app.usecase.status.sid.GetSidSession;
 
 @Component
 @RequiredArgsConstructor
-public class SidClient implements SidAuthenticate, GetSidSession {
+public class SidRestClient implements SidAuthenticate, GetSidSession {
     private final SmartIdClient smartIdClient;
     private final RelyingPartyConf relyingPartyConf;
 
@@ -32,8 +32,8 @@ public class SidClient implements SidAuthenticate, GetSidSession {
 
         var authenticationSessionResponse = smartIdClient.createNotificationAuthentication()
             .withRpChallenge(rpChallenge.toBase64EncodedValue())
-            .withRelyingPartyUUID(String.valueOf(relyingPartyConf.getUuid()))
-            .withRelyingPartyName(relyingPartyConf.getName())
+            .withRelyingPartyUUID(String.valueOf(relyingPartyConf.getSidUuid()))
+            .withRelyingPartyName(relyingPartyConf.getSidName())
             .withInteractions(request.interactions())
             .withHashAlgorithm(HashAlgorithm.SHA_256)
             .withSignatureAlgorithm(AuthenticationSignatureAlgorithm.RSASSA_PSS)

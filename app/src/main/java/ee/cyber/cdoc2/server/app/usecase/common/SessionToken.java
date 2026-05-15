@@ -10,7 +10,6 @@ import com.authlete.sd.SDJWT;
 import com.authlete.sd.SDObjectBuilder;
 import com.nimbusds.jwt.JWTClaimsSet;
 
-import ee.cyber.cdoc2.auth.EtsiIdentifier;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce.UriSessionNonce;
 
 public final class SessionToken {
@@ -70,7 +69,7 @@ public final class SessionToken {
 
         JWTClaimsSet regularClaims = new JWTClaimsSet.Builder()
             .issuer(creationParams.issuer)
-            .subject(creationParams.etsiIdentifier.toString())
+            .subject(creationParams.subject)
             .build();
 
         claims.putAll(regularClaims.toJSONObject());
@@ -88,12 +87,12 @@ public final class SessionToken {
     }
 
     private static String uriSessionNonceToClaim(UriSessionNonce uriSessionNonce) {
-        return uriSessionNonce.uri().toString() + "/" + uriSessionNonce.nonce();
+        return uriSessionNonce.uri() + "/" + uriSessionNonce.nonce();
     }
 
     public record SessionTokenCreationParams(
         List<UriSessionNonce> sessionNonceData,
-        EtsiIdentifier etsiIdentifier,
+        String subject,
         String issuer
     ) {
     }

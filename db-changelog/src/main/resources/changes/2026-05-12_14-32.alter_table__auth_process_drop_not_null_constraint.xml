@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="auth" id="alter_table__auth_process_drop_not_null_constraint.0000">
+        <dropNotNullConstraint tableName="AUTH_PROCESS" columnName="INTERACTIONS_DIGEST"/>
+
+        <rollback>
+            <addNotNullConstraint tableName="AUTH_PROCESS" columnName="INTERACTIONS_DIGEST"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

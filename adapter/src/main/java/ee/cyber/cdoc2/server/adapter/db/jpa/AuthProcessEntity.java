@@ -29,7 +29,10 @@ public class AuthProcessEntity {
     @Column(name = "status", nullable = false)
     private String status;
 
-    @Column(name = "interactions_digest", nullable = false)
+    @Column(name = "type", nullable = false)
+    private String type;
+
+    @Column(name = "interactions_digest")
     private String interactionsDigest;
 
     @Column(name = "rp_challenge", nullable = false)

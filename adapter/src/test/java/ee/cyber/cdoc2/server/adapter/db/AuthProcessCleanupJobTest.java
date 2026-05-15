@@ -18,6 +18,7 @@ import ee.cyber.cdoc2.server.adapter.conf.AuthProcessCleanupConf;
 import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessEntity;
 import ee.cyber.cdoc2.server.adapter.db.jpa.AuthProcessJpaRepository;
 import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessStatus;
+import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessType;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -98,6 +99,7 @@ class AuthProcessCleanupJobTest {
         AuthProcessEntity entity = new AuthProcessEntity();
 
         entity.setUuid(UUID.randomUUID().toString());
+        entity.setType(AuthProcessType.SID.name());
         entity.setMidSidSessionId("midSidSessionId");
         entity.setInteractionsDigest("interactionsDigest");
         entity.setRpChallenge("rpChallenge");
