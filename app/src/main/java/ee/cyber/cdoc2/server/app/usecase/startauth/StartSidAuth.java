@@ -19,6 +19,8 @@ import ee.cyber.cdoc2.auth.EtsiIdentifier;
 import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessType;
 import ee.cyber.cdoc2.server.app.usecase.common.SessionToken;
 
+import static ee.cyber.cdoc2.server.app.usecase.startauth.StartAuthImpl.createRpChallengeBytes;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -27,7 +29,8 @@ public class StartSidAuth {
     private final SessionNonce sessionNonce;
     private final SidAuthenticate sidAuthenticate;
 
-    String execute(UUID authProcessUuid, byte[] rpChallenge, EtsiIdentifier etsiIdentifier) {
+    String execute(UUID authProcessUuid, EtsiIdentifier etsiIdentifier) {
+        byte[] rpChallenge = createRpChallengeBytes();
         List<SessionNonce.UriSessionNonce> sessionNonces = sessionNonce.collectSessionNonces();
 
         SessionToken.SessionTokenCreationParams tokenCreationParams = new SessionToken.SessionTokenCreationParams(
