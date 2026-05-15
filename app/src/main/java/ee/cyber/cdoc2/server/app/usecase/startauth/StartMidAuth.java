@@ -22,6 +22,8 @@ import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessType;
 import ee.cyber.cdoc2.server.app.usecase.common.MidUtil;
 import ee.cyber.cdoc2.server.app.usecase.common.SessionToken;
 
+import static ee.cyber.cdoc2.server.app.usecase.startauth.StartAuthImpl.createRpChallengeBytes;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -32,7 +34,6 @@ public class StartMidAuth {
 
     String execute(
         UUID authProcessUuid,
-        byte[] rpChallenge,
         EtsiIdentifier etsiIdentifier,
         String phoneNr
     ) {
@@ -40,6 +41,8 @@ public class StartMidAuth {
         String validNationalIdentityNumber = getAndValidateNationalIdentityNumber(
             etsiIdentifier.getIdentifier()
         );
+
+        byte[] rpChallenge = createRpChallengeBytes();
 
         List<SessionNonce.UriSessionNonce> sessionNonces = sessionNonce.collectSessionNonces();
 

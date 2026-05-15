@@ -27,20 +27,17 @@ public class StartAuthImpl implements StartAuth {
         EtsiIdentifier etsiIdentifier = getAndValidateEtsiIdentifier(request);
 
         UUID authUuid = UUID.randomUUID();
-        byte[] rpChallenge = createRpChallengeBytes();
         String verificationCode;
 
         if (request.mobileNr() != null) {
             verificationCode = startMidAuth.execute(
                 authUuid,
-                rpChallenge,
                 etsiIdentifier,
                 request.mobileNr()
             );
         } else {
             verificationCode = startSidAuth.execute(
                 authUuid,
-                rpChallenge,
                 etsiIdentifier
             );
         }
@@ -51,7 +48,7 @@ public class StartAuthImpl implements StartAuth {
         );
     }
 
-    private static byte[] createRpChallengeBytes() {
+    static byte[] createRpChallengeBytes() {
         byte[] rpChallengeBytes = new byte[RP_CHALLENGE_BYTES_LENGTH];
         new SecureRandom().nextBytes(rpChallengeBytes);
         return rpChallengeBytes;
