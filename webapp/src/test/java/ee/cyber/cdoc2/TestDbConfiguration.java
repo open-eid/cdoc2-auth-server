@@ -18,11 +18,16 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 @Configuration
+@EnableAutoConfiguration(exclude = {
+    LiquibaseAutoConfiguration.class
+})
 public class TestDbConfiguration {
 
     @Bean
