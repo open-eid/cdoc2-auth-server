@@ -42,19 +42,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class Cdoc2AuthServerApplicationTest {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final int WIREMOCK_PORT = 9080;
-    private static final String IDENTIFIER_OK = "PNOEE-40504040001";
-    private static final String IDENTIFIER_USER_REFUSED = "PNOEE-30403039917";
+    private static final String SID_IDENTIFIER_OK = "PNOEE-40504040001";
+    private static final String SID_IDENTIFIER_USER_REFUSED = "PNOEE-30403039917";
+    public static final String MID_IDENTIFIER_OK = "PNOEE-51307149560";
+    public static final String MID_PHONE_NUMBER_OK = "+37269930366";
+
     private static final String SESSION_NONCE_1_VALUE = "WTq9gAkv5_UJioELXDqOAA";
     private static final String SESSION_NONCE_2_VALUE = "nrVcSEcHuWt2SKfjkMm6RQ";
     public static final String SESSION_NONCE_URI_1 = "/session_nonce_1";
     public static final String SESSION_NONCE_URI_2 = "/session_nonce_2";
 
-    public static final String OK_1_IDENTITY_CODE = "PNOEE-51307149560";
-    public static final String OK_1_PHONE_NUMBER = "+37269930366";
-
     @RegisterExtension
     static WireMockExtension wiremock = WireMockExtension.newInstance()
         .options(wireMockConfig()
+            .httpDisabled(true)
             .httpsPort(WIREMOCK_PORT)
             .keystorePath("wiremock_keystore.p12")
             .keystorePassword("changeit")
@@ -67,7 +68,46 @@ class Cdoc2AuthServerApplicationTest {
     private MockMvc mockMvc;
 
     @Test
-    void shouldGetAuthStatus() throws Exception {
+    void shouldPerformFullAuthProcessForSid() throws Exception {
+        performAuthProcess(
+            new StartAuthRequest(
+                "etsi/" + SID_IDENTIFIER_OK,
+                null
+            )
+        );
+    }
+
+    @Test
+    void shouldPerformFullAuthProcessForMid() throws Exception {
+        performAuthProcess(
+            new StartAuthRequest(
+                "etsi/" + MID_IDENTIFIER_OK,
+                MID_PHONE_NUMBER_OK
+            )
+        );
+    }
+
+    @Test
+    void shouldGetWellKnown() throws Exception {
+        MockHttpServletResponse getWellKnownResponse = mockMvc.perform(
+                get(URI.create("/.well-known/jwks.jws"))
+            ).andExpect(status().isOk())
+            .andReturn().getResponse();
+
+        GetWellKnownResponseBody getWellKnownResponseBody = OBJECT_MAPPER.readValue(
+            getWellKnownResponse.getContentAsString(),
+            GetWellKnownResponseBody.class
+        );
+
+        assertEquals(2, getWellKnownResponseBody.keys.size());
+
+        assertTrue(
+            getWellKnownResponseBody.keys.stream()
+                .allMatch(key -> key.kid != null && key.kty != null)
+        );
+    }
+
+    private void performAuthProcess(StartAuthRequest startAuthRequest) throws Exception {
         wiremock.stubFor(
             WireMock.post(
                 urlEqualTo(SESSION_NONCE_URI_1)
@@ -85,16 +125,6 @@ class Cdoc2AuthServerApplicationTest {
                 .withHeader("Content-Type", "application/json")
                 .withBody("{\"nonce\":\"" + SESSION_NONCE_2_VALUE + "\"}"))
         );
-
-        StartAuthRequest startAuthRequest = new StartAuthRequest(
-            "etsi/" + IDENTIFIER_OK,
-            null
-        );
-
-//        StartAuthRequest startAuthRequest = new StartAuthRequest(
-//            "etsi/" + OK_1_IDENTITY_CODE,
-//            OK_1_PHONE_NUMBER
-//        );
 
         MockHttpServletResponse startAuthResponse = mockMvc.perform(
                 post(URI.create("/auth/start"))
@@ -171,26 +201,6 @@ class Cdoc2AuthServerApplicationTest {
         }
 
         return authStatusResponseBody;
-    }
-
-    @Test
-    void shouldGetWellKnown() throws Exception {
-        MockHttpServletResponse getWellKnownResponse = mockMvc.perform(
-                get(URI.create("/.well-known/jwks.jws"))
-            ).andExpect(status().isOk())
-            .andReturn().getResponse();
-
-        GetWellKnownResponseBody getWellKnownResponseBody = OBJECT_MAPPER.readValue(
-            getWellKnownResponse.getContentAsString(),
-            GetWellKnownResponseBody.class
-        );
-
-        assertEquals(2, getWellKnownResponseBody.keys.size());
-
-        assertTrue(
-            getWellKnownResponseBody.keys.stream()
-                .allMatch(key -> key.kid != null && key.kty != null)
-        );
     }
 
     private record StartAuthRequest(String identifier, String mobileNr) {

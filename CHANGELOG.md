@@ -4,6 +4,7 @@
 
 ### Features:
 
+* Mobile-ID support for session token creation
 * Expired authorization processes are cleaned by a scheduled job. New configuration keys:
     * `app.cleanup.rate` - milliseconds between job executions, default '30000'
     * `app.cleanup.authProcessMaxAgeMinutes` - maximum allowable age for an auth process in 

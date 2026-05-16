@@ -40,11 +40,15 @@ In configuration files, the following properties must start with the `app.` pref
 | restclient.session-nonce.connection-request-timeout | 5000          | connection timeout for session nonce requests, in millisecond                                     |
 | well-known.ec-private-key-name                      |               | name of the EC private key to use for signing the session token                                   |
 | well-known.ec-key-kid                               |               | key id of the EC private key to use for signing the session token                                 |
-| rp.name                                             |               | Relying party name that auth-server presents to the SID/MID services                              |
-| rp.uuid                                             |               | Relying party UUID that auth-server presents to the SID/MID services                              |
+| rp.sid.name                                         |               | Relying party name that auth-server presents to the SID services                                  |
+| rp.sid.uuid                                         |               | Relying party UUID that auth-server presents to the SID services                                  |
+| rp.mid.name                                         |               | Relying party name that auth-server presents to the MID services                                  |
+| rp.mid.uuid                                         |               | Relying party UUID that auth-server presents to the MID services                                  |
 | rp.certificate-level                                | QUALIFIED     | The required certificate level when authenticating through SID/MID services                       |
 | rp.scheme-name                                      | smart-id-demo | Name of the SID scheme used (eg. `smart-id`)                                                      |
 | smartid.client.hostUrl                              |               | URL of the SID RP API                                                                             |
+| mobileid.client.hostUrl                             |               | URL of the MID RP API                                                                             |
+| mobileid.client.timeoutSeconds                      | 5             | Timeout for MID connections, in seconds                                                           |
 | cleanup.rate                                        | 30000         | milliseconds between auth process cleanup job executions                                          |
 | cleanup.authProcessMaxAgeMinutes                    | 5             | maximum allowable age for an auth process in minutes                                              |
 | cleanup.authProcessDeletionLimit                    | 1000          | limit to the number of records deleted by a single run of the cleanup job                         |
@@ -88,6 +92,7 @@ Defined bundles:
 |:--------------|:---------------------|:-------------------------------------------------------------------------------|
 | server-bundle | keystore, truststore | keystore and truststore (if any) to use for embedded server SSL connections    |
 | sid-server    | truststore           | provides truststore for SID server connections                                 |
+| mid-server    | truststore           | provides truststore for MID server connections                                 |
 | trusted-infra | truststore           | provides truststore for REST clients communicating with other CDOC2 components |
 
 ### Building the docker image locally
