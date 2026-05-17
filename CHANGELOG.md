@@ -18,6 +18,7 @@
   authProcessUuid found in database
 * Switched to latest Spring Boot 3 from Spring Boot 4 to resolve constant Jackson version conflicts
   between Spring Boot and SK clients (smart-id-java-client, mid-rest-java-client)
+* REST endpoint input validation errors are returned as HTTP 400 Bad Request with problem details.
 * SID and MID processes can be configured to use different RP name and UUID values
 
 ## [0.5.0] First public release 
