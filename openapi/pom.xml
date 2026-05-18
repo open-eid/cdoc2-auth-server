@@ -49,7 +49,7 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webmvc</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
             <version>${spring-boot.version}</version>
         </dependency>
     </dependencies>
@@ -110,9 +110,8 @@
                     <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
                     <generateAliasAsModel>false</generateAliasAsModel>
                     <configOptions>
-                        <useSpringBoot4>true</useSpringBoot4>
                         <useTags>true</useTags>
-                        <useJackson3>true</useJackson3>
+                        <useJakartaEe>true</useJakartaEe>
                         <openApiNullable>false</openApiNullable>
                         <delegatePattern>true</delegatePattern>
                         <dateLibrary>java8</dateLibrary>

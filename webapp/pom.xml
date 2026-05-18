@@ -53,9 +53,8 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
             <version>${spring-boot.version}</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -74,7 +73,7 @@
 
         <dependency>
             <groupId>org.wiremock</groupId>
-            <artifactId>wiremock-standalone</artifactId>
+            <artifactId>wiremock</artifactId>
             <version>3.13.2</version>
             <scope>test</scope>
         </dependency>
@@ -92,13 +91,6 @@
             <version>0.5.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.20.2</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -111,10 +103,12 @@
                     <image>
                         <env>
                             <BP_JVM_VERSION>21</BP_JVM_VERSION>
-                            <BP_SPRING_CLOUD_BINDINGS_DISABLED>true</BP_SPRING_CLOUD_BINDINGS_DISABLED>
+                            <BP_SPRING_CLOUD_BINDINGS_DISABLED>true
+                            </BP_SPRING_CLOUD_BINDINGS_DISABLED>
                             <!--suppress UnresolvedMavenProperty -->
                             <BP_DEPENDENCY_MIRROR>${bp.dependency.mirror}</BP_DEPENDENCY_MIRROR>
-                            <BPL_SPRING_CLOUD_BINDINGS_DISABLED>true</BPL_SPRING_CLOUD_BINDINGS_DISABLED>
+                            <BPL_SPRING_CLOUD_BINDINGS_DISABLED>true
+                            </BPL_SPRING_CLOUD_BINDINGS_DISABLED>
                             <!--suppress UnresolvedMavenProperty -->
                             <HTTP_PROXY>${http.proxy}</HTTP_PROXY>
                             <!--suppress UnresolvedMavenProperty -->
