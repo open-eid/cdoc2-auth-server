@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MidConf {
-    private static final String SSL_BUNDLE_NAME = "mid-server";
+    private static final String SSL_BUNDLE_NAME = "sid-trusted-issuers";
 
     @Bean
     public MidAuthenticationResponseValidator midAuthenticationResponseValidator(
