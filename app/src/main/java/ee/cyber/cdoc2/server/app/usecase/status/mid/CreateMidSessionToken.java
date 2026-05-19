@@ -82,6 +82,9 @@ public class CreateMidSessionToken {
         MidAuthenticationResult authResult = responseValidator.validate(midAuthentication);
         List<String> authErrors = authResult.getErrors();
         if (!authResult.isValid() || !authErrors.isEmpty()) {
+            for (String error : authErrors) {
+                log.error(error);
+            }
             throw new IllegalStateException("MID signature validation failed");
         }
     }
