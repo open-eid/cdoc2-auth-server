@@ -5,6 +5,7 @@ import java.net.URI;
 import java.security.interfaces.ECPublicKey;
 import java.util.List;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -68,6 +69,7 @@ class Cdoc2AuthServerApplicationTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Tag("net")
     @Test
     void shouldPerformFullAuthProcessForSid() throws Exception {
         performAuthProcess(
@@ -78,6 +80,7 @@ class Cdoc2AuthServerApplicationTest {
         );
     }
 
+    @Tag("net")
     @Test
     void shouldPerformFullAuthProcessForMid() throws Exception {
         performAuthProcess(
