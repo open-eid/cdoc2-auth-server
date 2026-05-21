@@ -2,11 +2,7 @@ package ee.cyber.cdoc2.server.adapter.conf;
 
 import java.io.InputStream;
 import java.nio.file.Paths;
-import java.security.KeyFactory;
-import java.security.interfaces.ECPublicKey;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 import org.jspecify.annotations.Nullable;
@@ -50,9 +46,9 @@ public class WellKnownJwkConf {
         List<JWK> keys = new ArrayList<>();
 
         for (String pemFile : pemFiles) {
-            ECPublicKey publicKey = loadPemPublicKey(pemFile);
+            JWK publicKeyJwk = loadPublicKeyJwk(pemFile);
 
-            ECKey jwk = new ECKey.Builder(Curve.P_256, publicKey)
+            ECKey jwk = new ECKey.Builder(Curve.P_256, publicKeyJwk.toECKey().toECPublicKey())
                 .keyID(Paths.get(pemFile).getFileName().toString().replace(".pem", ""))
                 .algorithm(JWSAlgorithm.ES256)
                 .build();
@@ -62,18 +58,10 @@ public class WellKnownJwkConf {
         return new JWKSet(keys).toString();
     }
 
-    private ECPublicKey loadPemPublicKey(String name) throws Exception {
+    private JWK loadPublicKeyJwk(String name) throws Exception {
         try (InputStream is = resourceLoader.loadResource(name).getInputStream()) {
             String pem = new String(is.readAllBytes());
-            String base64 = pem
-                .replace("-----BEGIN PUBLIC KEY-----", "")
-                .replace("-----END PUBLIC KEY-----", "")
-                .replaceAll("\\s+", "");
-            byte[] der = Base64.getDecoder().decode(base64);
-
-            return (ECPublicKey) KeyFactory
-                .getInstance("EC")
-                .generatePublic(new X509EncodedKeySpec(der));
+            return JWK.parseFromPEMEncodedObjects(pem);
         }
     }
 
