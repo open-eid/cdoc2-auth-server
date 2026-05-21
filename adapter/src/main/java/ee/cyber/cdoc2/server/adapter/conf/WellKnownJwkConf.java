@@ -109,7 +109,7 @@ public class WellKnownJwkConf {
 
         if (!props.publicKeys.contains(props.activePublicKey)) {
             throw new IllegalStateException("app.well-known.activePublicKey must "
-                + "contained in app.well-known.publicKeys list");
+                + "be contained in app.well-known.publicKeys list");
         }
     }
 }
