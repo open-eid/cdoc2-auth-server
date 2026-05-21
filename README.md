@@ -38,8 +38,9 @@ In configuration files, the following properties must start with the `app.` pref
 | restclient.session-nonce.retries                    | 3             | number of retries when session nonce request fails                                                |
 | restclient.session-nonce.read-timeout               | 5000          | read timeout for session nonce requests, in millisecond                                           |
 | restclient.session-nonce.connection-request-timeout | 5000          | connection timeout for session nonce requests, in millisecond                                     |
-| well-known.ec-private-key-name                      |               | name of the EC private key to use for signing the session token                                   |
-| well-known.ec-key-kid                               |               | key id of the EC private key to use for signing the session token                                 |
+| well-known.ecPrivateKeyPem                          |               | PEM-encoded resource for the EC ES256 private key to use for signing the session token            |
+| well-known.kid                                      |               | key id of the key to use for signing the session token                                            |
+| well-known.jwk                                      |               | JWK resource for the public key(s) advertised by the /.well-known/jwks.jws endpoint               |
 | rp.sid.name                                         |               | Relying party name that auth-server presents to the SID services                                  |
 | rp.sid.uuid                                         |               | Relying party UUID that auth-server presents to the SID services                                  |
 | rp.mid.name                                         |               | Relying party name that auth-server presents to the MID services                                  |

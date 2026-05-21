@@ -29,7 +29,7 @@ public class SdJwtSigner {
     public String sign(JWTClaimsSet claimsSet, List<Disclosure> disclosures) {
         JWSHeader header =
             new JWSHeader.Builder(JWSAlgorithm.ES256)
-                .keyID(jwtKeysConf.getEcKeyKid())
+                .keyID(jwtKeysConf.getKid())
                 .type(new JOSEObjectType(SESSION_TOKEN_JWT_TYP))
                 .build();
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## [unreleased]
+
+### Improvements
+* JWK for /.well-known/jwks.jws configurable. Removed key defaults from main classpath, 
+  enforcing requirement for externally provided keys.
+
 ## [0.6.0]
 
 ### Features:

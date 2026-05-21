@@ -4,5 +4,5 @@ import java.security.interfaces.ECPrivateKey;
 
 public interface JwtKeysConf {
     ECPrivateKey ecPrivateKey();
-    String getEcKeyKid();
+    String getKid();
 }
