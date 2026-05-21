@@ -23,21 +23,21 @@ public class JwtKeyConfImpl implements JwtKeysConf {
 
     @ConfigurationProperties(prefix = "app.jwt")
     public record AppProperties(
-        @Nullable String ecPrivateKeyPem,
-        @Nullable String kid
+        @Nullable String ecPrivateKeyPem
     ) {
     }
 
     public JwtKeyConfImpl(
         AppProperties props,
-        ResourceLoaderWrapper resourceLoader
+        ResourceLoaderWrapper resourceLoader,
+        WellKnownJwkConf wellKnownJwkConf
     ) throws JOSEException,
         IOException {
         validateConf(props);
         this.resourceLoader = resourceLoader;
         String ecPrivatePem = readFile(props.ecPrivateKeyPem());
         this.ecPrivateKey = JWK.parseFromPEMEncodedObjects(ecPrivatePem).toECKey().toECPrivateKey();
-        this.kid = props.kid();
+        this.kid = wellKnownJwkConf.getActivePublicKeyKid();
     }
 
     @Override
@@ -59,10 +59,6 @@ public class JwtKeyConfImpl implements JwtKeysConf {
     private void validateConf(AppProperties props) {
         if (props.ecPrivateKeyPem == null || props.ecPrivateKeyPem.isBlank()) {
             throw new IllegalStateException("app.jwt.ecPrivateKeyPem must be defined");
-        }
-
-        if (props.kid == null || props.kid.isBlank()) {
-            throw new IllegalStateException("app.jwt.kid must be defined");
         }
     }
 }
