@@ -70,7 +70,7 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
 
     @Override
     public ResponseEntity<WellKnownResponse> getWellKnown() {
-        return ResponseEntity.ok(wellKnownJwkConf.getJwk());
+        return ResponseEntity.ok(wellKnownJwkConf.getJwkResponse());
     }
 
     //TODO should be created dynamically based on controller URI

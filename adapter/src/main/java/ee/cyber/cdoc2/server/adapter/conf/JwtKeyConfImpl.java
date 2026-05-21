@@ -16,19 +16,19 @@ import ee.cyber.cdoc2.server.adapter.resource.ResourceLoaderWrapper;
 import ee.cyber.cdoc2.server.app.conf.JwtKeysConf;
 
 @Configuration
-public class JwtKeysConfImpl implements JwtKeysConf {
+public class JwtKeyConfImpl implements JwtKeysConf {
     private final ResourceLoaderWrapper resourceLoader;
     private final ECPrivateKey ecPrivateKey;
     private final String kid;
 
-    @ConfigurationProperties(prefix = "app.well-known")
+    @ConfigurationProperties(prefix = "app.jwt")
     public record AppProperties(
         @Nullable String ecPrivateKeyPem,
         @Nullable String kid
     ) {
     }
 
-    public JwtKeysConfImpl(
+    public JwtKeyConfImpl(
         AppProperties props,
         ResourceLoaderWrapper resourceLoader
     ) throws JOSEException,
@@ -58,11 +58,11 @@ public class JwtKeysConfImpl implements JwtKeysConf {
 
     private void validateConf(AppProperties props) {
         if (props.ecPrivateKeyPem == null || props.ecPrivateKeyPem.isBlank()) {
-            throw new IllegalStateException("app.well-known.ecPrivateKeyPem must be defined");
+            throw new IllegalStateException("app.jwt.ecPrivateKeyPem must be defined");
         }
 
         if (props.kid == null || props.kid.isBlank()) {
-            throw new IllegalStateException("app.well-known.kid must be defined");
+            throw new IllegalStateException("app.jwt.kid must be defined");
         }
     }
 }
