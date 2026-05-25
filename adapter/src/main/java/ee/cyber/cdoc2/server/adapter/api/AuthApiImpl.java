@@ -21,6 +21,7 @@ import ee.cyber.cdoc2.server.adapter.generated.model.AuthProcessStatusResponse;
 import ee.cyber.cdoc2.server.adapter.generated.model.StartAuthProcessResponse;
 import ee.cyber.cdoc2.server.adapter.generated.model.WellKnownResponse;
 import ee.cyber.cdoc2.server.app.exception.InputValidationException;
+import ee.cyber.cdoc2.server.app.usecase.startauth.Language;
 import ee.cyber.cdoc2.server.app.usecase.startauth.StartAuth;
 import ee.cyber.cdoc2.server.app.usecase.status.GetStatus;
 
@@ -37,7 +38,8 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
             StartAuth.Response response =
                 startAuth.execute(new StartAuth.Request(
                     authIdentity.getIdentifier(),
-                    authIdentity.getMobileNr()
+                    authIdentity.getMobileNr(),
+                    toLanguage(authIdentity.getLanguage())
                 ));
 
             StartAuthProcessResponse responseBody = new StartAuthProcessResponse(
@@ -98,5 +100,13 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
         return Base64.getUrlEncoder().encodeToString(
             Base64.getDecoder().decode(base64String)
         );
+    }
+
+    private static Language toLanguage(AuthIdentity.LanguageEnum languageEnum) {
+        return switch (languageEnum) {
+            case EE, UNKNOWN_DEFAULT_OPEN_API -> Language.EE;
+            case RU -> Language.RU;
+            case EN -> Language.EN;
+        };
     }
 }

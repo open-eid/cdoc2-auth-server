@@ -7,7 +7,7 @@ import org.jspecify.annotations.Nullable;
 public interface StartAuth {
     Response execute(Request request);
 
-    record Request(String nationalId, @Nullable String mobileNr) {
+    record Request(String nationalId, @Nullable String mobileNr, Language language) {
     }
 
     record Response(UUID uuid, String verificationCode) {

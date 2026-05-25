@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import com.authlete.sd.SDJWT;
 
 import ee.cyber.cdoc2.auth.EtsiIdentifier;
+import ee.cyber.cdoc2.server.app.conf.DisplayTextConf;
 import ee.cyber.cdoc2.server.app.exception.InputValidationException;
 import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessType;
 import ee.cyber.cdoc2.server.app.usecase.common.MidUtil;
@@ -31,11 +32,13 @@ public class StartMidAuth {
     private final StoreAuthProcess storeAuthProcess;
     private final SessionNonce sessionNonce;
     private final MidAuthenticate midAuthenticate;
+    private final DisplayTextConf displayTextConf;
 
     String execute(
         UUID authProcessUuid,
         EtsiIdentifier etsiIdentifier,
-        String phoneNr
+        String phoneNr,
+        Language language
     ) {
         String validPhoneNumber = getAndValidatePhoneNumber(phoneNr);
         String validNationalIdentityNumber = getAndValidateNationalIdentityNumber(
@@ -59,12 +62,12 @@ public class StartMidAuth {
         );
 
         UUID sessionId = midAuthenticate.execute(new MidAuthenticate.Request(
-                validPhoneNumber,
-                validNationalIdentityNumber,
-                authenticationHash,
-            "Creating CDOC2 session: " + " " + etsiIdentifier.getSemanticsIdentifier()
-            )
-        );
+            validPhoneNumber,
+            validNationalIdentityNumber,
+            authenticationHash,
+            displayTextConf.getDisplayText(language),
+            language
+        ));
 
         String verificationCode = authenticationHash.calculateVerificationCode();
 

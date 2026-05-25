@@ -33,12 +33,14 @@ public class StartAuthImpl implements StartAuth {
             verificationCode = startMidAuth.execute(
                 authUuid,
                 etsiIdentifier,
-                request.mobileNr()
+                request.mobileNr(),
+                request.language()
             );
         } else {
             verificationCode = startSidAuth.execute(
                 authUuid,
-                etsiIdentifier
+                etsiIdentifier,
+                request.language()
             );
         }
 
