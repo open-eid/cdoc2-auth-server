@@ -9,7 +9,9 @@ import ee.cyber.cdoc2.server.app.usecase.startauth.Language;
 
 @Configuration
 public class DisplayTextConfImpl implements DisplayTextConf {
-    private static final String DEFAULT_DISPLAY_TEXT = "Please confirm authentication";
+    static final String SEMANTICS_IDENTIFIER_PLACEHOLDER = "{semanticsIdentifier}";
+    private static final String DEFAULT_DISPLAY_TEXT =
+        "Please confirm authentication: " + SEMANTICS_IDENTIFIER_PLACEHOLDER;
 
     @ConfigurationProperties(prefix = "app.auth.display-text")
     public record AppProperties(
@@ -26,11 +28,13 @@ public class DisplayTextConfImpl implements DisplayTextConf {
     }
 
     @Override
-    public String getDisplayText(Language language) {
-        return switch (language) {
+    public String getDisplayText(Language language, String semanticsIdentifier) {
+        String template = switch (language) {
             case EE -> props.ee();
             case RU -> props.ru();
             case EN -> props.en();
         };
+
+        return template.replace(SEMANTICS_IDENTIFIER_PLACEHOLDER, semanticsIdentifier);
     }
 }

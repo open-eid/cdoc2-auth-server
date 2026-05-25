@@ -48,8 +48,7 @@ public class StartSidAuth {
         List<NotificationInteraction> interactions = List.of(
             NotificationInteraction
                 .confirmationMessageAndVerificationCodeChoice(
-                    displayTextConf.getDisplayText(language)
-                        + ": " + etsiIdentifier.getSemanticsIdentifier()
+                    displayTextConf.getDisplayText(language, etsiIdentifier.getSemanticsIdentifier())
                 )
         );
 

@@ -65,7 +65,7 @@ public class StartMidAuth {
             validPhoneNumber,
             validNationalIdentityNumber,
             authenticationHash,
-            displayTextConf.getDisplayText(language),
+            displayTextConf.getDisplayText(language, etsiIdentifier.getSemanticsIdentifier()),
             language
         ));
 
