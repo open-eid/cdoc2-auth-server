@@ -1,6 +1,7 @@
 package ee.cyber.cdoc2.server.adapter.api;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +26,7 @@ import ee.cyber.cdoc2.server.app.usecase.startauth.Language;
 import ee.cyber.cdoc2.server.app.usecase.startauth.StartAuth;
 import ee.cyber.cdoc2.server.app.usecase.status.GetStatus;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AuthApiImpl implements Cdoc2AuthApiDelegate {
@@ -104,9 +106,13 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
 
     private static Language toLanguage(AuthIdentity.LanguageEnum languageEnum) {
         return switch (languageEnum) {
-            case EE, UNKNOWN_DEFAULT_OPEN_API -> Language.EE;
+            case EE -> Language.EE;
             case RU -> Language.RU;
             case EN -> Language.EN;
+            case UNKNOWN_DEFAULT_OPEN_API -> {
+                log.warn("Unrecognized language '{}', falling back to default (EN)", languageEnum);
+                yield Language.EN;
+            }
         };
     }
 }
