@@ -7,22 +7,11 @@ import java.util.List;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 
 import com.authlete.sd.SDJWT;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.ECDSAVerifier;
 import com.nimbusds.jose.jwk.ECKey;
@@ -31,43 +20,16 @@ import com.nimbusds.jwt.SignedJWT;
 
 import ee.cyber.cdoc2.server.adapter.generated.model.AuthProcessStatusResponse;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-@AutoConfigureMockMvc
-class Cdoc2AuthServerApplicationTest {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final int WIREMOCK_PORT = 9080;
-    private static final String SID_IDENTIFIER_OK = "PNOEE-40504040001";
+class Cdoc2AuthServerApplicationTest extends AbstractAuthServerTest {
+
     private static final String SID_IDENTIFIER_USER_REFUSED = "PNOEE-30403039917";
-    public static final String MID_IDENTIFIER_OK = "PNOEE-51307149560";
-    public static final String MID_PHONE_NUMBER_OK = "+37269930366";
-
-    private static final String SESSION_NONCE_1_VALUE = "WTq9gAkv5_UJioELXDqOAA";
-    private static final String SESSION_NONCE_2_VALUE = "nrVcSEcHuWt2SKfjkMm6RQ";
-    public static final String SESSION_NONCE_URI_1 = "/session_nonce_1";
-    public static final String SESSION_NONCE_URI_2 = "/session_nonce_2";
-
-    @RegisterExtension
-    static WireMockExtension wiremock = WireMockExtension.newInstance()
-        .options(wireMockConfig()
-            .httpDisabled(true)
-            .httpsPort(WIREMOCK_PORT)
-            .keystorePath("wiremock_keystore.p12")
-            .keystorePassword("changeit")
-            .keyManagerPassword("changeit")
-            .keystoreType("PKCS12")
-        )
-        .build();
-
-    @Autowired
-    private MockMvc mockMvc;
 
     @Tag("net")
     @Test
@@ -112,23 +74,7 @@ class Cdoc2AuthServerApplicationTest {
     }
 
     private void performAuthProcess(StartAuthRequest startAuthRequest) throws Exception {
-        wiremock.stubFor(
-            WireMock.post(
-                urlEqualTo(SESSION_NONCE_URI_1)
-            ).willReturn(aResponse()
-                .withStatus(HttpStatus.OK.value())
-                .withHeader("Content-Type", "application/json")
-                .withBody("{\"nonce\":\"" + SESSION_NONCE_1_VALUE + "\"}"))
-        );
-
-        wiremock.stubFor(
-            WireMock.post(
-                urlEqualTo(SESSION_NONCE_URI_2)
-            ).willReturn(aResponse()
-                .withStatus(HttpStatus.OK.value())
-                .withHeader("Content-Type", "application/json")
-                .withBody("{\"nonce\":\"" + SESSION_NONCE_2_VALUE + "\"}"))
-        );
+        stubSessionNonces();
 
         MockHttpServletResponse startAuthResponse = mockMvc.perform(
                 post(URI.create("/auth/start"))
