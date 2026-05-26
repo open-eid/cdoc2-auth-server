@@ -1,5 +1,6 @@
 package ee.cyber.cdoc2.server.adapter.api;
 
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,10 +22,12 @@ import ee.cyber.cdoc2.server.adapter.generated.model.AuthIdentity;
 import ee.cyber.cdoc2.server.adapter.generated.model.AuthProcessStatusResponse;
 import ee.cyber.cdoc2.server.adapter.generated.model.StartAuthProcessResponse;
 import ee.cyber.cdoc2.server.adapter.generated.model.WellKnownResponse;
+import ee.cyber.cdoc2.server.app.conf.DisplayTextConf;
 import ee.cyber.cdoc2.server.app.exception.InputValidationException;
 import ee.cyber.cdoc2.server.app.usecase.startauth.Language;
 import ee.cyber.cdoc2.server.app.usecase.startauth.StartAuth;
 import ee.cyber.cdoc2.server.app.usecase.status.GetStatus;
+
 
 @Slf4j
 @Component
@@ -32,6 +35,7 @@ import ee.cyber.cdoc2.server.app.usecase.status.GetStatus;
 public class AuthApiImpl implements Cdoc2AuthApiDelegate {
     private final StartAuth startAuth;
     private final GetStatus getStatus;
+    private final DisplayTextConf displayTextConf;
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
@@ -104,15 +108,27 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
         );
     }
 
-    private static Language toLanguage(AuthIdentity.LanguageEnum languageEnum) {
+    private Language toLanguage(
+        @Nullable AuthIdentity.LanguageEnum languageEnum
+    ) {
+        if (
+            languageEnum == null
+                || languageEnum == AuthIdentity.LanguageEnum.UNKNOWN_DEFAULT_OPEN_API
+        ) {
+            log.warn(
+                "Unrecognized language '{}', falling back to default ({})",
+                languageEnum,
+                displayTextConf.getDefaultLanguage()
+            );
+            return displayTextConf.getDefaultLanguage();
+        }
+
         return switch (languageEnum) {
-            case EE -> Language.EE;
+            case ET -> Language.ET;
             case RU -> Language.RU;
             case EN -> Language.EN;
-            case UNKNOWN_DEFAULT_OPEN_API -> {
-                log.warn("Unrecognized language '{}', falling back to default (EN)", languageEnum);
-                yield Language.EN;
-            }
+            // Adding default to cover all enum values, this is unreachable, as we cover this above
+            default -> throw new IllegalStateException("Unexpected value: " + languageEnum);
         };
     }
 }

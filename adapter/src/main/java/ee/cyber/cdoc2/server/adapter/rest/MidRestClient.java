@@ -26,7 +26,7 @@ public class MidRestClient implements MidAuthenticate, GetMidSession {
 
     private static MidLanguage toMidLanguage(Language language) {
         return switch (language) {
-            case EE -> MidLanguage.EST;
+            case ET -> MidLanguage.EST;
             case RU -> MidLanguage.RUS;
             case EN -> MidLanguage.ENG;
         };

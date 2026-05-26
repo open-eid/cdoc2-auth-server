@@ -42,7 +42,7 @@ class DisplayTextLanguageTest extends AbstractAuthServerTest {
 
     @Test
     void shouldUseSidEstonianDisplayTextWhenLanguageIsEE() throws Exception {
-        startSidAuth("ee");
+        startSidAuth("et");
 
         ArgumentCaptor<SidAuthenticate.Request> captor =
             ArgumentCaptor.forClass(SidAuthenticate.Request.class);
@@ -79,7 +79,7 @@ class DisplayTextLanguageTest extends AbstractAuthServerTest {
 
     @Test
     void shouldUseMidEstonianDisplayTextAndLanguageWhenLanguageIsEE() throws Exception {
-        startMidAuth("ee");
+        startMidAuth("et");
 
         ArgumentCaptor<MidAuthenticate.Request> captor =
             ArgumentCaptor.forClass(MidAuthenticate.Request.class);
@@ -87,7 +87,7 @@ class DisplayTextLanguageTest extends AbstractAuthServerTest {
 
         MidAuthenticate.Request request = captor.getValue();
         assertEquals("Kinnitage autentimine: " + MID_IDENTIFIER_OK, request.displayText());
-        assertEquals(Language.EE, request.language());
+        assertEquals(Language.ET, request.language());
     }
 
     @Test
