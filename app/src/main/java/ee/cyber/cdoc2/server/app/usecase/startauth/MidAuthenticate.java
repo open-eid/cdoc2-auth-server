@@ -12,7 +12,8 @@ public interface MidAuthenticate {
         String phoneNumber,
         String nationalIdentityNumber,
         MidAuthenticationHashToSign authenticationHash,
-        String displayText
+        String displayText,
+        Language language
     ) {
     }
 }

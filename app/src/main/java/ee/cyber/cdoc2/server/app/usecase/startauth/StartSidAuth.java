@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import com.authlete.sd.SDJWT;
 
 import ee.cyber.cdoc2.auth.EtsiIdentifier;
+import ee.cyber.cdoc2.server.app.conf.DisplayTextConf;
 import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessType;
 import ee.cyber.cdoc2.server.app.usecase.common.SessionToken;
 
@@ -28,8 +29,9 @@ public class StartSidAuth {
     private final StoreAuthProcess storeAuthProcess;
     private final SessionNonce sessionNonce;
     private final SidAuthenticate sidAuthenticate;
+    private final DisplayTextConf displayTextConf;
 
-    String execute(UUID authProcessUuid, EtsiIdentifier etsiIdentifier) {
+    String execute(UUID authProcessUuid, EtsiIdentifier etsiIdentifier, Language language) {
         byte[] rpChallenge = createRpChallengeBytes();
         List<SessionNonce.UriSessionNonce> sessionNonces = sessionNonce.collectSessionNonces();
 
@@ -45,8 +47,9 @@ public class StartSidAuth {
 
         List<NotificationInteraction> interactions = List.of(
             NotificationInteraction
-                .confirmationMessageAndVerificationCodeChoice("Creating CDOC2 session:"
-                    + " " + etsiIdentifier.getSemanticsIdentifier())
+                .confirmationMessageAndVerificationCodeChoice(
+                    displayTextConf.getDisplayText(language, etsiIdentifier.getSemanticsIdentifier())
+                )
         );
 
         String interactionsBase64 =
