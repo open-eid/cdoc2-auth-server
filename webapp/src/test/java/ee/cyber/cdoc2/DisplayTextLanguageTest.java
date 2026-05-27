@@ -116,6 +116,32 @@ class DisplayTextLanguageTest extends AbstractAuthServerTest {
         assertEquals(Language.RU, request.language());
     }
 
+    @Test
+    void shouldUseMidEstonianDisplayTextAndLanguageWhenLanguageIsMissing() throws Exception {
+        startMidAuth(null);
+
+        ArgumentCaptor<MidAuthenticate.Request> captor =
+            ArgumentCaptor.forClass(MidAuthenticate.Request.class);
+        verify(midRestClient).execute(captor.capture());
+
+        MidAuthenticate.Request request = captor.getValue();
+        assertEquals("Kinnitage autentimine: " + MID_IDENTIFIER_OK, request.displayText());
+        assertEquals(Language.ET, request.language());
+    }
+
+    @Test
+    void shouldUseMidEstonianDisplayTextAndLanguageWhenLanguageIsInvalid() throws Exception {
+        startMidAuth("invalid");
+
+        ArgumentCaptor<MidAuthenticate.Request> captor =
+            ArgumentCaptor.forClass(MidAuthenticate.Request.class);
+        verify(midRestClient).execute(captor.capture());
+
+        MidAuthenticate.Request request = captor.getValue();
+        assertEquals("Kinnitage autentimine: " + MID_IDENTIFIER_OK, request.displayText());
+        assertEquals(Language.ET, request.language());
+    }
+
     private void startSidAuth(String language) throws Exception {
         mockMvc.perform(
             post(URI.create("/auth/start"))
