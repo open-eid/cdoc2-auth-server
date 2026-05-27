@@ -6,11 +6,13 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import ee.cyber.cdoc2.server.adapter.rest.MidRestClient;
 import ee.cyber.cdoc2.server.adapter.rest.SidRestClient;
+import ee.cyber.cdoc2.server.app.conf.DisplayTextConf;
 import ee.cyber.cdoc2.server.app.usecase.startauth.Language;
 import ee.cyber.cdoc2.server.app.usecase.startauth.MidAuthenticate;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SidAuthenticate;
@@ -23,6 +25,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class DisplayTextLanguageTest extends AbstractAuthServerTest {
+
+    @Autowired
+    private DisplayTextConf displayTextConf;
 
     @MockitoBean
     private SidRestClient sidRestClient;
@@ -117,29 +122,31 @@ class DisplayTextLanguageTest extends AbstractAuthServerTest {
     }
 
     @Test
-    void shouldUseMidEstonianDisplayTextAndLanguageWhenLanguageIsMissing() throws Exception {
+    void shouldUseDefaultDisplayTextAndLanguageWhenLanguageIsMissing() throws Exception {
         startMidAuth(null);
 
         ArgumentCaptor<MidAuthenticate.Request> captor =
             ArgumentCaptor.forClass(MidAuthenticate.Request.class);
         verify(midRestClient).execute(captor.capture());
 
+        Language defaultLanguage = displayTextConf.getDefaultLanguage();
         MidAuthenticate.Request request = captor.getValue();
-        assertEquals("Kinnitage autentimine: " + MID_IDENTIFIER_OK, request.displayText());
-        assertEquals(Language.ET, request.language());
+        assertEquals(displayTextConf.getDisplayText(defaultLanguage, MID_IDENTIFIER_OK), request.displayText());
+        assertEquals(defaultLanguage, request.language());
     }
 
     @Test
-    void shouldUseMidEstonianDisplayTextAndLanguageWhenLanguageIsInvalid() throws Exception {
+    void shouldUseDefaultDisplayTextAndLanguageWhenLanguageIsInvalid() throws Exception {
         startMidAuth("invalid");
 
         ArgumentCaptor<MidAuthenticate.Request> captor =
             ArgumentCaptor.forClass(MidAuthenticate.Request.class);
         verify(midRestClient).execute(captor.capture());
 
+        Language defaultLanguage = displayTextConf.getDefaultLanguage();
         MidAuthenticate.Request request = captor.getValue();
-        assertEquals("Kinnitage autentimine: " + MID_IDENTIFIER_OK, request.displayText());
-        assertEquals(Language.ET, request.language());
+        assertEquals(displayTextConf.getDisplayText(defaultLanguage, MID_IDENTIFIER_OK), request.displayText());
+        assertEquals(defaultLanguage, request.language());
     }
 
     private void startSidAuth(String language) throws Exception {
