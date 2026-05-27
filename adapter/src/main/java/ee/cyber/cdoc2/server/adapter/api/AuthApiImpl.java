@@ -99,15 +99,7 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
     private Language toLanguage(
         @Nullable AuthIdentity.LanguageEnum languageEnum
     ) {
-        if (
-            languageEnum == null
-                || languageEnum == AuthIdentity.LanguageEnum.UNKNOWN_DEFAULT_OPEN_API
-        ) {
-            log.warn(
-                "Unrecognized language '{}', falling back to default ({})",
-                languageEnum,
-                displayTextConf.getDefaultLanguage()
-            );
+        if (languageEnum == null) {
             return displayTextConf.getDefaultLanguage();
         }
 
@@ -115,8 +107,13 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
             case ET -> Language.ET;
             case RU -> Language.RU;
             case EN -> Language.EN;
-            // Adding default to cover all enum values, this is unreachable, as we cover this above
-            default -> throw new IllegalStateException("Unexpected value: " + languageEnum);
+            case UNKNOWN_DEFAULT_OPEN_API -> {
+                log.warn(
+                    "Unrecognized language, falling back to default ({})",
+                    displayTextConf.getDefaultLanguage()
+                );
+                yield displayTextConf.getDefaultLanguage();
+            }
         };
     }
 }
