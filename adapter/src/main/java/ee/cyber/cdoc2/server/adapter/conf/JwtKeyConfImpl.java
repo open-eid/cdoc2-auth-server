@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.interfaces.ECPrivateKey;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,27 +16,28 @@ import ee.cyber.cdoc2.server.adapter.resource.ResourceLoaderWrapper;
 import ee.cyber.cdoc2.server.app.conf.JwtKeysConf;
 
 @Configuration
-public class JwtKeysConfImpl implements JwtKeysConf {
+public class JwtKeyConfImpl implements JwtKeysConf {
     private final ResourceLoaderWrapper resourceLoader;
     private final ECPrivateKey ecPrivateKey;
-    private final String ecKeyKid;
+    private final String kid;
 
-    @ConfigurationProperties(prefix = "app.well-known")
+    @ConfigurationProperties(prefix = "app.jwt")
     public record AppProperties(
-        String ecPrivateKeyName,
-        String ecKeyKid
+        @Nullable String ecPrivateKeyPem
     ) {
     }
 
-    public JwtKeysConfImpl(
+    public JwtKeyConfImpl(
         AppProperties props,
-        ResourceLoaderWrapper resourceLoader
+        ResourceLoaderWrapper resourceLoader,
+        WellKnownJwkConf wellKnownJwkConf
     ) throws JOSEException,
         IOException {
+        validateConf(props);
         this.resourceLoader = resourceLoader;
-        String ecPrivatePem = readFile(props.ecPrivateKeyName());
+        String ecPrivatePem = readFile(props.ecPrivateKeyPem());
         this.ecPrivateKey = JWK.parseFromPEMEncodedObjects(ecPrivatePem).toECKey().toECPrivateKey();
-        this.ecKeyKid = props.ecKeyKid();
+        this.kid = wellKnownJwkConf.getActivePublicKeyKid();
     }
 
     @Override
@@ -44,13 +46,19 @@ public class JwtKeysConfImpl implements JwtKeysConf {
     }
 
     @Override
-    public String getEcKeyKid() {
-        return ecKeyKid;
+    public String getKid() {
+        return kid;
     }
 
     private String readFile(String name) throws IOException {
         try (InputStream is = resourceLoader.loadResource(name).getInputStream()) {
             return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        }
+    }
+
+    private void validateConf(AppProperties props) {
+        if (props.ecPrivateKeyPem == null || props.ecPrivateKeyPem.isBlank()) {
+            throw new IllegalStateException("app.jwt.ecPrivateKeyPem must be defined");
         }
     }
 }

@@ -102,7 +102,7 @@ class Cdoc2AuthServerApplicationTest extends AbstractAuthServerTest {
         );
 
         WellKnownKey ecPublicKey = getWellKnownResponseBody.keys.stream()
-            .filter(k -> "ec-key-2026".equals(k.kid))
+            .filter(k -> k.kid.startsWith("L3RrY5YVq"))
             .findFirst().orElse(null);
 
         assertNotNull(ecPublicKey);

@@ -4,8 +4,6 @@ import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.Base64;
 import java.util.UUID;
@@ -14,8 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import ee.cyber.cdoc2.server.adapter.conf.WellKnownJwkConf;
 import ee.cyber.cdoc2.server.adapter.exception.AuthProcessNotFoundException;
 import ee.cyber.cdoc2.server.adapter.generated.api.Cdoc2AuthApiDelegate;
 import ee.cyber.cdoc2.server.adapter.generated.model.AuthIdentity;
@@ -35,8 +32,8 @@ import ee.cyber.cdoc2.server.app.usecase.status.GetStatus;
 public class AuthApiImpl implements Cdoc2AuthApiDelegate {
     private final StartAuth startAuth;
     private final GetStatus getStatus;
+    private final WellKnownJwkConf wellKnownJwkConf;
     private final DisplayTextConf displayTextConf;
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
     public ResponseEntity<StartAuthProcessResponse> startAuth(AuthIdentity authIdentity) {
@@ -81,16 +78,7 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
 
     @Override
     public ResponseEntity<WellKnownResponse> getWellKnown() {
-        InputStream input = getClass()
-            .getClassLoader()
-            .getResourceAsStream("well-known-sample.json");
-
-        try {
-            WellKnownResponse response = OBJECT_MAPPER.readValue(input, WellKnownResponse.class);
-            return ResponseEntity.ok(response);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return ResponseEntity.ok(wellKnownJwkConf.getJwkResponse());
     }
 
     //TODO should be created dynamically based on controller URI

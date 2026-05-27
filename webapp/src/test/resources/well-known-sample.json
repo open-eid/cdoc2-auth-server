@@ -5,6 +5,7 @@
       "crv" : "P-256",
       "x" : "gQT1_Ud-qCJZL-9zm_HBb2v_L1-ermyIo5IohV4Svyw",
       "y" : "Y0DLwH5fHZSxwTN7Ndp7VrEys3yqdMQ_5cfmAYFOeEk",
+      "alg": "ES256",
       "kid" : "ec-key-2026"
     },
     {
