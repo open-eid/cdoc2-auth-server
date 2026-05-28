@@ -5,6 +5,14 @@
 ### Improvements
 * JWK for /.well-known/jwks.jws configurable from list of PEM-encoded resources. Removed key 
   defaults from main classpath, enforcing requirement for externally provided keys.
+* Made the authentication display text configurable. 
+  The `/auth/start` endpoint body has new parameter `language`, that determines what display text to show the user.
+  The allowed values are `et`, `en` and `ru`.
+  The default language is Estonian (`et`). The new configuration parameters are:
+  * `app.auth.display-text.et`
+  * `app.auth.display-text.en`
+  * `app.auth.display-text.ru`
+  * `app.auth.display-text.defaultLanguage`
 
 ## [0.6.0]
 
