@@ -13,6 +13,7 @@
   * `app.auth.display-text.en`
   * `app.auth.display-text.ru`
   * `app.auth.display-text.defaultLanguage`
+* Added `/info` endpoint.
 
 ## [0.6.0]
 
