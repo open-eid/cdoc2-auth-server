@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
 import java.util.Base64;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.MediaType;
@@ -21,6 +22,7 @@ import ee.cyber.cdoc2.server.adapter.generated.model.StartAuthProcessResponse;
 import ee.cyber.cdoc2.server.adapter.generated.model.WellKnownResponse;
 import ee.cyber.cdoc2.server.app.conf.DisplayTextConf;
 import ee.cyber.cdoc2.server.app.exception.InputValidationException;
+import ee.cyber.cdoc2.server.app.usecase.info.GetServerInfo;
 import ee.cyber.cdoc2.server.app.usecase.startauth.Language;
 import ee.cyber.cdoc2.server.app.usecase.startauth.StartAuth;
 import ee.cyber.cdoc2.server.app.usecase.status.GetStatus;
@@ -34,6 +36,7 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
     private final GetStatus getStatus;
     private final WellKnownJwkConf wellKnownJwkConf;
     private final DisplayTextConf displayTextConf;
+    private final GetServerInfo getServerInfo;
 
     @Override
     public ResponseEntity<StartAuthProcessResponse> startAuth(AuthIdentity authIdentity) {
@@ -79,6 +82,11 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
     @Override
     public ResponseEntity<WellKnownResponse> getWellKnown() {
         return ResponseEntity.ok(wellKnownJwkConf.getJwkResponse());
+    }
+
+    @Override
+    public ResponseEntity<Map<String, Object>> getInfo() {
+        return ResponseEntity.ok(getServerInfo.execute());
     }
 
     //TODO should be created dynamically based on controller URI

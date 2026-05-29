@@ -4,6 +4,7 @@ package ee.cyber.cdoc2;
 import java.net.URI;
 import java.security.interfaces.ECPublicKey;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -72,6 +73,19 @@ class Cdoc2AuthServerApplicationTest extends AbstractAuthServerTest {
                 .allMatch(key -> key.kid != null && key.kty != null)
         );
     }
+
+    @Test
+    void shouldGetInfo() throws Exception {
+        MockHttpServletResponse response = mockMvc.perform(
+                get(URI.create("/info"))
+            ).andExpect(status().isOk())
+            .andReturn().getResponse();
+
+        Map<?, ?> info = OBJECT_MAPPER.readValue(response.getContentAsString(), Map.class);
+
+        assertFalse(info.isEmpty());
+    }
+
 
     private void performAuthProcess(StartAuthRequest startAuthRequest) throws Exception {
         stubSessionNonces();
