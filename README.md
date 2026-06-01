@@ -57,6 +57,7 @@ In configuration files, the following properties must start with the `app.` pref
 | app.auth.display-text.en                            | `Please confirm authentication: {semanticsIdentifier}` | Display text shown to the user in Estonian during MID/SID authentication prompts. Supports the `{semanticsIdentifier}` placeholder, which is replaced with users ID.         |
 | app.auth.display-text.ru                            | `Please confirm authentication: {semanticsIdentifier}` | Display text shown to the user in Estonian during MID/SID authentication prompts. Supports the `{semanticsIdentifier}` placeholder, which is replaced with users ID.         |
 | app.auth.display-text.defaultLanguage               | et                                                     | Language to use when the client does not specify a language or specifies an unsupported one. Accepted values: `et`, `en`, `ru`.                                              |
+| app.session-token.issuer                            |                                                        | The issuer added to the created session token.                                                                                                                               |
 
 ### Spring properties
 

@@ -18,6 +18,7 @@ import com.authlete.sd.SDJWT;
 
 import ee.cyber.cdoc2.auth.EtsiIdentifier;
 import ee.cyber.cdoc2.server.app.conf.DisplayTextConf;
+import ee.cyber.cdoc2.server.app.conf.SessionTokenConf;
 import ee.cyber.cdoc2.server.app.exception.InputValidationException;
 import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessType;
 import ee.cyber.cdoc2.server.app.usecase.common.MidUtil;
@@ -33,6 +34,7 @@ public class StartMidAuth {
     private final SessionNonce sessionNonce;
     private final MidAuthenticate midAuthenticate;
     private final DisplayTextConf displayTextConf;
+    private final SessionTokenConf sessionTokenConf;
 
     String execute(
         UUID authProcessUuid,
@@ -52,7 +54,7 @@ public class StartMidAuth {
         SessionToken.SessionTokenCreationParams tokenCreationParams = new SessionToken.SessionTokenCreationParams(
             sessionNonces,
             etsiIdentifier.toString(),
-            "https://cdoc2-auth-server.ee"
+            sessionTokenConf.getIssuer()
         );
 
         SDJWT unsignedSdJWT = SessionToken.unsignedSdJwtWithAllDisclosures(tokenCreationParams);
