@@ -6,7 +6,7 @@
     <parent>
         <groupId>ee.cyber.cdoc2</groupId>
         <artifactId>cdoc2-auth-server</artifactId>
-        <version>0.6.0</version>
+        <version>0.7.0</version>
     </parent>
 
     <artifactId>cdoc2-auth-server-webapp</artifactId>
@@ -81,14 +81,14 @@
         <dependency>
             <groupId>ee.cyber.cdoc2</groupId>
             <artifactId>db-changelog</artifactId>
-            <version>0.6.0</version>
+            <version>0.7.0</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>ee.cyber.cdoc2</groupId>
             <artifactId>adapter</artifactId>
-            <version>0.6.0</version>
+            <version>0.7.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
