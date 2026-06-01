@@ -17,6 +17,7 @@ import com.authlete.sd.SDJWT;
 
 import ee.cyber.cdoc2.auth.EtsiIdentifier;
 import ee.cyber.cdoc2.server.app.conf.DisplayTextConf;
+import ee.cyber.cdoc2.server.app.conf.SessionTokenConf;
 import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessType;
 import ee.cyber.cdoc2.server.app.usecase.common.SessionToken;
 
@@ -30,6 +31,7 @@ public class StartSidAuth {
     private final SessionNonce sessionNonce;
     private final SidAuthenticate sidAuthenticate;
     private final DisplayTextConf displayTextConf;
+    private final SessionTokenConf sessionTokenConf;
 
     String execute(UUID authProcessUuid, EtsiIdentifier etsiIdentifier, Language language) {
         byte[] rpChallenge = createRpChallengeBytes();
@@ -38,7 +40,7 @@ public class StartSidAuth {
         SessionToken.SessionTokenCreationParams tokenCreationParams = new SessionToken.SessionTokenCreationParams(
             sessionNonces,
             etsiIdentifier.toString(),
-            "https://cdoc2-auth-server.ee"
+            sessionTokenConf.getIssuer()
         );
 
         SDJWT unsignedSdJWT = SessionToken.unsignedSdJwtWithAllDisclosures(tokenCreationParams);

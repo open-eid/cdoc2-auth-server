@@ -15,6 +15,7 @@
   * `app.auth.display-text.defaultLanguage`
 * Added `/info` endpoint.
 * Improved handling of client exceptions from MID/SID REST calls
+* Made the issuer value for the session token configurable with the configuration parameter `app.session-token.issuer`.
 
 ## [0.6.0]
 
