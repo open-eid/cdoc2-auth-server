@@ -2,6 +2,8 @@ package ee.cyber.cdoc2.server.adapter.api;
 
 import jakarta.validation.ConstraintViolationException;
 
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -11,8 +13,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class ValidationExceptionHandler {
+public class ApiValidationExceptionHandler {
     private static final String VALIDATION_PROBLEM_TITLE = "Request validation Failed";
+    private static final String VALIDATION_PROBLEM_CODE_VALUE = "API_VALIDATION";
+    private static final String VALIDATION_PROBLEM_CODE_FIELD = "errorCode";
 
     // Handles @RequestBody validation failures
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -24,6 +28,8 @@ public class ValidationExceptionHandler {
         problem.setDetail(ex.getBindingResult().getFieldErrors().stream()
             .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
             .collect(java.util.stream.Collectors.joining(", ")));
+
+        problem.setProperties(Map.of(VALIDATION_PROBLEM_CODE_FIELD, VALIDATION_PROBLEM_CODE_VALUE));
 
         return ResponseEntity.badRequest().body(problem);
     }
@@ -39,6 +45,8 @@ public class ValidationExceptionHandler {
             .map(cv -> cv.getPropertyPath() + ": " + cv.getMessage())
             .collect(java.util.stream.Collectors.joining(", ")));
 
+        problem.setProperties(Map.of(VALIDATION_PROBLEM_CODE_FIELD, VALIDATION_PROBLEM_CODE_VALUE));
+
         return ResponseEntity.badRequest().body(problem);
     }
 
@@ -50,6 +58,9 @@ public class ValidationExceptionHandler {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problem.setTitle("Malformed Request");
         problem.setDetail(ex.getMostSpecificCause().getMessage());
+
+        problem.setProperties(Map.of(VALIDATION_PROBLEM_CODE_FIELD, VALIDATION_PROBLEM_CODE_VALUE));
+
         return ResponseEntity.badRequest().body(problem);
     }
 }

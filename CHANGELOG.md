@@ -1,6 +1,6 @@
 # Changelog
 
-## [unreleased]
+## [0.7.0]
 
 ### Improvements
 * JWK for /.well-known/jwks.jws configurable from list of PEM-encoded resources. Removed key 
@@ -14,6 +14,7 @@
   * `app.auth.display-text.ru`
   * `app.auth.display-text.defaultLanguage`
 * Added `/info` endpoint.
+* Improved handling of client exceptions from MID/SID REST calls
 
 ## [0.6.0]
 

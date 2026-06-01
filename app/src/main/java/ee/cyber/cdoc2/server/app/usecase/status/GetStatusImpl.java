@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
+import ee.cyber.cdoc2.server.app.exception.InputValidationException;
 import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessType;
 import ee.cyber.cdoc2.server.app.usecase.status.mid.CreateMidSessionToken;
 import ee.cyber.cdoc2.server.app.usecase.status.mid.GetMidSession;
@@ -27,7 +28,12 @@ public class GetStatusImpl implements GetStatus {
 
     @Override
     public Response execute(String uuidStr) {
-        UUID authProcessUuid = UUID.fromString(uuidStr);
+        UUID authProcessUuid;
+        try {
+            authProcessUuid = UUID.fromString(uuidStr);
+        } catch (IllegalArgumentException e) {
+            throw new InputValidationException(e.getMessage(), e);
+        }
 
         GetAuthProcess.Response authProcess = getAuthProcess.execute(authProcessUuid);
 
@@ -48,7 +54,9 @@ public class GetStatusImpl implements GetStatus {
 
         if (STARTED == authProcess.status()) {
             if (authProcess.midSidSessionUuid() == null) {
-                throw new RuntimeException("midSidSessionUuId missing on STARTED auth process");
+                throw new IllegalStateException(
+                    "midSidSessionUuId missing on STARTED auth process"
+                );
             }
 
             SessionStatusHolder sidMidSessionStatus = switch (authProcessType) {
@@ -98,7 +106,7 @@ public class GetStatusImpl implements GetStatus {
             }
         }
 
-        throw new RuntimeException(authProcessType + " session in unknown state");
+        throw new IllegalStateException(authProcessType + " session in unknown state");
     }
 }
 
