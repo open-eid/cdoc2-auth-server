@@ -14,14 +14,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import ee.cyber.cdoc2.server.adapter.conf.WellKnownJwkConf;
-import ee.cyber.cdoc2.server.adapter.exception.AuthProcessNotFoundException;
 import ee.cyber.cdoc2.server.adapter.generated.api.Cdoc2AuthApiDelegate;
 import ee.cyber.cdoc2.server.adapter.generated.model.AuthIdentity;
 import ee.cyber.cdoc2.server.adapter.generated.model.AuthProcessStatusResponse;
 import ee.cyber.cdoc2.server.adapter.generated.model.StartAuthProcessResponse;
 import ee.cyber.cdoc2.server.adapter.generated.model.WellKnownResponse;
 import ee.cyber.cdoc2.server.app.conf.DisplayTextConf;
-import ee.cyber.cdoc2.server.app.exception.InputValidationException;
 import ee.cyber.cdoc2.server.app.usecase.info.GetServerInfo;
 import ee.cyber.cdoc2.server.app.usecase.startauth.Language;
 import ee.cyber.cdoc2.server.app.usecase.startauth.StartAuth;
@@ -40,43 +38,35 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
 
     @Override
     public ResponseEntity<StartAuthProcessResponse> startAuth(AuthIdentity authIdentity) {
-        try {
-            StartAuth.Response response =
-                startAuth.execute(new StartAuth.Request(
-                    authIdentity.getIdentifier(),
-                    authIdentity.getMobileNr(),
-                    toLanguage(authIdentity.getLanguage())
-                ));
+        StartAuth.Response response =
+            startAuth.execute(new StartAuth.Request(
+                authIdentity.getIdentifier(),
+                authIdentity.getMobileNr(),
+                toLanguage(authIdentity.getLanguage())
+            ));
 
-            StartAuthProcessResponse responseBody = new StartAuthProcessResponse(
-                response.verificationCode()
-            );
+        StartAuthProcessResponse responseBody = new StartAuthProcessResponse(
+            response.verificationCode()
+        );
 
-            return ResponseEntity.created(getAuthStatusProcessLocation(
-                    response.uuid()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(responseBody);
-        } catch (InputValidationException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.created(getAuthStatusProcessLocation(
+                response.uuid()))
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(responseBody);
     }
 
     @Override
     public ResponseEntity<AuthProcessStatusResponse> getAuthProcessStatus(String authProcessUuid) {
-        try {
-            GetStatus.Response response = getStatus.execute(authProcessUuid);
+        GetStatus.Response response = getStatus.execute(authProcessUuid);
 
-            AuthProcessStatusResponse responseBody = new AuthProcessStatusResponse(response.status())
-                .endResult(response.endResult())
-                .sessionToken(response.sessionToken())
-                .signingCertificate(
-                    base64toBase64Url(response.signingCertificate())
-                );
+        AuthProcessStatusResponse responseBody = new AuthProcessStatusResponse(response.status())
+            .endResult(response.endResult())
+            .sessionToken(response.sessionToken())
+            .signingCertificate(
+                base64toBase64Url(response.signingCertificate())
+            );
 
-            return ResponseEntity.ok(responseBody);
-        } catch (AuthProcessNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(responseBody);
     }
 
     @Override

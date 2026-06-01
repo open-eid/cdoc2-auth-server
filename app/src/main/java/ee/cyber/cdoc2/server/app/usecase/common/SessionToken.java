@@ -79,7 +79,7 @@ public final class SessionToken {
         try {
             parsed = JWTClaimsSet.parse(claims);
         } catch (ParseException e) {
-            throw new RuntimeException("Failed to parse SDJWT claims");
+            throw new IllegalStateException("Failed to parse SDJWT claims", e);
         }
 
         // Prepare the payload part of a credential JWT.
