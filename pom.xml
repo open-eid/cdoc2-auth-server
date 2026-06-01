@@ -62,6 +62,32 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+<!--            CVE-2026-41293, CVE-2026-43512, CVE-2026-43515-->
+<!--            can be removed if spring-boot BOM starts to include patched version of tomcat-->
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+                <version>10.1.55</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-el</artifactId>
+                <version>10.1.55</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-websocket</artifactId>
+                <version>10.1.55</version>
+            </dependency>
+
+<!--            CVE-2026-5598 -->
+<!--            vulnerable version pulled by ee.sk.smartid:smart-id-java-client:jar:3.2-->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>1.84</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
