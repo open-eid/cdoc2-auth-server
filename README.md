@@ -123,3 +123,13 @@ openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out ec_keypair.p
   
 openssl ec -in ec_keypair.pem -out ec_private.pem
 ```
+
+### Creating SBOM (Software Bill of Materials)
+
+The SBOM report will be automatically generated at build time.
+
+To manually create the SBOM report, run:
+```
+mvn cyclonedx:makeAggregateBom
+```
+The generated reports (`target/bom.json` and `target/bom.xml`) include dependencies from all submodules.
