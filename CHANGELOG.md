@@ -1,9 +1,10 @@
 # Changelog
 
-
 ## [0.7.1]
 
 ### Improvements
+* Give more informative Internal Server Error results when auth/start/ encounters a problem 
+  collecting session nonces from CDOC2 servers
 * Use CycloneDX Maven plugin for SBOM creation
 
 ## [0.7.0]

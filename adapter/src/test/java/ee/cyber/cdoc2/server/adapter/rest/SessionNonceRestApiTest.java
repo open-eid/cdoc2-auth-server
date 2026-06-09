@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -19,6 +18,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 
 import ee.cyber.cdoc2.server.adapter.conf.SessionNonceRestClientConf;
 import ee.cyber.cdoc2.server.adapter.conf.SessionNonceUriConfImpl;
+import ee.cyber.cdoc2.server.adapter.exception.ServerException;
 import ee.cyber.cdoc2.server.app.usecase.startauth.SessionNonce;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -102,7 +102,7 @@ class SessionNonceRestApiTest {
         );
 
         assertInstanceOf(CompletionException.class, exception);
-        assertInstanceOf(ResourceAccessException.class, exception.getCause());
+        assertInstanceOf(ServerException.class, exception.getCause());
         wiremock.verify(1, postRequestedFor(urlEqualTo(SESSION_NONCE_1_URI)));
         wiremock.verify(DEFAULT_RETRIES + 1,
             postRequestedFor(urlEqualTo(SESSION_NONCE_2_URI)));
