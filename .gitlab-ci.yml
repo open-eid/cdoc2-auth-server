@@ -1,10 +1,47 @@
 stages:
+  - test
   - build
+
+test:
+  stage: test
+  image: maven:3.9.14-eclipse-temurin-21-alpine
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: on_success
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: on_success
+    - when: never
+  script:
+    - cat $MAVEN_SETTINGS
+    - mvn clean verify -s $MAVEN_SETTINGS -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
+    - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, " instructions covered"; print "Total", 100*covered/instructions, "% covered" }' webapp/target/site/jacoco-aggregate/jacoco.csv
+  coverage: /Total \d+\.\d+ %/
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - "**/target/surefire-reports/*.xml"
+      coverage_report:
+        coverage_format: jacoco
+        path: "webapp/target/site/jacoco-aggregate/jacoco.xml"
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - .m2/repository
 
 build:
   stage: build
   image: maven:3.9.14-eclipse-temurin-21-alpine
   script:
     - cat $MAVEN_SETTINGS
-    - mvn clean install -s $MAVEN_SETTINGS -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
-
+    - mvn clean install -s $MAVEN_SETTINGS -DskipTests -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: on_success
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: on_success
+    - when: never
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - .m2/repository

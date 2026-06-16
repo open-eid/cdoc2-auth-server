@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.7.2]
+
+### Improvements
+* Improve the tests coverage
+
 ## [0.7.1]
 
 ### Improvements
