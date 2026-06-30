@@ -1,6 +1,8 @@
 package ee.cyber.cdoc2.server.app.usecase.startauth;
 
 
+import ee.sk.mid.MidVerificationCodeCalculator;
+import ee.sk.smartid.VerificationCodeCalculator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,13 +36,15 @@ public class StartAuthImpl implements StartAuth {
                 authUuid,
                 etsiIdentifier,
                 request.mobileNr(),
-                request.language()
+                request.language(),
+                MidVerificationCodeCalculator::calculateMobileIdVerificationCode
             );
         } else {
             verificationCode = startSidAuth.execute(
                 authUuid,
                 etsiIdentifier,
-                request.language()
+                request.language(),
+                VerificationCodeCalculator::calculate
             );
         }
 

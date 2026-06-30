@@ -11,6 +11,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Function;
 
 import org.springframework.stereotype.Component;
 
@@ -40,7 +41,8 @@ public class StartMidAuth {
         UUID authProcessUuid,
         EtsiIdentifier etsiIdentifier,
         String phoneNr,
-        Language language
+        Language language,
+        Function<byte[], String> verificationCodeFunction
     ) {
         String validPhoneNumber = getAndValidatePhoneNumber(phoneNr);
         String validNationalIdentityNumber = getAndValidateNationalIdentityNumber(
@@ -71,7 +73,9 @@ public class StartMidAuth {
             language
         ));
 
-        String verificationCode = authenticationHash.calculateVerificationCode();
+        String verificationCode = verificationCodeFunction.apply(
+            authenticationHash.getHash()
+        );
 
         storeAuthProcess.execute(new StoreAuthProcess.Request(
             authProcessUuid,
