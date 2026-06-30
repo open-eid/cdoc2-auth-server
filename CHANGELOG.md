@@ -4,6 +4,7 @@
 
 ### Improvements
 * Improve the tests coverage
+* Small refactor to `startauth` usecase code to allow verification code creation testing.
 
 ## [0.7.1]
 
