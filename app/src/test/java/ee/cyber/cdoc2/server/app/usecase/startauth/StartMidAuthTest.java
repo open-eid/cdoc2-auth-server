@@ -43,7 +43,7 @@ class StartMidAuthTest {
     }
 
     @Test
-    void verificationCodeCalculationIsCalledWithCorrectByteArraySize() {
+    void verificationCodeCalculationIsCalledWithCorrectByteArrayLength() {
         String verificationCode = startMidAuth.execute(
             UUID.randomUUID(),
             VALID_ETSI,
