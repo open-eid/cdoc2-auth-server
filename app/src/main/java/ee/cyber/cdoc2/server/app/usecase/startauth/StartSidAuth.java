@@ -1,6 +1,5 @@
 package ee.cyber.cdoc2.server.app.usecase.startauth;
 
-import ee.sk.smartid.VerificationCodeCalculator;
 import ee.sk.smartid.common.InteractionsMapper;
 import ee.sk.smartid.common.notification.interactions.NotificationInteraction;
 import ee.sk.smartid.util.InteractionUtil;
@@ -10,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 import org.springframework.stereotype.Component;
 
@@ -33,7 +33,12 @@ public class StartSidAuth {
     private final DisplayTextConf displayTextConf;
     private final SessionTokenConf sessionTokenConf;
 
-    String execute(UUID authProcessUuid, EtsiIdentifier etsiIdentifier, Language language) {
+    String execute(
+        UUID authProcessUuid,
+        EtsiIdentifier etsiIdentifier,
+        Language language,
+        Function<byte[], String> verificationCodeFunction
+    ) {
         byte[] rpChallenge = createRpChallengeBytes();
         List<SessionNonce.UriSessionNonce> sessionNonces = sessionNonce.collectSessionNonces();
 
@@ -45,7 +50,7 @@ public class StartSidAuth {
 
         SDJWT unsignedSdJWT = SessionToken.unsignedSdJwtWithAllDisclosures(tokenCreationParams);
 
-        String verificationCode = VerificationCodeCalculator.calculate(rpChallenge);
+        String verificationCode = verificationCodeFunction.apply(rpChallenge);
 
         List<NotificationInteraction> interactions = List.of(
             NotificationInteraction
