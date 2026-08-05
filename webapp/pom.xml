@@ -6,7 +6,7 @@
     <parent>
         <groupId>ee.cyber.cdoc2</groupId>
         <artifactId>cdoc2-auth-server</artifactId>
-        <version>0.7.1</version>
+        <version>0.7.3</version>
     </parent>
 
     <artifactId>cdoc2-auth-server-webapp</artifactId>
@@ -67,7 +67,7 @@
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
-            <version>5.0.2</version>
+            <version>5.0.3</version>
             <scope>test</scope>
         </dependency>
 
@@ -81,21 +81,21 @@
         <dependency>
             <groupId>ee.cyber.cdoc2</groupId>
             <artifactId>db-changelog</artifactId>
-            <version>0.7.1</version>
+            <version>0.7.3</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>ee.cyber.cdoc2</groupId>
             <artifactId>adapter</artifactId>
-            <version>0.7.1</version>
+            <version>0.7.3</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>ee.cyber.cdoc2</groupId>
             <artifactId>app</artifactId>
-            <version>0.7.1</version>
+            <version>0.7.3</version>
             <scope>compile</scope>
             <exclusions>
                 <exclusion>

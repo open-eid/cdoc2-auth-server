@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.3]
+
+### Improvements
+* Dependency updates
+
+### Fixes
+* `/auth/status` returns `HTTP 404 NOT FOUND` for non-existent auth process instead of `HTTP 400`
+
 ## [0.7.2]
 
 ### Improvements
