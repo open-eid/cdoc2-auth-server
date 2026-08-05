@@ -26,7 +26,7 @@ public class ClientExceptionHandler {
             )
         );
 
-        return ResponseEntity.badRequest().body(problem);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problem);
     }
 
     @ExceptionHandler(ClientBadRequestException.class)
