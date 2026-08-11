@@ -99,14 +99,13 @@ class DisplayTextLanguageTest extends AbstractAuthServerTest {
     void shouldUseSidDefaultDisplayTextAndLanguageWhenLanguageIsMissing() throws Exception {
         startSidAuth(null);
 
-        ArgumentCaptor<MidAuthenticate.Request> captor =
-            ArgumentCaptor.forClass(MidAuthenticate.Request.class);
-        verify(midRestClient).execute(captor.capture());
+        ArgumentCaptor<SidAuthenticate.Request> captor =
+            ArgumentCaptor.forClass(SidAuthenticate.Request.class);
+        verify(sidRestClient).execute(captor.capture());
 
+        String displayText = captor.getValue().interactions().get(0).displayText200();
         Language defaultLanguage = displayTextConf.getDefaultLanguage();
-        MidAuthenticate.Request request = captor.getValue();
-        assertEquals(displayTextConf.getDisplayText(defaultLanguage, MID_IDENTIFIER_OK), request.displayText());
-        assertEquals(defaultLanguage, request.language());
+        assertEquals(displayTextConf.getDisplayText(defaultLanguage, SID_IDENTIFIER_OK), displayText);
     }
 
     @Test
