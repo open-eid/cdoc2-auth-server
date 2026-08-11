@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.4]
+
+### Improvements
+* Language parameter for `auth/start` is constrained by openapi spec to be a nullable two character 
+  string. Actual validation of the input value is moved to app api implementation. Unrecognized 
+  language will result in HTTP 400 BAD REQUEST. Configured default language is applied only when 
+  language is not specified in request. 
+
 ## [0.7.3]
 
 ### Improvements

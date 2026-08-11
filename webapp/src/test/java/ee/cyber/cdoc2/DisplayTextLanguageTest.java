@@ -9,6 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.ResultActions;
 
 import ee.cyber.cdoc2.server.adapter.rest.MidRestClient;
 import ee.cyber.cdoc2.server.adapter.rest.SidRestClient;
@@ -46,7 +47,7 @@ class DisplayTextLanguageTest extends AbstractAuthServerTest {
     }
 
     @Test
-    void shouldUseSidEstonianDisplayTextWhenLanguageIsEE() throws Exception {
+    void shouldUseSidEstonianDisplayTextWhenLanguageIsET() throws Exception {
         startSidAuth("et");
 
         ArgumentCaptor<SidAuthenticate.Request> captor =
@@ -83,7 +84,38 @@ class DisplayTextLanguageTest extends AbstractAuthServerTest {
     }
 
     @Test
-    void shouldUseMidEstonianDisplayTextAndLanguageWhenLanguageIsEE() throws Exception {
+    void shouldUseSidDefaultDisplayTextWhenDisplayTextNotConfigured() throws Exception {
+        startSidAuth("lt");
+
+        ArgumentCaptor<SidAuthenticate.Request> captor =
+            ArgumentCaptor.forClass(SidAuthenticate.Request.class);
+        verify(sidRestClient).execute(captor.capture());
+
+        String displayText = captor.getValue().interactions().get(0).displayText200();
+        assertEquals("Please confirm authentication: " + SID_IDENTIFIER_OK, displayText);
+    }
+
+    @Test
+    void shouldUseSidDefaultDisplayTextAndLanguageWhenLanguageIsMissing() throws Exception {
+        startSidAuth(null);
+
+        ArgumentCaptor<MidAuthenticate.Request> captor =
+            ArgumentCaptor.forClass(MidAuthenticate.Request.class);
+        verify(midRestClient).execute(captor.capture());
+
+        Language defaultLanguage = displayTextConf.getDefaultLanguage();
+        MidAuthenticate.Request request = captor.getValue();
+        assertEquals(displayTextConf.getDisplayText(defaultLanguage, MID_IDENTIFIER_OK), request.displayText());
+        assertEquals(defaultLanguage, request.language());
+    }
+
+    @Test
+    void shouldReturnSidBadRequestWhenLanguageIsInvalid() throws Exception {
+        startSidAuthBadRequest("zz");
+    }
+
+    @Test
+    void shouldUseMidEstonianDisplayTextAndLanguageWhenLanguageIsET() throws Exception {
         startMidAuth("et");
 
         ArgumentCaptor<MidAuthenticate.Request> captor =
@@ -122,7 +154,20 @@ class DisplayTextLanguageTest extends AbstractAuthServerTest {
     }
 
     @Test
-    void shouldUseDefaultDisplayTextAndLanguageWhenLanguageIsMissing() throws Exception {
+    void shouldUseMidDefaultDisplayTextWhenDisplayTextNotConfigured() throws Exception {
+        startMidAuth("lt");
+
+        ArgumentCaptor<MidAuthenticate.Request> captor =
+            ArgumentCaptor.forClass(MidAuthenticate.Request.class);
+        verify(midRestClient).execute(captor.capture());
+
+        MidAuthenticate.Request request = captor.getValue();
+        assertEquals("Please confirm authentication: " + MID_IDENTIFIER_OK, request.displayText());
+        assertEquals(Language.LT, request.language());
+    }
+
+    @Test
+    void shouldUseMidDefaultDisplayTextAndLanguageWhenLanguageIsMissing() throws Exception {
         startMidAuth(null);
 
         ArgumentCaptor<MidAuthenticate.Request> captor =
@@ -136,37 +181,44 @@ class DisplayTextLanguageTest extends AbstractAuthServerTest {
     }
 
     @Test
-    void shouldUseDefaultDisplayTextAndLanguageWhenLanguageIsInvalid() throws Exception {
-        startMidAuth("invalid");
-
-        ArgumentCaptor<MidAuthenticate.Request> captor =
-            ArgumentCaptor.forClass(MidAuthenticate.Request.class);
-        verify(midRestClient).execute(captor.capture());
-
-        Language defaultLanguage = displayTextConf.getDefaultLanguage();
-        MidAuthenticate.Request request = captor.getValue();
-        assertEquals(displayTextConf.getDisplayText(defaultLanguage, MID_IDENTIFIER_OK), request.displayText());
-        assertEquals(defaultLanguage, request.language());
+    void shouldReturnMidBadRequestWhenLanguageIsInvalid() throws Exception {
+        startMidAuthBadRequest("zz");
     }
 
     private void startSidAuth(String language) throws Exception {
-        mockMvc.perform(
+        startSidAuthPerform(language).andExpect(status().isCreated());
+    }
+
+    private void startSidAuthBadRequest(String language) throws Exception {
+        startSidAuthPerform(language).andExpect(status().isBadRequest());
+    }
+
+    private ResultActions startSidAuthPerform(String language) throws Exception {
+        return mockMvc.perform(
             post(URI.create("/auth/start"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(OBJECT_MAPPER.writeValueAsString(
                     new StartAuthRequest("etsi/" + SID_IDENTIFIER_OK, null, language)
                 ))
-        ).andExpect(status().isCreated());
+        );
     }
 
     private void startMidAuth(String language) throws Exception {
-        mockMvc.perform(
+        startMidAuthPerform(language).andExpect(status().isCreated());
+    }
+
+    private void startMidAuthBadRequest(String language) throws Exception {
+        startMidAuthPerform(language).andExpect(status().isBadRequest());
+    }
+
+    private ResultActions startMidAuthPerform(String language) throws Exception {
+        return mockMvc.perform(
             post(URI.create("/auth/start"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(OBJECT_MAPPER.writeValueAsString(
                     new StartAuthRequest("etsi/" + MID_IDENTIFIER_OK, MID_PHONE_NUMBER_OK, language)
                 ))
-        ).andExpect(status().isCreated());
+        );
     }
 
     private record StartAuthRequest(String identifier, String mobileNr, String language) {

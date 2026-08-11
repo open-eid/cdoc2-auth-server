@@ -19,6 +19,7 @@ public class DisplayTextConfImpl implements DisplayTextConf {
         @DefaultValue(DEFAULT_DISPLAY_TEXT) String et,
         @DefaultValue(DEFAULT_DISPLAY_TEXT) String ru,
         @DefaultValue(DEFAULT_DISPLAY_TEXT) String en,
+        @DefaultValue(DEFAULT_DISPLAY_TEXT) String lt,
         @DefaultValue("et") Language defaultLanguage
     ) {
     }
@@ -35,6 +36,7 @@ public class DisplayTextConfImpl implements DisplayTextConf {
             case ET -> props.et();
             case RU -> props.ru();
             case EN -> props.en();
+            case LT -> props.lt();
         };
 
         return template.replace(SEMANTICS_IDENTIFIER_PLACEHOLDER, semanticsIdentifier);

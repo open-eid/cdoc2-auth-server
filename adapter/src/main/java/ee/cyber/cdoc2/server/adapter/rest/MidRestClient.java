@@ -33,6 +33,7 @@ public class MidRestClient implements MidAuthenticate, GetMidSession {
             case ET -> MidLanguage.EST;
             case RU -> MidLanguage.RUS;
             case EN -> MidLanguage.ENG;
+            case LT -> MidLanguage.LIT;
         };
     }
 
