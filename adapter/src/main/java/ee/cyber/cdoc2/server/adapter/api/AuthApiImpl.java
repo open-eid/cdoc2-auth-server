@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import ee.cyber.cdoc2.server.adapter.conf.WellKnownJwkConf;
+import ee.cyber.cdoc2.server.adapter.exception.ClientBadRequestException;
 import ee.cyber.cdoc2.server.adapter.generated.api.Cdoc2AuthApiDelegate;
 import ee.cyber.cdoc2.server.adapter.generated.model.AuthIdentity;
 import ee.cyber.cdoc2.server.adapter.generated.model.AuthProcessStatusResponse;
@@ -30,6 +31,8 @@ import ee.cyber.cdoc2.server.app.usecase.status.GetStatus;
 @Component
 @RequiredArgsConstructor
 public class AuthApiImpl implements Cdoc2AuthApiDelegate {
+    private static final String API_VALIDATION_ERROR_LANGUAGE = "UNKNOWN_LANGUAGE";
+
     private final StartAuth startAuth;
     private final GetStatus getStatus;
     private final WellKnownJwkConf wellKnownJwkConf;
@@ -95,23 +98,18 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
     }
 
     private Language toLanguage(
-        @Nullable AuthIdentity.LanguageEnum languageEnum
+        @Nullable String language
     ) {
-        if (languageEnum == null) {
+        if (language == null) {
             return displayTextConf.getDefaultLanguage();
         }
 
-        return switch (languageEnum) {
-            case ET -> Language.ET;
-            case RU -> Language.RU;
-            case EN -> Language.EN;
-            case UNKNOWN_DEFAULT_OPEN_API -> {
-                log.warn(
-                    "Unrecognized language, falling back to default ({})",
-                    displayTextConf.getDefaultLanguage()
-                );
-                yield displayTextConf.getDefaultLanguage();
-            }
-        };
+        try {
+            return Language.valueOf(language.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            String errorMessage = "Unrecognized language " + language;
+            log.warn(errorMessage);
+            throw new ClientBadRequestException(API_VALIDATION_ERROR_LANGUAGE, errorMessage);
+        }
     }
 }

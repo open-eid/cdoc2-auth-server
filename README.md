@@ -6,9 +6,9 @@
     - Implementation details for data access, input and output
     - May depend on: `app`, `openapi`
 - `app`
-    - Business logic, completely agnostic towards data access implementation.
-      Internally structured according to logical application usecases. Defines interfaces
-      for any needed external data access, which are then implemented in the `adapter` module
+    - Business logic, completely agnostic towards data access implementation. Internally structured
+      according to logical application usecases. Defines interfaces for any needed external data
+      access, which are then implemented in the `adapter` module
     - May not have dependencies to other modules
 - `db-changelog`
     - Liquibase changes and related helpers
@@ -24,8 +24,7 @@
 
 - Create database (see README.md under /db-changelog)
 - `mvn clean install`. JAR is created under /webapp/target.
-- run JAR - `java -jar webapp.jar`. Provide custom `application.properties` in same
-  folder as needed
+- run JAR - `java -jar webapp.jar`. Provide custom `application.properties` in same folder as needed
 
 ### Application properties
 
@@ -54,9 +53,10 @@ In configuration files, the following properties must start with the `app.` pref
 | cleanup.authProcessMaxAgeMinutes                    | 5                                                      | maximum allowable age for an auth process in minutes                                                                                                                         |
 | cleanup.authProcessDeletionLimit                    | 1000                                                   | limit to the number of records deleted by a single run of the cleanup job                                                                                                    |
 | app.auth.display-text.et                            | `Please confirm authentication: {semanticsIdentifier}` | Display text shown to the user in Estonian during MID/SID authentication prompts. Supports the `{semanticsIdentifier}` placeholder, which is replaced with users ID.         |
-| app.auth.display-text.en                            | `Please confirm authentication: {semanticsIdentifier}` | Display text shown to the user in Estonian during MID/SID authentication prompts. Supports the `{semanticsIdentifier}` placeholder, which is replaced with users ID.         |
-| app.auth.display-text.ru                            | `Please confirm authentication: {semanticsIdentifier}` | Display text shown to the user in Estonian during MID/SID authentication prompts. Supports the `{semanticsIdentifier}` placeholder, which is replaced with users ID.         |
-| app.auth.display-text.defaultLanguage               | et                                                     | Language to use when the client does not specify a language or specifies an unsupported one. Accepted values: `et`, `en`, `ru`.                                              |
+| app.auth.display-text.en                            | `Please confirm authentication: {semanticsIdentifier}` | Display text shown to the user in English during MID/SID authentication prompts. Supports the `{semanticsIdentifier}` placeholder, which is replaced with users ID.          |
+| app.auth.display-text.ru                            | `Please confirm authentication: {semanticsIdentifier}` | Display text shown to the user in Russian during MID/SID authentication prompts. Supports the `{semanticsIdentifier}` placeholder, which is replaced with users ID.          |
+| app.auth.display-text.lt                            | `Please confirm authentication: {semanticsIdentifier}` | Display text shown to the user in Lithuanian during MID/SID authentication prompts. Supports the `{semanticsIdentifier}` placeholder, which is replaced with users ID.       |
+| app.auth.display-text.defaultLanguage               | et                                                     | Language to use when the client does not specify a language. Accepted values: `et`, `en`, `ru`, `lt`.                                                                        |
 | app.session-token.issuer                            |                                                        | The issuer added to the created session token.                                                                                                                               |
 
 ### Spring properties
@@ -129,7 +129,10 @@ openssl ec -in ec_keypair.pem -out ec_private.pem
 The SBOM report will be automatically generated at build time.
 
 To manually create the SBOM report, run:
+
 ```
 mvn cyclonedx:makeAggregateBom
 ```
-The generated reports (`target/bom.json` and `target/bom.xml`) include dependencies from all submodules.
+
+The generated reports (`target/bom.json` and `target/bom.xml`) include dependencies from all
+submodules.
