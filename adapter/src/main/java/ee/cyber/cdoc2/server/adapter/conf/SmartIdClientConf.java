@@ -22,7 +22,7 @@ public class SmartIdClientConf {
     @ConfigurationProperties(prefix = "app.smartid.client")
     public record AppProperties(
         String hostUrl,
-        @DefaultValue("1000") long sessionStatusLongPollMs
+        @DefaultValue("3000") long sessionStatusLongPollMs
     ) {
     }
 
