@@ -99,7 +99,7 @@ class Cdoc2AuthServerApplicationTest extends AbstractAuthServerTest {
 
         AuthProcessStatusResponse authStatusResponseBody = performAuthStatusRequest(
             startAuthResponse,
-            2
+            5
         );
 
         assertNotNull(authStatusResponseBody);
