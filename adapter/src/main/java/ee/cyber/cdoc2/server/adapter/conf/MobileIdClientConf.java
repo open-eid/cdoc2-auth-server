@@ -17,7 +17,7 @@ import ee.cyber.cdoc2.server.app.conf.RelyingPartyConf;
 @RequiredArgsConstructor
 public class MobileIdClientConf {
     private static final String DEFAULT_DISPLAY_TEXT_FORMAT = "GSM7";
-    private static final String DEFAULT_TIMEOUT_SECONDS = "1";
+    private static final String DEFAULT_STATUS_POLL_TIMEOUT_SECONDS = "1";
 
     private static final String SSL_BUNDLE_NAME = "mid-server";
     private final SslBundles sslBundles;
@@ -25,7 +25,7 @@ public class MobileIdClientConf {
     @ConfigurationProperties(prefix = "app.mobileid.client")
     public record AppProperties(
         String hostUrl,
-        @DefaultValue(DEFAULT_TIMEOUT_SECONDS) int statusPollTimeoutSeconds,
+        @DefaultValue(DEFAULT_STATUS_POLL_TIMEOUT_SECONDS) int statusPollTimeoutSeconds,
         @DefaultValue(DEFAULT_DISPLAY_TEXT_FORMAT) String displayTextFormat
     ) {
     }
