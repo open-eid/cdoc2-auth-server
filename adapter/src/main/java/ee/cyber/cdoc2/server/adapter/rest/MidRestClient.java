@@ -67,7 +67,7 @@ public class MidRestClient implements MidAuthenticate, GetMidSession {
                 .getAuthenticationSessionStatus(
                     new MidSessionStatusRequest(
                         sessionId.toString(),
-                        properties.timeoutSeconds()
+                        properties.statusPollTimeoutSeconds()
                     )
                 );
 

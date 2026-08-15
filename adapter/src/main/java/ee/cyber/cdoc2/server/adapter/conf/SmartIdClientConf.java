@@ -4,8 +4,10 @@ import ee.sk.smartid.SmartIdClient;
 import lombok.RequiredArgsConstructor;
 
 import java.security.KeyStore;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.boot.ssl.SslBundles;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,11 +16,14 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class SmartIdClientConf {
     private static final String SSL_BUNDLE_NAME = "sid-server";
+    private static final String DEFAULT_STATUS_POLL_TIMEOUT_SECONDS = "1";
+
     private final SslBundles sslBundles;
 
     @ConfigurationProperties(prefix = "app.smartid.client")
     public record AppProperties(
-        String hostUrl
+        String hostUrl,
+        @DefaultValue(DEFAULT_STATUS_POLL_TIMEOUT_SECONDS) long statusPollTimeoutSeconds
     ) {
     }
 
@@ -29,6 +34,9 @@ public class SmartIdClientConf {
         SmartIdClient smartIdClient = new SmartIdClient();
         smartIdClient.setHostUrl(props.hostUrl);
         smartIdClient.setTrustStore(trustStore);
+        smartIdClient.setSessionStatusResponseSocketOpenTime(
+            TimeUnit.SECONDS, props.statusPollTimeoutSeconds
+        );
 
         return smartIdClient;
     }
