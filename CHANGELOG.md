@@ -9,7 +9,7 @@
   language is not specified in request. 
 * Added client config parameters:
   * `app.smartid.client.statusPollTimeoutSeconds`
-  * `app.smartid.client.statusPollTimeoutSeconds`\
+  * `app.mobileid.client.statusPollTimeoutSeconds`\
   Default value `1`. It defines the max time the SID/MID API may hold a session status request open 
   (server-side long poll) before responding with the current status, in seconds. Value of 0 
   means request will return only when status is COMPLETE
