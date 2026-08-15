@@ -10,7 +10,7 @@
 * Added SmartID client config parameter `app.smartid.client.statusPollTimeoutSeconds`. Default 
   value `1`. It defines the max time the SID API may hold a session status request open 
   (server-side long poll) before responding with the current status, in seconds. Value of 0 
-  means  request will return only when status is COMPLETE
+  means request will return only when status is COMPLETE
 
 ## [0.7.3]
 
