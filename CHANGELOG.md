@@ -7,8 +7,10 @@
   string. Actual validation of the input value is moved to app api implementation. Unrecognized 
   language will result in HTTP 400 BAD REQUEST. Configured default language is applied only when 
   language is not specified in request. 
-* Added SmartID client config parameter `app.smartid.client.statusPollTimeoutSeconds`. Default 
-  value `1`. It defines the max time the SID API may hold a session status request open 
+* Added client config parameters:
+  * `app.smartid.client.statusPollTimeoutSeconds`
+  * `app.smartid.client.statusPollTimeoutSeconds`\
+  Default value `1`. It defines the max time the SID/MID API may hold a session status request open 
   (server-side long poll) before responding with the current status, in seconds. Value of 0 
   means request will return only when status is COMPLETE
 
