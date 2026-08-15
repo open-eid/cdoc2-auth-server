@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.7.4]
+## [0.8.0]
 
 ### Improvements
 * Language parameter for `auth/start` is constrained by openapi spec to be a nullable two character 

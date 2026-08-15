@@ -12,7 +12,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 import ee.cyber.cdoc2.auth.EtsiIdentifier;
-import ee.cyber.cdoc2.auth.exception.InvalidEtsiSemanticsIdenfierException;
+import ee.cyber.cdoc2.auth.exception.InvalidEtsiSemanticsIdentifierException;
 import ee.cyber.cdoc2.server.app.exception.InputValidationException;
 
 @Slf4j
@@ -63,7 +63,7 @@ public class StartAuthImpl implements StartAuth {
     private EtsiIdentifier getAndValidateEtsiIdentifier(StartAuth.Request request) {
         try {
             return new EtsiIdentifier(request.nationalId());
-        } catch (InvalidEtsiSemanticsIdenfierException e) {
+        } catch (InvalidEtsiSemanticsIdentifierException e) {
             log.warn("Error parsing ETSI identifier: {}", e.getMessage());
             throw new InputValidationException(e.getMessage(), e);
         }
