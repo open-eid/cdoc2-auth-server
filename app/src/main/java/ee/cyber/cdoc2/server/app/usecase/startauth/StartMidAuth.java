@@ -93,7 +93,7 @@ public class StartMidAuth {
         try {
             Objects.requireNonNull(phoneNr);
             return MidInputUtil.getValidatedPhoneNumber(phoneNr);
-        } catch (MidInvalidPhoneNumberException e) {
+        } catch (MidInvalidPhoneNumberException | NullPointerException e) {
             throw new InputValidationException(e.getMessage(), e);
         }
     }

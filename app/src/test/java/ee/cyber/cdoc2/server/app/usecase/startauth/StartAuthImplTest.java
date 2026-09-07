@@ -19,16 +19,24 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import ee.cyber.cdoc2.auth.EtsiIdentifier;
+import ee.cyber.cdoc2.server.app.exception.InputValidationException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class StartAuthImplTest {
     private static final String VALID_ETSI = "etsi/PNOEE-50101010009";
     private static final String VALID_PHONE_NR = "+37269930366";
+    private static final String EXPECTED_SEMANTICS_IDENTIFIER = "PNOEE-50101010009";
+    private static final String EXPECTED_BARE_IDENTIFIER = "50101010009";
+    private static final String MALFORMED_ETSI_MISSING_HYPHEN = "etsi/PNOEE50101010009";
+    private static final String ETSI_WITHOUT_PREFIX = "PNOEE-50101010009";
+    private static final String ETSI_WITH_UNKNOWN_IDENTITY_TYPE = "etsi/XXXEE-50101010009";
 
     @Mock
     private StartSidAuth startSidAuth;
@@ -95,6 +103,80 @@ class StartAuthImplTest {
         String verificationCode = vcFunction.apply(input);
 
         assertEquals(expected, verificationCode);
+    }
+
+    @Test
+    void executeWithMobileNrCallsStartMidAuthNotSid() {
+        when(startMidAuth.execute(any(UUID.class), any(EtsiIdentifier.class), anyString(),
+            any(Language.class), any())).thenReturn("1234");
+
+        StartAuth.Response response = startAuth.execute(new StartAuth.Request(
+            VALID_ETSI, VALID_PHONE_NR, Language.EN
+        ));
+
+        assertNotNull(response.uuid());
+        assertEquals("1234", response.verificationCode());
+        verify(startMidAuth).execute(any(UUID.class), any(EtsiIdentifier.class), anyString(),
+            any(Language.class), any());
+        verify(startSidAuth, never()).execute(any(), any(), any(), any());
+    }
+
+    @Test
+    void executeWithoutMobileNrCallsStartSidAuthNotMid() {
+        when(startSidAuth.execute(any(UUID.class), any(EtsiIdentifier.class),
+            any(Language.class), any())).thenReturn("5678");
+
+        StartAuth.Response response = startAuth.execute(new StartAuth.Request(
+            VALID_ETSI, null, Language.EN
+        ));
+
+        assertNotNull(response.uuid());
+        assertEquals("5678", response.verificationCode());
+        verify(startSidAuth).execute(any(UUID.class), any(EtsiIdentifier.class),
+            any(Language.class), any());
+        verify(startMidAuth, never()).execute(any(), any(), anyString(), any(), any());
+    }
+
+    @Test
+    void executeForwardsValidatedEtsiIdentifierToBranchImpl() {
+        ArgumentCaptor<EtsiIdentifier> captor = ArgumentCaptor.forClass(EtsiIdentifier.class);
+
+        startAuth.execute(new StartAuth.Request(VALID_ETSI, null, Language.EN));
+
+        verify(startSidAuth).execute(any(UUID.class), captor.capture(), any(Language.class), any());
+        EtsiIdentifier forwarded = captor.getValue();
+        assertEquals(EXPECTED_SEMANTICS_IDENTIFIER, forwarded.getSemanticsIdentifier());
+        assertEquals(EXPECTED_BARE_IDENTIFIER, forwarded.getIdentifier());
+    }
+
+    @Test
+    void executeInvalidEtsiFormatThrowsInputValidationException() {
+        assertThrows(InputValidationException.class, () -> startAuth.execute(
+            new StartAuth.Request(MALFORMED_ETSI_MISSING_HYPHEN, null, Language.EN)
+        ));
+
+        verify(startSidAuth, never()).execute(any(), any(), any(), any());
+        verify(startMidAuth, never()).execute(any(), any(), anyString(), any(), any());
+    }
+
+    @Test
+    void executeEtsiWithoutPrefixThrowsInputValidationException() {
+        assertThrows(InputValidationException.class, () -> startAuth.execute(
+            new StartAuth.Request(ETSI_WITHOUT_PREFIX, null, Language.EN)
+        ));
+
+        verify(startSidAuth, never()).execute(any(), any(), any(), any());
+        verify(startMidAuth, never()).execute(any(), any(), anyString(), any(), any());
+    }
+
+    @Test
+    void executeEtsiWithUnknownIdentityTypeThrowsInputValidationException() {
+        assertThrows(InputValidationException.class, () -> startAuth.execute(
+            new StartAuth.Request(ETSI_WITH_UNKNOWN_IDENTITY_TYPE, null, Language.EN)
+        ));
+
+        verify(startSidAuth, never()).execute(any(), any(), any(), any());
+        verify(startMidAuth, never()).execute(any(), any(), anyString(), any(), any());
     }
 
     static Stream<Arguments> knownSidVectors() {
