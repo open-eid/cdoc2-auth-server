@@ -7,111 +7,170 @@ import ee.cyber.cdoc2.server.app.usecase.status.sid.GetSidSession;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SessionStatusHolderTest {
 
+    private static final String SID_CERT_VALUE = "MIID-sample-sid-cert";
+    private static final String MID_CERT_VALUE = "MIID-sample-mid-cert";
+
     @Test
-    void isRunningWhenSidSessionStateIsRunning() {
-        var response = new GetSidSession.Response("RUNNING", null, null, null, null);
-        var holder = new SessionStatusHolder(response);
+    void sidRunningIsRunning() {
+        SessionStatusHolder holder = new SessionStatusHolder(
+            sidResponse("RUNNING", null, SID_CERT_VALUE)
+        );
 
         assertTrue(holder.isRunning());
         assertFalse(holder.isCompletedOk());
         assertFalse(holder.isCompletedNotOk());
+        assertEquals("RUNNING", holder.getState());
+        assertNull(holder.getEndResult());
     }
 
     @Test
-    void isRunningWhenMidSessionStateIsRunning() {
-        var response = new GetMidSession.Response("RUNNING", null, null, null);
-        var holder = new SessionStatusHolder(response);
-
-        assertTrue(holder.isRunning());
-        assertFalse(holder.isCompletedOk());
-        assertFalse(holder.isCompletedNotOk());
-    }
-
-    @Test
-    void isCompletedOkWhenSidStateIsCompleteAndEndResultIsOk() {
-        var response = new GetSidSession.Response("COMPLETE", "OK", null, null, null);
-        var holder = new SessionStatusHolder(response);
+    void sidCompleteOkIsCompletedOk() {
+        SessionStatusHolder holder = new SessionStatusHolder(
+            sidResponse("COMPLETE", "OK", SID_CERT_VALUE)
+        );
 
         assertFalse(holder.isRunning());
         assertTrue(holder.isCompletedOk());
         assertFalse(holder.isCompletedNotOk());
+        assertEquals("OK", holder.getEndResult());
     }
 
     @Test
-    void isCompletedNotOkWhenSidStateIsCompleteAndEndResultIsNotOk() {
-        var response = new GetSidSession.Response("COMPLETE", "USER_REFUSED", null, null, null);
-        var holder = new SessionStatusHolder(response);
+    void sidCompleteUserRefusedIsNotOk() {
+        SessionStatusHolder holder = new SessionStatusHolder(
+            sidResponse("COMPLETE", "USER_REFUSED", SID_CERT_VALUE)
+        );
 
         assertFalse(holder.isRunning());
         assertFalse(holder.isCompletedOk());
         assertTrue(holder.isCompletedNotOk());
+        assertEquals("USER_REFUSED", holder.getEndResult());
     }
 
     @Test
-    void isCompletedNotOkWhenMidStateIsCompleteAndEndResultIsNotOk() {
-        var response = new GetMidSession.Response("COMPLETE", "TIMEOUT", null, null);
-        var holder = new SessionStatusHolder(response);
+    void sidCompleteNullEndResultIsNotOk() {
+        SessionStatusHolder holder = new SessionStatusHolder(
+            sidResponse("COMPLETE", null, SID_CERT_VALUE)
+        );
 
         assertFalse(holder.isRunning());
         assertFalse(holder.isCompletedOk());
-        assertTrue(holder.isCompletedNotOk());
+        assertTrue(holder.isCompletedNotOk(),
+            "COMPLETE with null endResult must be treated as not-OK to avoid the success path");
     }
 
     @Test
-    void getCertReturnsSidCertificateValue() {
-        var cert = new GetSidSession.Certificate("sid-cert-pem", "QUALIFIED");
-        var response = new GetSidSession.Response("COMPLETE", "OK", null, cert, null);
-        var holder = new SessionStatusHolder(response);
+    void sidHolderStoresSidResponse() {
+        GetSidSession.Response sidResp = sidResponse("COMPLETE", "OK", SID_CERT_VALUE);
 
-        assertEquals("sid-cert-pem", holder.getCert());
-    }
+        SessionStatusHolder holder = new SessionStatusHolder(sidResp);
 
-    @Test
-    void getCertReturnsMidCertificateValue() {
-        var response = new GetMidSession.Response("COMPLETE", "OK", "mid-cert-pem", null);
-        var holder = new SessionStatusHolder(response);
-
-        assertEquals("mid-cert-pem", holder.getCert());
-    }
-
-    @Test
-    void getCertThrowsWhenSidCertIsNull() {
-        var response = new GetSidSession.Response("COMPLETE", "OK", null, null, null);
-        var holder = new SessionStatusHolder(response);
-
-        assertThrows(IllegalStateException.class, holder::getCert);
-    }
-
-    @Test
-    void getCertThrowsWhenMidCertIsNull() {
-        var response = new GetMidSession.Response("COMPLETE", "OK", null, null);
-        var holder = new SessionStatusHolder(response);
-
-        assertThrows(IllegalStateException.class, holder::getCert);
-    }
-
-    @Test
-    void sidHolderHasNullMidSessionResponse() {
-        var response = new GetSidSession.Response("RUNNING", null, null, null, null);
-        var holder = new SessionStatusHolder(response);
-
-        assertNotNull(holder.getSidSessionResponse());
+        assertSame(sidResp, holder.getSidSessionResponse());
         assertNull(holder.getMidSessionResponse());
     }
 
     @Test
-    void midHolderHasNullSidSessionResponse() {
-        var response = new GetMidSession.Response("RUNNING", null, null, null);
-        var holder = new SessionStatusHolder(response);
+    void sidGetCertReturnsValue() {
+        SessionStatusHolder holder = new SessionStatusHolder(
+            sidResponse("COMPLETE", "OK", SID_CERT_VALUE)
+        );
 
+        assertEquals(SID_CERT_VALUE, holder.getCert());
+    }
+
+    @Test
+    void sidGetCertThrowsWhenMissing() {
+        SessionStatusHolder holder = new SessionStatusHolder(
+            sidResponse("COMPLETE", "OK", null)
+        );
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class, holder::getCert);
+        assertEquals("Certificate missing in SID session response", ex.getMessage());
+    }
+
+    @Test
+    void midCompleteOkIsCompletedOk() {
+        SessionStatusHolder holder = new SessionStatusHolder(
+            midResponse("COMPLETE", "OK", MID_CERT_VALUE)
+        );
+
+        assertFalse(holder.isRunning());
+        assertTrue(holder.isCompletedOk());
+        assertFalse(holder.isCompletedNotOk());
+        assertEquals("COMPLETE", holder.getState());
+        assertEquals("OK", holder.getEndResult());
+    }
+
+    @Test
+    void midCompleteNullEndResultIsNotOk() {
+        SessionStatusHolder holder = new SessionStatusHolder(
+            midResponse("COMPLETE", null, null)
+        );
+
+        assertTrue(holder.isCompletedNotOk(),
+            "COMPLETE with null endResult must be treated as not-OK in the MID branch too");
+        assertFalse(holder.isCompletedOk());
+    }
+
+    @Test
+    void midHolderStoresMidResponse() {
+        GetMidSession.Response midResp = midResponse("COMPLETE", "OK", MID_CERT_VALUE);
+
+        SessionStatusHolder holder = new SessionStatusHolder(midResp);
+
+        assertSame(midResp, holder.getMidSessionResponse());
         assertNull(holder.getSidSessionResponse());
-        assertNotNull(holder.getMidSessionResponse());
+    }
+
+    @Test
+    void midGetCertReturnsValue() {
+        SessionStatusHolder holder = new SessionStatusHolder(
+            midResponse("COMPLETE", "OK", MID_CERT_VALUE)
+        );
+
+        assertEquals(MID_CERT_VALUE, holder.getCert());
+    }
+
+    @Test
+    void midGetCertThrowsWhenNull() {
+        SessionStatusHolder holder = new SessionStatusHolder(
+            midResponse("COMPLETE", "OK", null)
+        );
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class, holder::getCert);
+        assertEquals("Certificate value is null", ex.getMessage());
+    }
+
+    private static GetSidSession.Response sidResponse(
+        String state,
+        String endResult,
+        String certValue
+    ) {
+        GetSidSession.Certificate cert = certValue == null
+            ? null
+            : new GetSidSession.Certificate(certValue, "QUALIFIED");
+
+        return new GetSidSession.Response(
+            state,
+            endResult,
+            null, // signature
+            cert,
+            null  // interactionTypeUsed
+        );
+    }
+
+    private static GetMidSession.Response midResponse(
+        String state,
+        String endResult,
+        String certValue
+    ) {
+        return new GetMidSession.Response(state, endResult, certValue, null /* signature */);
     }
 }
