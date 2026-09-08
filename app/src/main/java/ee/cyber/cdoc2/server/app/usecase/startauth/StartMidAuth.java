@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Base64;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -90,10 +89,13 @@ public class StartMidAuth {
     }
 
     private String getAndValidatePhoneNumber(String phoneNr) {
+        if (phoneNr == null) {
+            throw new InputValidationException("Phone number must not be null", null);
+        }
+
         try {
-            Objects.requireNonNull(phoneNr);
             return MidInputUtil.getValidatedPhoneNumber(phoneNr);
-        } catch (MidInvalidPhoneNumberException | NullPointerException e) {
+        } catch (MidInvalidPhoneNumberException e) {
             throw new InputValidationException(e.getMessage(), e);
         }
     }

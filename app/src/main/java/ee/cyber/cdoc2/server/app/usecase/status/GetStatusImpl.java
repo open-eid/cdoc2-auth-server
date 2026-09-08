@@ -53,7 +53,8 @@ public class GetStatusImpl implements GetStatus {
         AuthProcessType authProcessType = authProcess.type();
 
         if (STARTED == authProcess.status()) {
-            if (authProcess.midSidSessionUuid() == null) {
+            String midSidSessionUuid = authProcess.midSidSessionUuid();
+            if (midSidSessionUuid == null) {
                 throw new IllegalStateException(
                     "midSidSessionUuId missing on STARTED auth process"
                 );
@@ -61,10 +62,10 @@ public class GetStatusImpl implements GetStatus {
 
             SessionStatusHolder sidMidSessionStatus = switch (authProcessType) {
                 case AuthProcessType.SID -> new SessionStatusHolder(this.getSidSession.execute(
-                    UUID.fromString(authProcess.midSidSessionUuid())
+                    UUID.fromString(midSidSessionUuid)
                 ));
                 case AuthProcessType.MID -> new SessionStatusHolder(this.getMidSession.execute(
-                    UUID.fromString(authProcess.midSidSessionUuid())
+                    UUID.fromString(midSidSessionUuid)
                 ));
             };
 

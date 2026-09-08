@@ -32,7 +32,7 @@ public class CreateMidSessionToken {
 
     public String execute(UUID authProcessUuid, GetMidSession.@Nullable Response sessionResponse) {
         GetMidSession.Response midSessionResponse = validateSessionResponse(sessionResponse);
-        validateSessionSignatureNotBlank(midSessionResponse.signature());
+        MidSessionSignature signature = validateSessionSignatureNotBlank(midSessionResponse.signature());
 
         GetSessionTokenMaterial.Response sessionTokenMaterial =
             getSessionTokenMaterial.execute(
@@ -41,7 +41,8 @@ public class CreateMidSessionToken {
 
         validateSignature(
             sessionTokenMaterial.rpChallenge(),
-            midSessionResponse
+            midSessionResponse,
+            signature
         );
 
         return createSignedSdJwtForMid.execute(
@@ -59,12 +60,14 @@ public class CreateMidSessionToken {
         return sessionResponse;
     }
 
-    private void validateSignature(String rpChallenge, GetMidSession.Response sessionResponse) {
+    private void validateSignature(
+        String rpChallenge,
+        GetMidSession.Response sessionResponse,
+        MidSessionSignature sessionSignature
+    ) {
         X509Certificate certificate = MidCertificateParser.parseX509Certificate(
             sessionResponse.cert()
         );
-
-        MidSessionSignature sessionSignature = sessionResponse.signature();
 
         MidAuthenticationHashToSign hashSigned = MidUtil.createAuthenticationHash(
             Base64.getDecoder().decode(rpChallenge)
@@ -89,10 +92,13 @@ public class CreateMidSessionToken {
         }
     }
 
-    private void validateSessionSignatureNotBlank(@Nullable MidSessionSignature signature) {
+    private MidSessionSignature validateSessionSignatureNotBlank(
+        @Nullable MidSessionSignature signature
+    ) {
         if (signature == null || isBlank(signature.getValue())) {
             log.error("Signature was not present in the response");
             throw new IllegalStateException("Signature was not present in the response");
         }
+        return signature;
     }
 }

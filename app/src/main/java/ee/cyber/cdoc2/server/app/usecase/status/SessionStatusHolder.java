@@ -70,10 +70,12 @@ public class SessionStatusHolder {
     }
 
     private String getSidSigningCertificate(GetSidSession.Response response) {
-        if (response.cert() == null) {
+        GetSidSession.Certificate cert = response.cert();
+
+        if (cert == null) {
             throw new IllegalStateException("Certificate missing in SID session response");
         }
 
-        return response.cert().value();
+        return cert.value();
     }
 }
