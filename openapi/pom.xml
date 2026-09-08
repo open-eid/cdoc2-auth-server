@@ -57,6 +57,15 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <configuration>
+                    <!-- all sources in this module are OpenAPI-generated -->
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>3.10.0</version>
                 <executions>

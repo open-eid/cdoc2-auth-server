@@ -15,11 +15,13 @@ import ee.cyber.cdoc2.auth.EtsiIdentifier;
 import ee.cyber.cdoc2.auth.exception.InvalidEtsiSemanticsIdentifierException;
 import ee.cyber.cdoc2.server.app.exception.InputValidationException;
 
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class StartAuthImpl implements StartAuth {
     private static final int RP_CHALLENGE_BYTES_LENGTH = 64;
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final StartSidAuth startSidAuth;
     private final StartMidAuth startMidAuth;
@@ -56,7 +58,7 @@ public class StartAuthImpl implements StartAuth {
 
     static byte[] createRpChallengeBytes() {
         byte[] rpChallengeBytes = new byte[RP_CHALLENGE_BYTES_LENGTH];
-        new SecureRandom().nextBytes(rpChallengeBytes);
+        SECURE_RANDOM.nextBytes(rpChallengeBytes);
         return rpChallengeBytes;
     }
 

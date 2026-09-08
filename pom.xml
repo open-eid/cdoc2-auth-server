@@ -63,6 +63,12 @@
                 <scope>import</scope>
             </dependency>
 
+            <dependency>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-annotations</artifactId>
+                <version>4.10.4</version>
+            </dependency>
+
             <!-- CVE-2026-5598 -->
             <!-- vulnerable version pulled by ee.sk.smartid:smart-id-java-client:jar:3.2-->
             <dependency>
@@ -100,9 +106,29 @@
                     <consoleOutput>true</consoleOutput>
 
                     <failsOnError>true</failsOnError>
-                    <failOnViolation>false</failOnViolation>
+                    <failOnViolation>true</failOnViolation>
 
                     <linkXRef>false</linkXRef>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.10.4.1</version>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <effort>Max</effort>
+                    <threshold>Medium</threshold>
+                    <failOnError>true</failOnError>
+                    <excludeFilterFile>${maven.multiModuleProjectDirectory}/spotbugs-exclude.xml</excludeFilterFile>
                 </configuration>
             </plugin>
 

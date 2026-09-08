@@ -40,6 +40,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.authlete</groupId>
             <artifactId>sd-jwt</artifactId>
             <version>1.8</version>

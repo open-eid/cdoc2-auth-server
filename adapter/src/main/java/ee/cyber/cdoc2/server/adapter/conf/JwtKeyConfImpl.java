@@ -15,8 +15,9 @@ import com.nimbusds.jose.jwk.JWK;
 import ee.cyber.cdoc2.server.adapter.resource.ResourceLoaderWrapper;
 import ee.cyber.cdoc2.server.app.conf.JwtKeysConf;
 
-@Configuration
-public class JwtKeyConfImpl implements JwtKeysConf {
+
+@Configuration(proxyBeanMethods = false)
+public final class JwtKeyConfImpl implements JwtKeysConf {
     private final ResourceLoaderWrapper resourceLoader;
     private final ECPrivateKey ecPrivateKey;
     private final String kid;

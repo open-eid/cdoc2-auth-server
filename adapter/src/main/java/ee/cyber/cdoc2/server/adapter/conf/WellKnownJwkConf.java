@@ -1,5 +1,7 @@
 package ee.cyber.cdoc2.server.adapter.conf;
 
+import lombok.Getter;
+
 import java.io.InputStream;
 import java.security.interfaces.ECPublicKey;
 import java.util.HashMap;
@@ -20,12 +22,15 @@ import com.nimbusds.jose.jwk.JWKSet;
 import ee.cyber.cdoc2.server.adapter.generated.model.WellKnownResponse;
 import ee.cyber.cdoc2.server.adapter.resource.ResourceLoaderWrapper;
 
-@Configuration
-public class WellKnownJwkConf {
+
+@Configuration(proxyBeanMethods = false)
+public final class WellKnownJwkConf {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final ResourceLoaderWrapper resourceLoader;
 
+    @Getter
     private final WellKnownResponse jwkResponse;
+    @Getter
     private final String activePublicKeyKid;
 
     @ConfigurationProperties(prefix = "app.well-known")
@@ -88,14 +93,6 @@ public class WellKnownJwkConf {
             String pem = new String(is.readAllBytes());
             return JWK.parseFromPEMEncodedObjects(pem);
         }
-    }
-
-    public WellKnownResponse getJwkResponse() {
-        return jwkResponse;
-    }
-
-    public String getActivePublicKeyKid() {
-        return activePublicKeyKid;
     }
 
     private void validateConf(AppProperties props) {
