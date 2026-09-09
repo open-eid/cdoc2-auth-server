@@ -1,5 +1,7 @@
 package ee.cyber.cdoc2.server.adapter.api;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,7 @@ import ee.cyber.cdoc2.server.adapter.exception.ClientBadRequestException;
 import ee.cyber.cdoc2.server.adapter.exception.ClientNotFoundException;
 import ee.cyber.cdoc2.server.app.exception.Cdoc2AuthValidationException;
 
+@Slf4j
 @RestControllerAdvice
 public class ClientExceptionHandler {
 
@@ -19,6 +22,8 @@ public class ClientExceptionHandler {
     public ResponseEntity<ProblemDetail> handleClientNotFoundException(
         ClientNotFoundException exception
     ) {
+        log.warn("Client not found error [{}]: {}", exception.getCode(), exception.getMessage());
+
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
         problem.setProperties(
             Map.of(
@@ -33,6 +38,8 @@ public class ClientExceptionHandler {
     public ResponseEntity<ProblemDetail> handleClientBadRequestException(
         ClientBadRequestException exception
     ) {
+        log.warn("Client bad request error [{}]: {}", exception.getCode(), exception.getMessage());
+
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problem.setProperties(
             Map.of(
@@ -47,6 +54,8 @@ public class ClientExceptionHandler {
     public ResponseEntity<ProblemDetail> handleCdoc2AuthValidationException(
         Cdoc2AuthValidationException exception
     ) {
+        log.warn("Validation error [{}]: {}", exception.getCode(), exception.getMessage());
+
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problem.setProperties(
             Map.of(

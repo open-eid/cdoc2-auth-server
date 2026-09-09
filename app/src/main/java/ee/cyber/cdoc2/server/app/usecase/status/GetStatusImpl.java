@@ -1,6 +1,7 @@
 package ee.cyber.cdoc2.server.app.usecase.status;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 
@@ -15,6 +16,7 @@ import ee.cyber.cdoc2.server.app.usecase.status.sid.GetSidSession;
 
 import static ee.cyber.cdoc2.server.app.usecase.common.AuthProcessStatus.*;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class GetStatusImpl implements GetStatus {
@@ -74,6 +76,11 @@ public class GetStatusImpl implements GetStatus {
             }
 
             if (sidMidSessionStatus.isCompletedNotOk()) {
+                log.info(
+                    "{} authentication for process {} ended with non-OK result: {}",
+                    authProcessType, authProcessUuid, sidMidSessionStatus.getEndResult()
+                );
+
                 failAuthProcess.execute(new FailAuthProcess.Request(
                     authProcessUuid,
                     sidMidSessionStatus.getEndResult()
