@@ -4,6 +4,10 @@
 
 ### Improvements
 * added `logstash-logback-encoder` dependency to enable JSON logging
+* Add support for tracing (`micrometer-tracing-bridge-otel`, `opentelemetry-exporter-otlp`)
+* Add Spring Security configuration (`spring-boot-starter-security`) requiring HTTP Basic
+  authentication for `/actuator/prometheus`
+
 
 ## [0.8.0]
 
