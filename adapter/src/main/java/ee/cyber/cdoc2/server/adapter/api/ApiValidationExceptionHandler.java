@@ -2,6 +2,8 @@ package ee.cyber.cdoc2.server.adapter.api;
 
 import jakarta.validation.ConstraintViolationException;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class ApiValidationExceptionHandler {
     private static final String VALIDATION_PROBLEM_TITLE = "Request validation Failed";
@@ -23,11 +26,15 @@ public class ApiValidationExceptionHandler {
     public ResponseEntity<ProblemDetail> handleMethodArgumentNotValid(
         MethodArgumentNotValidException ex) {
 
+        String detail = ex.getBindingResult().getFieldErrors().stream()
+            .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
+            .collect(java.util.stream.Collectors.joining(", "));
+
+        log.warn("Request body validation failed: {}", detail);
+
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problem.setTitle(VALIDATION_PROBLEM_TITLE);
-        problem.setDetail(ex.getBindingResult().getFieldErrors().stream()
-            .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
-            .collect(java.util.stream.Collectors.joining(", ")));
+        problem.setDetail(detail);
 
         problem.setProperties(Map.of(VALIDATION_PROBLEM_CODE_FIELD, VALIDATION_PROBLEM_CODE_VALUE));
 
@@ -39,11 +46,15 @@ public class ApiValidationExceptionHandler {
     public ResponseEntity<ProblemDetail> handleConstraintViolation(
         ConstraintViolationException ex) {
 
+        String detail = ex.getConstraintViolations().stream()
+            .map(cv -> cv.getPropertyPath() + ": " + cv.getMessage())
+            .collect(java.util.stream.Collectors.joining(", "));
+
+        log.warn("Request parameter validation failed: {}", detail);
+
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problem.setTitle(VALIDATION_PROBLEM_TITLE);
-        problem.setDetail(ex.getConstraintViolations().stream()
-            .map(cv -> cv.getPropertyPath() + ": " + cv.getMessage())
-            .collect(java.util.stream.Collectors.joining(", ")));
+        problem.setDetail(detail);
 
         problem.setProperties(Map.of(VALIDATION_PROBLEM_CODE_FIELD, VALIDATION_PROBLEM_CODE_VALUE));
 
@@ -54,6 +65,8 @@ public class ApiValidationExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ProblemDetail> handleNotReadable(
         HttpMessageNotReadableException ex) {
+
+        log.warn("Malformed request body: {}", ex.getMostSpecificCause().getMessage());
 
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problem.setTitle("Malformed Request");
