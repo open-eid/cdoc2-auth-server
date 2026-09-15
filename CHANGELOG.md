@@ -8,6 +8,7 @@
 * Add support for tracing (`micrometer-tracing-bridge-otel`, `opentelemetry-exporter-otlp`)
 * Add Spring Security configuration (`spring-boot-starter-security`) requiring HTTP Basic
   authentication for `/actuator/prometheus`
+* Dependency updates
 
 
 ## [0.8.0]

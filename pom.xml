@@ -80,6 +80,14 @@
                 <artifactId>bcprov-jdk18on</artifactId>
                 <version>1.84</version>
             </dependency>
+
+            <!-- Override vulnerable version pulled by -->
+            <!-- net.logstash.logback:logstash-logback-encoder:jar:9.0-->
+            <dependency>
+                <groupId>tools.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>3.2.2</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -132,7 +140,8 @@
                     <effort>Max</effort>
                     <threshold>Medium</threshold>
                     <failOnError>true</failOnError>
-                    <excludeFilterFile>${maven.multiModuleProjectDirectory}/spotbugs-exclude.xml</excludeFilterFile>
+                    <excludeFilterFile>${maven.multiModuleProjectDirectory}/spotbugs-exclude.xml
+                    </excludeFilterFile>
                 </configuration>
             </plugin>
 
