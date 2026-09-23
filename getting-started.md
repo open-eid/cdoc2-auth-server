@@ -4,7 +4,12 @@ This file describes how to run `cdoc2-auth-server` in your local development mac
 external infrastructure.
 
 ### Prerequisites
-cdoc2-auth-token is not published to Maven Central. Build and install it first:
+
+* JDK 21
+* Docker
+* `cdoc2-auth-token` library
+
+`cdoc2-auth-token` is not published to Maven Central. Build and install it first:
 
 ```bash
 git clone https://github.com/open-eid/cdoc2-auth.git
