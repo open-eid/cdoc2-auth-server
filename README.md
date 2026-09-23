@@ -103,12 +103,13 @@ spring.ssl.bundle.jks.somebundle.key.alias=authServerKey
 
 Defined bundles:
 
-| bundle name   | type                 | description                                                                    |
-|:--------------|:---------------------|:-------------------------------------------------------------------------------|
-| server-bundle | keystore, truststore | keystore and truststore (if any) to use for embedded server SSL connections    |
-| sid-server    | truststore           | provides truststore for SID server connections                                 |
-| mid-server    | truststore           | provides truststore for MID server connections                                 |
-| trusted-infra | truststore           | provides truststore for REST clients communicating with other CDOC2 components |
+| bundle name     | type                 | description                                                                                                                                      |
+|:----------------|:---------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------|
+| server-bundle   | keystore, truststore | keystore and truststore (if any) to use for embedded server SSL connections                                                                      |
+| sid-server      | truststore           | provides truststore for SID server connections                                                                                                   |
+| mid-server      | truststore           | provides truststore for MID server connections                                                                                                   |
+| trusted-infra   | truststore           | provides truststore for REST clients communicating with other CDOC2 components                                                                   |
+| trusted-issuers | truststore           | trustsore used by MobileID authentication response validation. Only required when `app.mobileid.validateAuthenticationResponse` is set to `true` |
 
 ### Building the docker image locally
 
