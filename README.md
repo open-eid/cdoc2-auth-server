@@ -28,10 +28,10 @@
 
 ## Logging configuration
 
-The logging format can be changed by providing logback configuration.
-An example OpenTelemetry-compatible Logback configuration is included in `otel-logback.xml`.
-To include the logback configuration, use the `-Dlogging.config` JVM option or configuring it
-in the `application.properties`.
+The logging format can be changed by providing logback configuration. An example
+OpenTelemetry-compatible Logback configuration is included in `otel-logback.xml`. To include the
+logback configuration, use the `-Dlogging.config` JVM option or configuring it in the
+`application.properties`.
 
 ### Application properties
 
@@ -57,15 +57,16 @@ In configuration files, the following properties must start with the `app.` pref
 | smartid.client.statusPollTimeoutSeconds             | 1                                                      | Max time the SID API may hold a session status request open (server-side long poll) before responding with the current status, in seconds. Value of 0 means request will return only when complete |
 | mobileid.client.hostUrl                             |                                                        | URL of the MID RP API                                                                                                                                                                              |
 | mobileid.client.statusPollTimeoutSeconds            | 1                                                      | Max time the MID API may hold a session status request open (server-side long poll) before responding with the current status, in seconds. Value of 0 means request will return only when complete |
+| mobileid.validateAuthenticationResponse             | false                                                  | When true, the authentication response returned by the mobelid client is additionally verified by auth-server.                                                                                     |
 | cleanup.rate                                        | 30000                                                  | milliseconds between auth process cleanup job executions                                                                                                                                           |
 | cleanup.authProcessMaxAgeMinutes                    | 5                                                      | maximum allowable age for an auth process in minutes                                                                                                                                               |
 | cleanup.authProcessDeletionLimit                    | 1000                                                   | limit to the number of records deleted by a single run of the cleanup job                                                                                                                          |
-| app.auth.display-text.et                            | `Please confirm authentication: {semanticsIdentifier}` | Display text shown to the user in Estonian during MID/SID authentication prompts. Supports the `{semanticsIdentifier}` placeholder, which is replaced with users ID.                               |
-| app.auth.display-text.en                            | `Please confirm authentication: {semanticsIdentifier}` | Display text shown to the user in English during MID/SID authentication prompts. Supports the `{semanticsIdentifier}` placeholder, which is replaced with users ID.                                |
-| app.auth.display-text.ru                            | `Please confirm authentication: {semanticsIdentifier}` | Display text shown to the user in Russian during MID/SID authentication prompts. Supports the `{semanticsIdentifier}` placeholder, which is replaced with users ID.                                |
-| app.auth.display-text.lt                            | `Please confirm authentication: {semanticsIdentifier}` | Display text shown to the user in Lithuanian during MID/SID authentication prompts. Supports the `{semanticsIdentifier}` placeholder, which is replaced with users ID.                             |
-| app.auth.display-text.defaultLanguage               | et                                                     | Language to use when the client does not specify a language. Accepted values: `et`, `en`, `ru`, `lt`.                                                                                              |
-| app.session-token.issuer                            |                                                        | The issuer added to the created session token.                                                                                                                                                     |
+| auth.display-text.et                                | `Please confirm authentication: {semanticsIdentifier}` | Display text shown to the user in Estonian during MID/SID authentication prompts. Supports the `{semanticsIdentifier}` placeholder, which is replaced with users ID.                               |
+| auth.display-text.en                                | `Please confirm authentication: {semanticsIdentifier}` | Display text shown to the user in English during MID/SID authentication prompts. Supports the `{semanticsIdentifier}` placeholder, which is replaced with users ID.                                |
+| auth.display-text.ru                                | `Please confirm authentication: {semanticsIdentifier}` | Display text shown to the user in Russian during MID/SID authentication prompts. Supports the `{semanticsIdentifier}` placeholder, which is replaced with users ID.                                |
+| auth.display-text.lt                                | `Please confirm authentication: {semanticsIdentifier}` | Display text shown to the user in Lithuanian during MID/SID authentication prompts. Supports the `{semanticsIdentifier}` placeholder, which is replaced with users ID.                             |
+| auth.display-text.defaultLanguage                   | et                                                     | Language to use when the client does not specify a language. Accepted values: `et`, `en`, `ru`, `lt`.                                                                                              |
+| session-token.issuer                                |                                                        | The issuer added to the created session token.                                                                                                                                                     |
 
 ### Spring properties
 
