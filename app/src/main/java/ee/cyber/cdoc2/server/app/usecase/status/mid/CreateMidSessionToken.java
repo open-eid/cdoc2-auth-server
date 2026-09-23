@@ -39,11 +39,13 @@ public class CreateMidSessionToken {
                 new GetSessionTokenMaterial.Request(authProcessUuid)
             );
 
-        validateSignature(
-            sessionTokenMaterial.rpChallenge(),
-            midSessionResponse,
-            signature
-        );
+        if (mobileIdConf.isAuthenticationResponseValidationEnabled()) {
+            validateSignature(
+                sessionTokenMaterial.rpChallenge(),
+                midSessionResponse,
+                signature
+            );
+        }
 
         return createSignedSdJwtForMid.execute(
             sessionTokenMaterial.unsignedJwt()
@@ -82,18 +84,15 @@ public class CreateMidSessionToken {
             .withHashType(hashSigned.getHashType())
             .build();
 
-        if (mobileIdConf.isAuthenticationResponseValidationEnabled()) {
+        MidAuthenticationResult authResult = mobileIdConf.getMidAuthenticationResponseValidator()
+            .validate(midAuthentication);
 
-            MidAuthenticationResult authResult = mobileIdConf.getMidAuthenticationResponseValidator()
-                .validate(midAuthentication);
-
-            List<String> authErrors = authResult.getErrors();
-            if (!authResult.isValid() || !authErrors.isEmpty()) {
-                for (String error : authErrors) {
-                    log.error(error);
-                }
-                throw new IllegalStateException("MID signature validation failed");
+        List<String> authErrors = authResult.getErrors();
+        if (!authResult.isValid() || !authErrors.isEmpty()) {
+            for (String error : authErrors) {
+                log.error(error);
             }
+            throw new IllegalStateException("MID signature validation failed");
         }
     }
 
