@@ -3,6 +3,14 @@
 This file describes how to run `cdoc2-auth-server` in your local development machine, without
 external infrastructure.
 
+### Prerequisites
+cdoc2-auth-token is not published to Maven Central. Build and install it first:
+
+```bash
+git clone https://github.com/open-eid/cdoc2-auth.git
+cd cdoc2-auth && mvn clean install -DskipTests
+```
+
 ### Installing and creating PostgreSQL DB in Docker
 
 #### Install PostgreSQL in Docker
