@@ -23,29 +23,43 @@ mvn clean compile liquibase:update
 ```
 
 ### Compiling the servers
-From `cdoc2-auth-server` directory run:
+From `cdoc2-auth-server` (repo root) directory run:
 ```bash
 mvn clean install
 ```
 
 ### Running
+From `cdoc2-rp-server` (repo root) directory
 (psql in docker must be running)
 
-From `webapp` directory run:
+The bundled `webapp/src/main/resources/application.properties` deliberately avoids configuring
+the mandatory cryptographic keys used by the application. The `webapp/src/test/resources` folder
+provides sample keys that can be used for local execution.
+Provide a custom `application.properties` in the same folder as the jar or the `java -jar` 
+command if you need to override any property (see README.md for the full list of `app.*` /
+`spring.*` properties).
+
+To use the sample test keys:
+
 ```bash
-java -jar target/cdoc2-auth-server-webapp-VER.jar
+cp webapp/src/test/resources/ec*.pem .
+cat > application.properties<< EOF
+app.jwt.ecPrivateKeyPem=ec-es256-private.pem
+app.well-known.publicKeys=ec-key-2025.pem,ec-key-2026.pem
+app.well-known.activePublicKey=ec-key-2026.pem
+EOF
+
+```
+
+Run the app:
+
+```bash
+java -jar webapp/target/cdoc2-auth-server-webapp-VER.jar
 ```
 where VER is the version of the package built by `mvn install` previously (e.g.
 `target/cdoc2-auth-server-webapp-0.8.0.jar`).
 
-The bundled `webapp/src/main/resources/application.properties` already ships a localhost dev
-configuration (self-signed keystore/truststores, connection to the dockerized Postgres started
-above, demo SID/MID service URLs), so the server can be started as-is without providing
-`-Dspring.config.location`. Provide a custom `application.properties` in the same folder as the
-jar if you need to override any property (see README.md for the full list of `app.*` /
-`spring.*` properties).
-
-Or run the server with `-Dlogging.config=target/test-classes/logback.xml` if you need to see logs.
+Run the server with `-Dlogging.config=target/test-classes/logback.xml` if you need to see logs.
 
 Note: to enable TLS handshake debugging, add `-Djavax.net.debug=ssl:handshake` option.
 
@@ -55,10 +69,10 @@ To include the logback configuration, use the `-Dlogging.config` JVM option.
 
 Example of running the server with `otel-logback.xml`:
 ```
-java -Dlogging.config=webapp/src/main/resources/otel-logback.xml -jar target/cdoc2-auth-server-webapp-VER.jar
+java -Dlogging.config=webapp/src/main/resources/otel-logback.xml -jar webapp/target/cdoc2-auth-server-webapp-VER.jar
 ```
 
-By default the server listens on `https://localhost:7500` and its actuator (management) endpoints
+By default, the server listens on `https://localhost:7500` and its actuator (management) endpoints
 on `https://localhost:17500`.
 
 When building the session token, `cdoc2-auth-server` fetches a session nonce from one of the
