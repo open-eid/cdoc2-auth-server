@@ -17,16 +17,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import ee.cyber.cdoc2.server.app.conf.MobileIdConf;
 import ee.cyber.cdoc2.server.app.usecase.status.GetSessionTokenMaterial;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -79,6 +75,9 @@ class CreateMidSessionTokenTest {
     private MidAuthenticationResponseValidator responseValidator;
 
     @Mock
+    private MobileIdConf mobileIdConf;
+
+    @Mock
     private MidAuthenticationResult validatorResult;
 
     @InjectMocks
@@ -89,6 +88,11 @@ class CreateMidSessionTokenTest {
     @BeforeEach
     void setUp() {
         midCertStandardBase64 = toStandardBase64(MID_CERT_URL_SAFE);
+
+        lenient().when(mobileIdConf.getMidAuthenticationResponseValidator())
+            .thenReturn(responseValidator);
+        lenient().when(mobileIdConf.isAuthenticationResponseValidationEnabled())
+            .thenReturn(false);
 
         lenient().when(getSessionTokenMaterial.execute(any(GetSessionTokenMaterial.Request.class)))
             .thenReturn(new GetSessionTokenMaterial.Response(
@@ -102,7 +106,8 @@ class CreateMidSessionTokenTest {
     }
 
     @Test
-    void executeReturnsSignedJwt() {
+    void executeWithValidationEnabledReturnsSignedJwt() {
+        when(mobileIdConf.isAuthenticationResponseValidationEnabled()).thenReturn(true);
         when(responseValidator.validate(any(MidAuthentication.class))).thenReturn(validatorResult);
         when(validatorResult.isValid()).thenReturn(true);
         when(validatorResult.getErrors()).thenReturn(List.of());
@@ -125,11 +130,18 @@ class CreateMidSessionTokenTest {
     }
 
     @Test
-    void executeForwardsAuthUuid() {
-        when(responseValidator.validate(any(MidAuthentication.class))).thenReturn(validatorResult);
-        when(validatorResult.isValid()).thenReturn(true);
-        when(validatorResult.getErrors()).thenReturn(List.of());
+    void executeWithValidationDisabledReturnsSignedJwt() {
+        String result = createMidSessionToken.execute(UUID.randomUUID(), midResponse());
 
+        assertEquals(SIGNED_SD_JWT_RESULT, result);
+        verify(createSignedSdJwtForMid).execute(UNSIGNED_JWT_SAMPLE);
+
+        // Verify the validator was never invoked
+        verifyNoInteractions(responseValidator);
+    }
+
+    @Test
+    void executeForwardsAuthUuid() {
         UUID authProcessUuid = UUID.randomUUID();
         createMidSessionToken.execute(authProcessUuid, midResponse());
 
@@ -189,6 +201,7 @@ class CreateMidSessionTokenTest {
 
     @Test
     void executeInvalidValidationThrows() {
+        when(mobileIdConf.isAuthenticationResponseValidationEnabled()).thenReturn(true);
         when(responseValidator.validate(any(MidAuthentication.class))).thenReturn(validatorResult);
         when(validatorResult.isValid()).thenReturn(false);
         when(validatorResult.getErrors()).thenReturn(List.of());
@@ -202,6 +215,7 @@ class CreateMidSessionTokenTest {
 
     @Test
     void executeValidationErrorsThrows() {
+        when(mobileIdConf.isAuthenticationResponseValidationEnabled()).thenReturn(true);
         when(responseValidator.validate(any(MidAuthentication.class))).thenReturn(validatorResult);
         when(validatorResult.isValid()).thenReturn(true);
         when(validatorResult.getErrors()).thenReturn(List.of(

@@ -2,7 +2,6 @@ package ee.cyber.cdoc2.server.app.usecase.status.mid;
 
 import ee.sk.mid.MidAuthentication;
 import ee.sk.mid.MidAuthenticationHashToSign;
-import ee.sk.mid.MidAuthenticationResponseValidator;
 import ee.sk.mid.MidAuthenticationResult;
 import ee.sk.mid.MidCertificateParser;
 import ee.sk.mid.rest.dao.MidSessionSignature;
@@ -17,6 +16,7 @@ import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
+import ee.cyber.cdoc2.server.app.conf.MobileIdConf;
 import ee.cyber.cdoc2.server.app.usecase.common.MidUtil;
 import ee.cyber.cdoc2.server.app.usecase.status.GetSessionTokenMaterial;
 
@@ -28,7 +28,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class CreateMidSessionToken {
     private final CreateSignedSdJwtForMid createSignedSdJwtForMid;
     private final GetSessionTokenMaterial getSessionTokenMaterial;
-    private final MidAuthenticationResponseValidator responseValidator;
+    private final MobileIdConf mobileIdConf;
 
     public String execute(UUID authProcessUuid, GetMidSession.@Nullable Response sessionResponse) {
         GetMidSession.Response midSessionResponse = validateSessionResponse(sessionResponse);
@@ -39,11 +39,13 @@ public class CreateMidSessionToken {
                 new GetSessionTokenMaterial.Request(authProcessUuid)
             );
 
-        validateSignature(
-            sessionTokenMaterial.rpChallenge(),
-            midSessionResponse,
-            signature
-        );
+        if (mobileIdConf.isAuthenticationResponseValidationEnabled()) {
+            validateSignature(
+                sessionTokenMaterial.rpChallenge(),
+                midSessionResponse,
+                signature
+            );
+        }
 
         return createSignedSdJwtForMid.execute(
             sessionTokenMaterial.unsignedJwt()
@@ -82,7 +84,9 @@ public class CreateMidSessionToken {
             .withHashType(hashSigned.getHashType())
             .build();
 
-        MidAuthenticationResult authResult = responseValidator.validate(midAuthentication);
+        MidAuthenticationResult authResult = mobileIdConf.getMidAuthenticationResponseValidator()
+            .validate(midAuthentication);
+
         List<String> authErrors = authResult.getErrors();
         if (!authResult.isValid() || !authErrors.isEmpty()) {
             for (String error : authErrors) {
