@@ -78,7 +78,7 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
-                <version>1.84</version>
+                <version>1.85</version>
             </dependency>
 
             <!-- Override vulnerable version pulled by -->
@@ -87,6 +87,24 @@
                 <groupId>tools.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>3.2.2</version>
+            </dependency>
+
+            <!-- org.apache.tomcat.embed overrides should be removed when non-vulnerable version -->
+            <!-- is available in Spring Boot BOM-->
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+                <version>10.1.60</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-websocket</artifactId>
+                <version>10.1.60</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-el</artifactId>
+                <version>10.1.60</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
