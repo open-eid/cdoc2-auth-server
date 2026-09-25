@@ -54,7 +54,7 @@ class GetStatusImplTest {
 
         GetStatus.Response response = getStatusImpl.execute(VALID_UUID_STR);
 
-        assertEquals(AuthProcessStatus.FAILED.name(), response.status());
+        assertEquals(AuthProcessStatus.FAILED, response.status());
         assertEquals("USER_CANCELLED", response.endResult());
         assertNull(response.sessionToken());
     }
@@ -68,7 +68,7 @@ class GetStatusImplTest {
 
         GetStatus.Response response = getStatusImpl.execute(VALID_UUID_STR);
 
-        assertEquals(AuthProcessStatus.COMPLETE.name(), response.status());
+        assertEquals(AuthProcessStatus.COMPLETE, response.status());
         assertEquals("OK", response.endResult());
         assertEquals("existing-token", response.sessionToken());
         assertEquals("signing-cert", response.signingCertificate());
@@ -96,7 +96,7 @@ class GetStatusImplTest {
 
         GetStatus.Response response = getStatusImpl.execute(VALID_UUID_STR);
 
-        assertEquals(AuthProcessStatus.STARTED.name(), response.status());
+        assertEquals(AuthProcessStatus.STARTED, response.status());
         assertNull(response.sessionToken());
     }
 
@@ -112,7 +112,7 @@ class GetStatusImplTest {
 
         GetStatus.Response response = getStatusImpl.execute(VALID_UUID_STR);
 
-        assertEquals(AuthProcessStatus.FAILED.name(), response.status());
+        assertEquals(AuthProcessStatus.FAILED, response.status());
         assertEquals("USER_REFUSED", response.endResult());
         verify(failAuthProcess).execute(any(FailAuthProcess.Request.class));
     }
@@ -131,7 +131,7 @@ class GetStatusImplTest {
 
         GetStatus.Response response = getStatusImpl.execute(VALID_UUID_STR);
 
-        assertEquals(AuthProcessStatus.COMPLETE.name(), response.status());
+        assertEquals(AuthProcessStatus.COMPLETE, response.status());
         assertEquals("OK", response.endResult());
         assertEquals("signed-sd-jwt", response.sessionToken());
         assertEquals("sid-cert-pem", response.signingCertificate());
@@ -150,7 +150,7 @@ class GetStatusImplTest {
 
         GetStatus.Response response = getStatusImpl.execute(VALID_UUID_STR);
 
-        assertEquals(AuthProcessStatus.STARTED.name(), response.status());
+        assertEquals(AuthProcessStatus.STARTED, response.status());
         assertNull(response.sessionToken());
     }
 
@@ -166,7 +166,7 @@ class GetStatusImplTest {
 
         GetStatus.Response response = getStatusImpl.execute(VALID_UUID_STR);
 
-        assertEquals(AuthProcessStatus.FAILED.name(), response.status());
+        assertEquals(AuthProcessStatus.FAILED, response.status());
         assertEquals("TIMEOUT", response.endResult());
         verify(failAuthProcess).execute(any(FailAuthProcess.Request.class));
     }
@@ -184,7 +184,7 @@ class GetStatusImplTest {
 
         GetStatus.Response response = getStatusImpl.execute(VALID_UUID_STR);
 
-        assertEquals(AuthProcessStatus.COMPLETE.name(), response.status());
+        assertEquals(AuthProcessStatus.COMPLETE, response.status());
         assertEquals("OK", response.endResult());
         assertEquals("signed-sd-jwt", response.sessionToken());
         assertEquals("mid-cert-pem", response.signingCertificate());
