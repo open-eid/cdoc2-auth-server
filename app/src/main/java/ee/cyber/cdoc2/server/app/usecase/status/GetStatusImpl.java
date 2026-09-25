@@ -40,12 +40,12 @@ public class GetStatusImpl implements GetStatus {
         GetAuthProcess.Response authProcess = getAuthProcess.execute(authProcessUuid);
 
         if (FAILED == authProcess.status()) {
-            return new Response(FAILED.name(), authProcess.endResult());
+            return new Response(FAILED, authProcess.endResult());
         }
 
         if (COMPLETE == authProcess.status()) {
             return new Response(
-                COMPLETE.name(),
+                COMPLETE,
                 authProcess.endResult(),
                 authProcess.sessionToken(),
                 authProcess.signingCert()
@@ -72,7 +72,7 @@ public class GetStatusImpl implements GetStatus {
             };
 
             if (sidMidSessionStatus.isRunning()) {
-                return new Response(STARTED.name());
+                return new Response(STARTED);
             }
 
             if (sidMidSessionStatus.isCompletedNotOk()) {
@@ -85,7 +85,7 @@ public class GetStatusImpl implements GetStatus {
                     authProcessUuid,
                     sidMidSessionStatus.getEndResult()
                 ));
-                return new Response(FAILED.name(), sidMidSessionStatus.getEndResult());
+                return new Response(FAILED, sidMidSessionStatus.getEndResult());
             }
 
             if (sidMidSessionStatus.isCompletedOk()) {
@@ -106,7 +106,7 @@ public class GetStatusImpl implements GetStatus {
                 ));
 
                 return new Response(
-                    COMPLETE.name(),
+                    COMPLETE,
                     sidMidSessionStatus.getEndResult(),
                     signedSdJwt,
                     cert

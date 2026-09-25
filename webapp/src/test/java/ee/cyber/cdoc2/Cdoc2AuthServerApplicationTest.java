@@ -103,7 +103,7 @@ class Cdoc2AuthServerApplicationTest extends AbstractAuthServerTest {
         );
 
         assertNotNull(authStatusResponseBody);
-        assertEquals("COMPLETE", authStatusResponseBody.getStatus());
+        assertEquals("COMPLETE", authStatusResponseBody.getStatus().getValue());
 
         MockHttpServletResponse getWellKnownResponse = mockMvc.perform(
                 get(URI.create("/.well-known/jwks.jws"))
@@ -159,7 +159,7 @@ class Cdoc2AuthServerApplicationTest extends AbstractAuthServerTest {
                 AuthProcessStatusResponse.class
             );
 
-            if (!"STARTED".equals(authStatusResponseBody.getStatus())) {
+            if (!"STARTED".equals(authStatusResponseBody.getStatus().getValue())) {
                 break;
             }
         }

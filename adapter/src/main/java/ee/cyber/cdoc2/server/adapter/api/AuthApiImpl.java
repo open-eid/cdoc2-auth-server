@@ -21,6 +21,7 @@ import ee.cyber.cdoc2.server.adapter.generated.model.AuthProcessStatusResponse;
 import ee.cyber.cdoc2.server.adapter.generated.model.StartAuthProcessResponse;
 import ee.cyber.cdoc2.server.adapter.generated.model.WellKnownResponse;
 import ee.cyber.cdoc2.server.app.conf.DisplayTextConf;
+import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessStatus;
 import ee.cyber.cdoc2.server.app.usecase.info.GetServerInfo;
 import ee.cyber.cdoc2.server.app.usecase.startauth.Language;
 import ee.cyber.cdoc2.server.app.usecase.startauth.StartAuth;
@@ -62,7 +63,9 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
     public ResponseEntity<AuthProcessStatusResponse> getAuthProcessStatus(String authProcessUuid) {
         GetStatus.Response response = getStatus.execute(authProcessUuid);
 
-        AuthProcessStatusResponse responseBody = new AuthProcessStatusResponse(response.status())
+        AuthProcessStatusResponse responseBody = new AuthProcessStatusResponse(
+            toStatusEnum(response.status())
+        )
             .endResult(response.endResult())
             .sessionToken(response.sessionToken())
             .signingCertificate(
@@ -111,5 +114,13 @@ public class AuthApiImpl implements Cdoc2AuthApiDelegate {
             log.warn(errorMessage);
             throw new ClientBadRequestException(API_VALIDATION_ERROR_LANGUAGE, errorMessage);
         }
+    }
+
+    private AuthProcessStatusResponse.StatusEnum toStatusEnum(AuthProcessStatus status) {
+        return switch (status) {
+            case STARTED -> AuthProcessStatusResponse.StatusEnum.STARTED;
+            case FAILED -> AuthProcessStatusResponse.StatusEnum.FAILED;
+            case COMPLETE -> AuthProcessStatusResponse.StatusEnum.COMPLETE;
+        };
     }
 }

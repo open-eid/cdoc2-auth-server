@@ -2,20 +2,22 @@ package ee.cyber.cdoc2.server.app.usecase.status;
 
 import org.jspecify.annotations.Nullable;
 
+import ee.cyber.cdoc2.server.app.usecase.common.AuthProcessStatus;
+
 public interface GetStatus {
     Response execute(String uuid);
 
     record Response(
-        String status,
+        AuthProcessStatus status,
         @Nullable String endResult,
         @Nullable String sessionToken,
         @Nullable String signingCertificate
     ) {
-        Response(String status) {
+        Response(AuthProcessStatus status) {
             this(status, null, null, null);
         }
 
-        Response(String status, @Nullable String endResult) {
+        Response(AuthProcessStatus status, @Nullable String endResult) {
             this(status, endResult, null, null);
         }
     }
