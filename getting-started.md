@@ -82,7 +82,7 @@ To include the logback configuration, use the `-Dlogging.config` JVM option.
 
 Example of running the server with `otel-logback.xml`:
 ```
-java -Dlogging.config=webapp/src/main/resources/otel-logback.xml -jar webapp/target/cdoc2-auth-server-webapp-VER.jar
+java -Dlogging.config=webapp/config/otel-logback.xml -jar webapp/target/cdoc2-auth-server-webapp-VER.jar
 ```
 
 By default, the server listens on `https://localhost:7500` and its actuator (management) endpoints
