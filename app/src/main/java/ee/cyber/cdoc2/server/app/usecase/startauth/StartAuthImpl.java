@@ -66,8 +66,7 @@ public class StartAuthImpl implements StartAuth {
         try {
             return new EtsiIdentifier(request.nationalId());
         } catch (InvalidEtsiSemanticsIdentifierException e) {
-            log.warn("Error parsing ETSI identifier: {}", e.getMessage());
-            throw new InputValidationException(e.getMessage(), e);
+            throw new InputValidationException("Error parsing ETSI identifier", e);
         }
     }
 }
