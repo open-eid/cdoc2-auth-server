@@ -48,7 +48,8 @@ public class SessionNonceRestClientConf {
     }
 
     @Bean
-    public RestClient sessionNonceRestClient(AppProperties props) throws Exception {
+    public RestClient sessionNonceRestClient(AppProperties props, RestClient.Builder builder)
+        throws Exception {
         KeyStore trustStore = sslBundles.getBundle(SSL_BUNDLE_NAME).getStores().getTrustStore();
 
         SSLContext sslContext = SSLContexts.custom()
@@ -78,7 +79,7 @@ public class SessionNonceRestClientConf {
             .setConnectionManager(connectionManager)
             .build();
 
-        return RestClient.builder()
+        return builder
             .requestFactory(new HttpComponentsClientHttpRequestFactory(httpClient))
             .build();
     }
