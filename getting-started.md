@@ -45,9 +45,8 @@ mvn clean install
 From `cdoc2-rp-server` (repo root) directory
 (psql in docker must be running)
 
-The bundled `webapp/src/main/resources/application.properties` deliberately avoids configuring
-the mandatory cryptographic keys used by the application. The `webapp/src/test/resources` folder
-provides sample keys that can be used for local execution.
+The `webapp/config` folder provides a sample application.properties, keys and trust stores that
+can be used for local execution.
 Provide a custom `application.properties` in the same folder as the jar or the `java -jar` 
 command if you need to override any property (see README.md for the full list of `app.*` /
 `spring.*` properties).
@@ -55,13 +54,7 @@ command if you need to override any property (see README.md for the full list of
 To use the sample test keys:
 
 ```bash
-cp webapp/src/test/resources/ec*.pem .
-cat > application.properties<< EOF
-app.jwt.ecPrivateKeyPem=ec-es256-private.pem
-app.well-known.publicKeys=ec-key-2025.pem,ec-key-2026.pem
-app.well-known.activePublicKey=ec-key-2026.pem
-EOF
-
+cp webapp/config/application.properties.sample application.properties
 ```
 
 Run the app:

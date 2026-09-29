@@ -12,7 +12,7 @@ management.endpoints.web.discovery.enabled=false
 # explicitly enable endpoints
 management.endpoint.info.enabled=true
 management.endpoint.health.enabled=true
-management.endpoint.health.show-details=when-authorized
+management.endpoint.health.show-details=always
 management.endpoint.startup.enabled=true
 management.endpoint.prometheus.enabled=true
 
@@ -53,29 +53,33 @@ app.auth.display-text.et=Kinnitage autentimine: {semanticsIdentifier}
 app.auth.display-text.en=Please confirm authentication: {semanticsIdentifier}
 app.auth.display-text.defaultLanguage=et
 
-app.session-nonce.uris=https://localhost:7600/session_nonce,https://localhost:8443/session_nonce,https://localhost:8442/session_nonce
+# comma separated list
+# https://localhost:7600/session_nonce - default local rp-server
+# https://localhost:8443/session_nonce - default local shares-server 1
+# https://localhost:8442/session_nonce - default local shares-server 2
+app.session-nonce.uris=https://localhost:7600/session_nonce
 
 # rate in milliseconds to run the auth process cleanup job. default is 30000
 #app.cleanup.rate=30000
 app.cleanup.authProcessMaxAgeMinutes=5
 
-spring.ssl.bundle.jks.sid-server.truststore.location=classpath:demo_server_trusted_ssl_certs.jks
+spring.ssl.bundle.jks.sid-server.truststore.location=webapp/config/demo_server_trusted_ssl_certs.jks
 spring.ssl.bundle.jks.sid-server.truststore.password=changeit
 spring.ssl.bundle.jks.sid-server.truststore.type=jks
 
-spring.ssl.bundle.jks.trusted-infra.truststore.location=classpath:cdoc2_infra_truststore.jks
+spring.ssl.bundle.jks.trusted-infra.truststore.location=webapp/config/cdoc2_infra_truststore.jks
 spring.ssl.bundle.jks.trusted-infra.truststore.password=changeit
 spring.ssl.bundle.jks.trusted-infra.truststore.type=jks
 
-spring.ssl.bundle.jks.mid-server.truststore.location=classpath:mobileid_demo_server_trusted_ssl_certs.p12
+spring.ssl.bundle.jks.mid-server.truststore.location=webapp/config/mobileid_demo_server_trusted_ssl_certs.p12
 spring.ssl.bundle.jks.mid-server.truststore.password=passwd
 spring.ssl.bundle.jks.mid-server.truststore.type=PKCS12
 
-spring.ssl.bundle.jks.trusted-issuers.truststore.location=classpath:test_trusted_issuers.jks
+spring.ssl.bundle.jks.trusted-issuers.truststore.location=webapp/config/test_trusted_issuers.jks
 spring.ssl.bundle.jks.trusted-issuers.truststore.password=changeit
 spring.ssl.bundle.jks.trusted-issuers.truststore.type=jks
 
-spring.ssl.bundle.jks.server-bundle.keystore.location=classpath:auth_server_localhost_keystore.p12
+spring.ssl.bundle.jks.server-bundle.keystore.location=webapp/config/auth_server_localhost_keystore.p12
 spring.ssl.bundle.jks.server-bundle.keystore.password=changeit
 spring.ssl.bundle.jks.server-bundle.keystore.type=pkcs12
 spring.ssl.bundle.jks.server-bundle.key.alias=authServerLocalhostKey
@@ -85,10 +89,14 @@ app.rp.sid.uuid=00000000-0000-4000-8000-000000000000
 app.rp.mid.name=DEMO
 app.rp.mid.uuid=00000000-0000-0000-0000-000000000000
 
+app.jwt.ecPrivateKeyPem=webapp/config/ec-es256-private.pem
+app.well-known.publicKeys=webapp/config/ec-key-2025.pem,webapp/config/ec-key-2026.pem
+app.well-known.activePublicKey=webapp/config/ec-key-2026.pem
+
 # Enable tracing (1.0 = 100% sampling)
 # management.tracing.sampling.probability=1.0
 # management.otlp.tracing.endpoint=http://localhost:4318/v1/traces
 
 # credentials for /actuator/prometheus api basic authentication
-#management.endpoints.metrics.username=username
-#management.endpoints.metrics.password=password
+management.endpoints.metrics.username=username
+management.endpoints.metrics.password=password
