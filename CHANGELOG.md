@@ -6,6 +6,8 @@
 * removed all classpath resources
 * TLS_1.3 no longer forced for infrastructure connections
 * status value returned by `/auth/status/` changed to enum in Openapi spec
+* MobileID authentication response validation is optional, disabled by default. New
+  configuration key `mobileid.validateAuthenticationResponse`
 * logging and tracing improvements
 
 ## [0.8.1]
@@ -16,8 +18,6 @@
 * Add support for tracing (`micrometer-tracing-bridge-otel`, `opentelemetry-exporter-otlp`)
 * Add Spring Security configuration (`spring-boot-starter-security`) requiring HTTP Basic
   authentication for `/actuator/prometheus`
-* MobileID authentication response validation is optional, disabled by default. New 
-  configuration key `mobileid.validateAuthenticationResponse`
 * Dependency updates
 
 ## [0.8.0]
