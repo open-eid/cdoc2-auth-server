@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.2]
+
+### Improvements
+* removed all classpath resources
+* TLS_1.3 no longer forced for infrastructure connections
+* status value returned by `/auth/status/` changed to enum in Openapi spec
+* logging and tracing improvements
+
 ## [0.8.1]
 
 ### Improvements
