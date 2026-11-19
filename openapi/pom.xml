@@ -131,7 +131,7 @@
                         <enumUnknownDefaultCase>true</enumUnknownDefaultCase>
                         <legacyDiscriminatorBehavior>false</legacyDiscriminatorBehavior>
                         <!-- requestMappingMode: https://github.com/OpenAPITools/openapi-generator/pull/13838 -->
-                        <requestMappingMode>none</requestMappingMode>&gt;
+                        <requestMappingMode>none</requestMappingMode>
                     </configOptions>
                     <typeMappings>
                         <typeMapping>duration=Duration</typeMapping>

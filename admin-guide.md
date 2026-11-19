@@ -4,6 +4,10 @@ This document describes how to configure and run `cdoc2-auth-server`.
 
 ## Monitoring
 
+### Logging
+
+An example logback config is provided in `webapp/config/otel-logback.xml`
+
 ### Tracing
 
 `cdoc2-auth-server` supports distributed tracing using OpenTelemetry Protocol (OTLP) through Spring Boot's
