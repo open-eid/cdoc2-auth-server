@@ -22,4 +22,9 @@
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
+
+    <!-- ee.sk.smartid.rest.SmartIdRestConnector from smart-id-java-client:3.2 logs some -->
+    <!-- personally identifiable information at the WARN level -->
+    <logger name="ee.sk.smartid.rest.SmartIdRestConnector" level="ERROR"/>
+
 </configuration>
