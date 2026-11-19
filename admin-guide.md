@@ -38,3 +38,14 @@ Format breakdown:
 * `<trace-id>` - 32-character hexadecimal trace identifier (16 bytes)
 * `<span-id>` - 16-character hexadecimal span identifier (8 bytes)
 * `01` - Trace flags (01 = sampled, 00 = not sampled)
+
+## Server Configuration
+
+### SSL version
+
+SSL configuration is done via Spring SSL bundles. The SSL bundle for server settings is
+`server-bundle`. An example of setting the accepted SSL versions: 
+
+`spring.ssl.bundle.jks.server-bundle.options.enabled-protocols=TLSv1.2,TLSv1.3`
+
+The `server.ssl.enabled-protocols` config option has no effect.
